@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novaly Launcher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-header: #0a0a0a;
+            --text-main: #ffffff;
+            --text-muted: #9e9e9e;
+            --hover-bg: #2a2a2a;
+            --accent-color: #ffffff;
+            --card-bg: #1a1a1a;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- EN-TÊTE HORIZONTAL --- */
+        .main-header {
+            height: 75px; background-color: var(--bg-header); display: flex; align-items: center;
+            justify-content: space-between; padding: 0 40px; border-bottom: 1px solid #222; flex-shrink: 0;
+        }
+
+        .header-left { display: flex; align-items: center; height: 100%; }
+
+        .logo-img {
+            height: 40px; margin-right: 50px; cursor: pointer; background-color: #000000; min-width: 120px;
+            color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; letter-spacing: 1.5px;
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 30px; height: 100%; }
+
+        .nav-item {
+            color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; cursor: pointer; height: 100%; display: flex; align-items: center; position: relative; transition: color 0.2s ease;
+        }
+
+        .nav-item:hover, .nav-item.active { color: var(--text-main); }
+        .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background-color: var(--accent-color); }
+
+        .header-right { display: flex; align-items: center; gap: 20px; height: 100%; }
+
+        .search-bar {
+            background-color: transparent; border: 1px solid #444; padding: 8px 16px; border-radius: 20px; color: white;
+            width: 220px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: border-color 0.2s;
+        }
+        .search-bar:focus { border-color: #888; }
+
+        /* --- SÉLECTEUR DE LANGUE & MENU DÉROULANT --- */
+        .lang-wrapper { position: relative; display: flex; align-items: center; }
+        
+        .lang-selector {
+            width: 36px; height: 36px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; transition: all 0.2s ease; color: white; background: #1a1a1a;
+        }
+        .lang-selector:hover { background-color: var(--hover-bg); border-color: white; }
+
+        .lang-dropdown {
+            position: absolute; top: 120%; right: 0; background: var(--bg-header); border: 1px solid #333;
+            border-radius: 8px; width: 160px; max-height: 300px; overflow-y: auto; display: none; flex-direction: column;
+            z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+        }
+        .lang-dropdown.show { display: flex; }
+
+        .lang-option {
+            padding: 12px 15px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+            font-size: 13px; font-weight: 500; color: var(--text-muted); transition: 0.2s; border-bottom: 1px solid #222;
+        }
+        .lang-option:last-child { border-bottom: none; }
+        .lang-option:hover { background: var(--hover-bg); color: white; }
+        
+        /* CSS POUR FORCER LES DRAPEAUX EN CERCLE */
+        .flag-icon { 
+            width: 20px; 
+            height: 20px; 
+            border-radius: 50%; 
+            object-fit: cover; /* Coupe l'image rectangulaire pour qu'elle remplisse le cercle proprement */
+            display: block;
+        }
+
+        /* --- PROFIL HEADER --- */
+        .profile-container { display: flex; align-items: center; gap: 12px; cursor: pointer; padding-left: 10px; border-left: 1px solid #333; }
+        .avatar { width: 36px; height: 36px; background-color: #555; border-radius: 50%; background-size: cover; background-position: center; }
+        .profile-info { display: flex; flex-direction: column; line-height: 1.2; }
+        .profile-name { font-weight: 600; font-size: 13px; }
+        .profile-status { color: #4cd137; font-size: 11px; font-weight: 500; }
+
+        /* --- CONTENU --- */
+        .content { flex-grow: 1; padding: 40px 80px; overflow-y: auto; display: flex; flex-direction: column; }
+        .page-title { margin: 0 0 30px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; display: none; }
+        .view-section { display: none; flex-grow: 1; }
+        .view-section.active { display: block; }
+
+        /* --- BANNIÈRE --- */
+        .hero-banner {
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
+            height: 450px; border-radius: 12px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; padding: 40px; margin-bottom: 40px;
+        }
+        .hero-banner h1 { font-size: 56px; margin: 0 0 10px; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .hero-banner p { font-size: 18px; color: #ddd; margin: 0 0 25px; max-width: 600px; }
+        .btn-hero { background: transparent; color: white; border: 2px solid white; padding: 12px 35px; font-size: 15px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .btn-hero:hover { background: white; color: black; }
+
+        /* --- GRILLES --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        .game-card { cursor: pointer; transition: transform 0.2s ease; }
+        .game-card:hover { transform: scale(1.03); }
+        .game-cover { height: 300px; border-radius: 8px; margin-bottom: 12px; background-color: #222; }
+        .game-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .game-price { background: #2a2a2a; color: #eee; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .game-status { color: var(--text-muted); font-size: 13px; }
+
+        .cover-orange { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .cover-purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .cover-teal { background: linear-gradient(135deg, #1abc9c, #16a085); }
+        .cover-gray { background: #333; }
+
+        /* --- PROFIL & DIVERS --- */
+        .profile-layout { display: flex; gap: 40px; max-width: 1000px; margin-bottom: 60px; }
+        .profile-sidebar { width: 250px; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
+        .profile-tab { padding: 12px 15px; color: var(--text-muted); cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 14px; transition: all 0.2s ease; }
+        .profile-tab:hover, .profile-tab.active { background-color: var(--hover-bg); color: var(--text-main); }
+        .profile-tab.active { border-left: 4px solid var(--accent-color); border-radius: 0 6px 6px 0; }
+        .profile-content { flex-grow: 1; }
+        .profile-tab-content { display: none; background: var(--card-bg); padding: 35px; border-radius: 8px; border: 1px solid #333; }
+        .profile-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; }
+        .form-group input { width: 90%; padding: 10px; background: #121212; border: 1px solid #444; color: white; border-radius: 4px; outline: none; }
+        .btn { background: white; color: black; border: none; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; }
+        .generic-view-content { background: var(--card-bg); padding: 40px; border-radius: 8px; text-align: center; color: var(--text-muted); margin-bottom: 60px; }
+        
+        .news-card { background: #222; border: 1px solid #333; border-radius: 8px; padding: 20px; text-align: left; transition: 0.2s; cursor: pointer; }
+        .news-card:hover { border-color: #555; background: #2a2a2a; }
+        .news-card h4 { margin: 0 0 10px 0; color: white; font-size: 16px; }
+        .news-card p { margin: 0; font-size: 13px; color: var(--text-muted); }
+
+        /* --- FOOTER --- */
+        .site-footer { background-color: var(--bg-main); border-top: 1px solid #222; padding: 50px 0 20px 0; margin-top: auto; font-size: 13px; color: var(--text-muted); }
+        .site-footer h4 { color: var(--text-main); font-size: 14px; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .footer-downloads { margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 40px; }
+        .app-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
+        .app-btn { 
+            background: transparent; border: 1px solid #444; color: white; padding: 12px 25px; 
+            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; 
+            display: flex; align-items: center; gap: 10px; transition: all 0.2s; 
+        }
+        .app-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .app-btn:hover { background-color: var(--hover-bg); border-color: white; transform: translateY(-2px); }
+
+        .footer-container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; margin-bottom: 50px; }
+        .footer-links { display: flex; gap: 80px; }
+        .footer-column { display: flex; flex-direction: column; gap: 15px; }
+        .footer-link { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-size: 13px; cursor: pointer; }
+        .footer-link:hover, .footer-link.active { color: var(--text-main); }
+        .footer-bottom { border-top: 1px solid #222; padding-top: 25px; font-size: 12px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="header-left">
+            <div class="logo-img" onclick="navigateTo('#magasin', 'store')">NOVALY</div>
+            
+            <nav class="nav-links">
+                <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
+                <div class="nav-item" id="nav-library" data-i18n="navLibrary" onclick="navigateTo('#bibliotheque', 'library')">Bibliothèque</div>
+                <div class="nav-item" id="nav-community" data-i18n="navCommunity" onclick="navigateTo('#communaute', 'community')">Communauté</div>
+                <div class="nav-item" id="nav-about" data-i18n="navAbout" onclick="navigateTo('#apropos', 'about')">À propos</div>
+            </nav>
+        </div>
+
+        <div class="header-right">           
+            <div class="nav-item" id="nav-cart" data-i18n="navCart" onclick="navigateTo('#panier', 'cart')">Panier</div>
+
+            <input type="text" id="main-search-bar" class="search-bar" data-i18n-ph="searchPh" placeholder="Rechercher un jeu...">
+            
+            <div class="lang-wrapper">
+                <div class="lang-selector" id="lang-btn" onclick="toggleLangMenu()">
+                    <img src="https://flagcdn.com/w40/fr.png" alt="fr" class="flag-icon">
+                </div>
+                <div class="lang-dropdown" id="lang-menu">
+                    <div class="lang-option" onclick="changeLanguage('fr', 'https://flagcdn.com/w40/fr.png')"><img src="https://flagcdn.com/w40/fr.png" alt="fr" class="flag-icon"> Français</div>
+                    <div class="lang-option" onclick="changeLanguage('en', 'https://flagcdn.com/w40/gb.png')"><img src="https://flagcdn.com/w40/gb.png" alt="en" class="flag-icon"> English</div>
+                    <div class="lang-option" onclick="changeLanguage('es', 'https://flagcdn.com/w40/es.png')"><img src="https://flagcdn.com/w40/es.png" alt="es" class="flag-icon"> Español</div>
+                    <div class="lang-option" onclick="changeLanguage('de', 'https://flagcdn.com/w40/de.png')"><img src="https://flagcdn.com/w40/de.png" alt="de" class="flag-icon"> Deutsch</div>
+                    <div class="lang-option" onclick="changeLanguage('it', 'https://flagcdn.com/w40/it.png')"><img src="https://flagcdn.com/w40/it.png" alt="it" class="flag-icon"> Italiano</div>
+                </div>
+            </div>
+            
+            <div class="profile-container" onclick="navigateTo('#profil', 'profile')">
+                <div class="avatar" id="header-avatar"></div>
+                <div class="profile-info">
+                    <span class="profile-name" id="header-username">okk k</span>
+                    <span class="profile-status" data-i18n="onlineStatus">En ligne</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="content">
+        
+        <h1 class="page-title" id="dynamic-page-title">Titre</h1>
+
+        <div id="view-store" class="view-section active">
+            <div class="hero-banner" id="store-banner">
+                <h1 data-i18n="bannerTitle">Cyberpunk Adventures</h1>
+                <p data-i18n="bannerDesc">Découvrez la nouvelle extension majeure. Explorez de nouveaux territoires et forgez votre propre destin.</p>
+                <button class="btn-hero" data-i18n="bannerBtn">Acheter Maintenant</button>
+            </div>
+
+            <h2 style="font-size: 18px; margin-bottom: 20px;" id="store-subtitle" data-i18n="storeSubtitle">Nouveautés et Tendances</h2>
+            <div class="grid" id="store-grid">
+                <div class="game-card">
+                    <div class="game-cover cover-orange"></div>
+                    <div class="game-title">Galactic Warfare</div>
+                    <div class="game-price">59.99 €</div>
+                </div>
+                <div class="game-card">
+                    <div class="game-cover cover-purple"></div>
+                    <div class="game-title">Neon Nights</div>
+                    <div class="game-price">29.99 €</div>
+                </div>
+                <div class="game-card">
+                    <div class="game-cover cover-teal"></div>
+                    <div class="game-title">Farm Life 2026</div>
+                    <div class="game-price">19.99 €</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-library" class="view-section">
+            <div class="grid">
+                <div class="game-card">
+                    <div class="game-cover cover-gray"></div>
+                    <div class="game-title">Projet Alpha</div>
+                    <div class="game-status" data-i18n="readyToPlay">Prêt à jouer</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-community" class="view-section">
+            <div class="generic-view-content" style="background: transparent; text-align: left; padding: 0;">
+                <h2 data-i18n="communityTitle" style="color: white; margin-bottom: 10px;">Communauté Novaly</h2>
+                <p data-i18n="communityDesc" style="margin-bottom: 30px;">Rejoignez la discussion, partagez vos créations et trouvez des coéquipiers.</p>
+                
+                <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    <div class="news-card">
+                        <h4 data-i18n="commNews1Title">📢 Mise à jour v1.2 : Patch Notes</h4>
+                        <p data-i18n="commNews1Desc">Découvrez toutes les nouveautés, corrections de bugs et équilibrages apportés par la dernière mise à jour.</p>
+                    </div>
+                    <div class="news-card">
+                        <h4 data-i18n="commNews2Title">🏆 Tournoi Galactic Warfare</h4>
+                        <p data-i18n="commNews2Desc">Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.</p>
+                    </div>
+                    <div class="news-card">
+                        <h4 data-i18n="commNews3Title">🎨 Créations de la semaine</h4>
+                        <p data-i18n="commNews3Desc">Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-about" class="view-section">
+            <div class="generic-view-content" style="max-width: 600px; margin: 0 auto; text-align: left;">
+                <h2 data-i18n="aboutTitle" style="color: white; margin-bottom: 20px;">À propos de Novaly</h2>
+                <p data-i18n="aboutDesc1" style="line-height: 1.6;">Novaly est votre plateforme de jeu de nouvelle génération, conçue pour offrir des performances optimales, une bibliothèque unifiée et une expérience utilisateur fluide sans distraction.</p>
+                <div style="background: #121212; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #333;">
+                    <p style="margin: 0; font-size: 14px; color: var(--text-main); font-weight: 600;" data-i18n="aboutVersion">Version du Launcher : 1.0.4 (Build 2026)</p>
+                    <p style="margin: 5px 0 0 0; font-size: 13px;" data-i18n="aboutStatus">Tous les systèmes sont opérationnels.</p>
+                </div>
+                <button class="btn" data-i18n="aboutBtn">Vérifier les mises à jour</button>
+            </div>
+        </div>
+
+        <div id="view-cart" class="view-section">
+            <div class="generic-view-content">
+                <h2 data-i18n="cartEmpty">Votre panier est vide</h2>
+                <p data-i18n="cartDesc">Découvrez nos nouveautés dans le magasin.</p>
+                <button class="btn" style="margin-top: 20px;" onclick="navigateTo('#magasin', 'store')" data-i18n="goStore">Aller au magasin</button>
+            </div>
+        </div>
+
+        <div id="view-contact" class="view-section">
+            <div class="generic-view-content" style="max-width: 500px; margin: 0 auto; text-align: left;">
+                <h2 data-i18n="contactTitle">Nous contacter</h2>
+                <div class="form-group">
+                    <label data-i18n="contactSubject">Sujet</label>
+                    <input type="text" style="width: 100%; box-sizing: border-box;">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="contactMessage">Message</label>
+                    <textarea style="width: 100%; height: 100px; background: #121212; border: 1px solid #444; color: white; padding: 10px; box-sizing: border-box;"></textarea>
+                </div>
+                <button class="btn" data-i18n="contactBtn">Envoyer le message</button>
+            </div>
+        </div>
+
+        <div id="view-profile" class="view-section">
+            <div class="profile-layout">
+                <div class="profile-sidebar">
+                    <div class="profile-tab active" data-i18n="tabPublic" onclick="switchProfileTab('public', this)">Profil Public</div>
+                    <div class="profile-tab" data-i18n="tabSecurity" onclick="switchProfileTab('security', this)">Sécurité & Connexion</div>
+                    <div class="profile-tab" data-i18n="tabPayment" onclick="switchProfileTab('payment', this)">Moyens de paiement</div>
+                </div>
+                <div class="profile-content">
+                    <div id="tab-public" class="profile-tab-content active">
+                        <h3 data-i18n="tabPublic">Profil Public</h3>
+                        <div class="form-group">
+                            <label data-i18n="profName">Nom d'utilisateur</label>
+                            <input type="text" id="profile-username" value="okk k">
+                        </div>
+                        <button class="btn" onclick="saveProfile()" data-i18n="profSave">Enregistrer les modifications</button>
+                        <p id="save-msg" style="color: #4cd137; font-size: 13px; display: none; margin-top: 10px;" data-i18n="profSaved">Profil mis à jour !</p>
+                    </div>
+                    <div id="tab-security" class="profile-tab-content">
+                        <h3 data-i18n="tabSecurity">Sécurité & Connexion</h3>
+                        <div class="form-group">
+                            <label>Adresse E-mail</label>
+                            <input type="email" value="joueur123@email.com" disabled>
+                        </div>
+                    </div>
+                    <div id="tab-payment" class="profile-tab-content">
+                        <h3 data-i18n="tabPayment">Moyens de paiement</h3>
+                        <p style="color:#aaa;">💳 Visa **** 4242</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="site-footer">
+            
+            <div class="footer-downloads">
+                <h4 data-i18n="footerAppsTitle">Téléchargez Novaly</h4>
+                <div class="app-buttons">
+                    <button class="app-btn">
+                        <svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> 
+                        App Store
+                    </button>
+                    <button class="app-btn">
+                        <svg viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg> 
+                        Google Play
+                    </button>
+                    <button class="app-btn">
+                        <svg viewBox="0 0 448 512"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg> 
+                        Windows
+                    </button>
+                    <button class="app-btn">
+                        <svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> 
+                        Mac
+                    </button>
+                    <button class="app-btn">
+                        <svg viewBox="0 0 448 512"><path d="M220.8 123.3c1.1 0 2.6-.4 2.6-.4 44.4-7.6 62.4-56.5 62.4-56.5 12.8-33.1-23-45.7-23-45.7-25-10.4-58.4-1.5-74 15.9-18.7 20.8-12.7 61.2-12.7 61.2 1.4 16.9 24.2 25.4 44.7 25.5zm199.1 154c-13.6-24.5-22.3-15-22.3-15-46.2 36.9-106.3 34.4-106.3 34.4-44.8.4-78.5-19.1-78.5-19.1-12.8-7.8-21.7-18.4-21.7-18.4-25.5-35.3-51.5-24.1-51.5-24.1-26.6 6.3-33.6 28.4-33.6 28.4-6.4 20.2-2.1 36.3-2.1 36.3 22.3 46 62.1 38.3 62.1 38.3 32.1-4 68-18.8 68-18.8 45.3-22.1 91.5-11.8 91.5-11.8 35.8 7.3 53.6 33.3 53.6 33.3 18.2 25.8 12 40.8 12 40.8-6.1 19.3-30.8 25.4-30.8 25.4-29.4 6-64.8-17.7-64.8-17.7-25-14.8-51.2-9-51.2-9-19.6 4-29.3 15-29.3 15-13.9 14.7-24 41.5-24 41.5-9.1 27.6-5.8 45.4-5.8 45.4 3 17.5 13.9 24.6 13.9 24.6 18.3 11 41.6 3.1 41.6 3.1 25.9-9.1 52.8-28.5 52.8-28.5 45.7-32.9 116.5-29 116.5-29 48.7-.9 87.2 21.6 87.2 21.6 16.5 9.7 28.3 23.3 28.3 23.3 24.6 32.7 13.9 66 13.9 66-12.4 35.7-44.1 48-44.1 48-28.8 11.2-61.6 2.3-61.6 2.3-33.1-9.9-63.5-31.5-63.5-31.5-40.4-30-101.4-27.1-101.4-27.1-41.9.4-74.9-16.7-74.9-16.7-24.9-14-42.5-33.2-42.5-33.2-22-26.6-21.2-56-21.2-56-1-31.3 14.1-57.1 14.1-57.1 16-29.2 41.1-43 41.1-43 27-14.7 57.6-11.4 57.6-11.4 36.3 3.9 68.7 22.8 68.7 22.8 39.5 24.8 95.8 28.2 95.8 28.2 45.2.2 82.5-16.8 82.5-16.8 21.3-10 35.7-25.2 35.7-25.2 24.1-27 18.5-56.1 18.5-56.1-5.7-28-25.5-44.1-25.5-44.1zM140.4 316.5c-15.6-10.6-21.9-27.9-21.9-27.9-7-20.9 2-41.4 2-41.4 12-24.8 33.6-35.4 33.6-35.4 22.5-10.8 48.7-6 48.7-6 26.6 4.7 47.7 21 47.7 21 17.5 14.8 24.7 34 24.7 34 8.7 23.3-1.6 45.2-1.6 45.2-14.4 26.5-38.6 37.3-38.6 37.3-25.1 11.9-52.9 6-52.9 6-25-4.4-41.7-22.8-41.7-22.8z"/></svg> 
+                        Linux
+                    </button>
+                </div>
+            </div>
+
+            <div class="footer-container">
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4 data-i18n="footerHelpTitle">Aide</h4>
+                        <a class="footer-link" id="nav-contact" onclick="navigateTo('#contact', 'contact')" data-i18n="navContact">Contactez-nous</a>
+                        <a class="footer-link" href="#">Support</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4 data-i18n="footerNovalyTitle">Novaly</h4>
+                        <a class="footer-link" onclick="navigateTo('#apropos', 'about')" data-i18n="navAbout">À propos</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div>© 2026 Novaly Games, LLC. <span data-i18n="footerRights">Tous droits réservés.</span></div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        const translations = {
+            fr: {
+                navStore: "Magasin", navLibrary: "Bibliothèque", navCommunity: "Communauté", navAbout: "À propos", navCart: "Panier", navContact: "Contactez-nous",
+                searchPh: "Rechercher un jeu...", onlineStatus: "En ligne",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Découvrez la nouvelle extension majeure. Explorez de nouveaux territoires et forgez votre propre destin.", bannerBtn: "Acheter Maintenant",
+                storeSubtitle: "Nouveautés et Tendances", searchResults: "Résultats de recherche...", readyToPlay: "Prêt à jouer",
+                communityTitle: "Communauté Novaly", communityDesc: "Rejoignez la discussion, partagez vos créations et trouvez des coéquipiers.",
+                commNews1Title: "📢 Mise à jour v1.2 : Patch Notes", commNews1Desc: "Découvrez toutes les nouveautés, corrections de bugs et équilibrages apportés par la dernière mise à jour.",
+                commNews2Title: "🏆 Tournoi Galactic Warfare", commNews2Desc: "Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.",
+                commNews3Title: "🎨 Créations de la semaine", commNews3Desc: "Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.",
+                aboutTitle: "À propos de Novaly", aboutDesc1: "Novaly est votre plateforme de jeu de nouvelle génération, conçue pour offrir des performances optimales, une bibliothèque unifiée et une expérience utilisateur fluide sans distraction.",
+                aboutVersion: "Version du Launcher : 1.0.4 (Build 2026)", aboutStatus: "Tous les systèmes sont opérationnels.", aboutBtn: "Vérifier les mises à jour",
+                cartEmpty: "Votre panier est vide", cartDesc: "Découvrez nos nouveautés dans le magasin.", goStore: "Aller au magasin",
+                contactTitle: "Nous contacter", contactSubject: "Sujet", contactMessage: "Message", contactBtn: "Envoyer le message",
+                tabPublic: "Profil Public", tabSecurity: "Sécurité & Connexion", tabPayment: "Moyens de paiement",
+                profName: "Nom d'utilisateur", profSave: "Enregistrer les modifications", profSaved: "Profil mis à jour !",
+                footerAppsTitle: "Téléchargez Novaly", footerHelpTitle: "Aide", footerNovalyTitle: "Novaly", footerRights: "Tous droits réservés.",
+                title_store: "Magasin", title_library: "Bibliothèque", title_community: "Communauté", title_about: "À propos", title_cart: "Mon Panier", title_contact: "Nous Contacter", title_profile: "Paramètres"
+            },
+            en: {
+                navStore: "Store", navLibrary: "Library", navCommunity: "Community", navAbout: "About", navCart: "Cart", navContact: "Contact Us",
+                searchPh: "Search for a game...", onlineStatus: "Online",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Discover the new major expansion. Explore new territories and forge your own destiny.", bannerBtn: "Buy Now",
+                storeSubtitle: "New & Trending", searchResults: "Search Results...", readyToPlay: "Ready to Play",
+                communityTitle: "Novaly Community", communityDesc: "Join the discussion, share your creations, and find teammates.",
+                commNews1Title: "📢 Update v1.2 : Patch Notes", commNews1Desc: "Discover all the new features, bug fixes, and balancing brought by the latest update.",
+                commNews2Title: "🏆 Galactic Warfare Tournament", commNews2Desc: "Registrations for the summer tournament are open! Form your team and try to win the grand prize.",
+                commNews3Title: "🎨 Creations of the week", commNews3Desc: "Check out the most popular mods and fan-arts voted by players this week.",
+                aboutTitle: "About Novaly", aboutDesc1: "Novaly is your next-generation gaming platform, designed to offer optimal performance, a unified library, and a seamless distraction-free user experience.",
+                aboutVersion: "Launcher Version: 1.0.4 (Build 2026)", aboutStatus: "All systems operational.", aboutBtn: "Check for updates",
+                cartEmpty: "Your cart is empty", cartDesc: "Check out our new releases in the store.", goStore: "Go to Store",
+                contactTitle: "Contact Us", contactSubject: "Subject", contactMessage: "Message", contactBtn: "Send Message",
+                tabPublic: "Public Profile", tabSecurity: "Security & Login", tabPayment: "Payment Methods",
+                profName: "Username", profSave: "Save Changes", profSaved: "Profile updated!",
+                footerAppsTitle: "Download Novaly", footerHelpTitle: "Help", footerNovalyTitle: "Novaly", footerRights: "All rights reserved.",
+                title_store: "Store", title_library: "Library", title_community: "Community", title_about: "About", title_cart: "My Cart", title_contact: "Contact Us", title_profile: "Settings"
+            },
+            es: {
+                navStore: "Tienda", navLibrary: "Biblioteca", navCommunity: "Comunidad", navAbout: "Acerca de", navCart: "Carrito", navContact: "Contáctenos",
+                searchPh: "Buscar un juego...", onlineStatus: "En línea",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Descubre la nueva expansión mayor. Explora nuevos territorios y forja tu propio destino.", bannerBtn: "Comprar Ahora",
+                storeSubtitle: "Novedades y Tendencias", searchResults: "Resultados de búsqueda...", readyToPlay: "Listo para jugar",
+                communityTitle: "Comunidad Novaly", communityDesc: "Únete a la discusión, comparte tus creaciones y encuentra compañeros de equipo.",
+                commNews1Title: "📢 Actualización v1.2 : Notas del Parche", commNews1Desc: "Descubre todas las novedades, correcciones de errores y ajustes de equilibrio de la última actualización.",
+                commNews2Title: "🏆 Torneo Galactic Warfare", commNews2Desc: "¡Las inscripciones para el torneo de verano están abiertas! Forma tu equipo y compite por el gran premio.",
+                commNews3Title: "🎨 Creaciones de la semana", commNews3Desc: "Descubre los mods y fan-arts más populares votados por los jugadores esta semana.",
+                aboutTitle: "Acerca de Novaly", aboutDesc1: "Novaly es tu plataforma de juegos de próxima generación, diseñada para ofrecer un rendimiento óptimo y una experiencia fluida sin distracciones.",
+                aboutVersion: "Versión del Launcher: 1.0.4 (Build 2026)", aboutStatus: "Todos los sistemas operativos.", aboutBtn: "Buscar actualizaciones",
+                cartEmpty: "Tu carrito está vacío", cartDesc: "Descubre nuestras novedades en la tienda.", goStore: "Ir a la tienda",
+                contactTitle: "Contáctenos", contactSubject: "Asunto", contactMessage: "Mensaje", contactBtn: "Enviar mensaje",
+                tabPublic: "Perfil Público", tabSecurity: "Seguridad e Inicio", tabPayment: "Métodos de pago",
+                profName: "Nombre de usuario", profSave: "Guardar cambios", profSaved: "¡Perfil actualizado!",
+                footerAppsTitle: "Descargar Novaly", footerHelpTitle: "Ayuda", footerNovalyTitle: "Novaly", footerRights: "Todos los derechos reservados.",
+                title_store: "Tienda", title_library: "Biblioteca", title_community: "Comunidad", title_about: "Acerca de", title_cart: "Mi Carrito", title_contact: "Contáctenos", title_profile: "Ajustes"
+            },
+            de: {
+                navStore: "Shop", navLibrary: "Bibliothek", navCommunity: "Gemeinschaft", navAbout: "Über uns", navCart: "Warenkorb", navContact: "Kontakt",
+                searchPh: "Spiel suchen...", onlineStatus: "Online",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Entdecken Sie die neue große Erweiterung. Erkunden Sie neue Gebiete und schmieden Sie Ihr eigenes Schicksal.", bannerBtn: "Jetzt Kaufen",
+                storeSubtitle: "Neu & im Trend", searchResults: "Suchergebnisse...", readyToPlay: "Bereit zum Spielen",
+                communityTitle: "Novaly Gemeinschaft", communityDesc: "Tritt der Diskussion bei, teile deine Kreationen und finde Teamkollegen.",
+                commNews1Title: "📢 Update v1.2 : Patchnotes", commNews1Desc: "Entdecken Sie alle neuen Funktionen, Fehlerbehebungen und Anpassungen des neuesten Updates.",
+                commNews2Title: "🏆 Galactic Warfare Turnier", commNews2Desc: "Die Anmeldungen für das Sommerturnier sind eröffnet! Bilde dein Team und gewinne den Hauptpreis.",
+                commNews3Title: "🎨 Kreationen der Woche", commNews3Desc: "Sieh dir die beliebtesten Mods und Fan-Arts an, die diese Woche von den Spielern gewählt wurden.",
+                aboutTitle: "Über Novaly", aboutDesc1: "Novaly ist Ihre Gaming-Plattform der nächsten Generation, entwickelt für optimale Leistung und ein nahtloses Benutzererlebnis.",
+                aboutVersion: "Launcher-Version: 1.0.4 (Build 2026)", aboutStatus: "Alle Systeme sind betriebsbereit.", aboutBtn: "Nach Updates suchen",
+                cartEmpty: "Dein Warenkorb ist leer", cartDesc: "Entdecke unsere Neuheiten im Shop.", goStore: "Zum Shop",
+                contactTitle: "Kontaktiere uns", contactSubject: "Betreff", contactMessage: "Nachricht", contactBtn: "Nachricht senden",
+                tabPublic: "Öffentliches Profil", tabSecurity: "Sicherheit & Login", tabPayment: "Zahlungsmethoden",
+                profName: "Benutzername", profSave: "Änderungen speichern", profSaved: "Profil aktualisiert!",
+                footerAppsTitle: "Novaly Herunterladen", footerHelpTitle: "Hilfe", footerNovalyTitle: "Novaly", footerRights: "Alle Rechte vorbehalten.",
+                title_store: "Shop", title_library: "Bibliothek", title_community: "Gemeinschaft", title_about: "Über uns", title_cart: "Mein Warenkorb", title_contact: "Kontakt", title_profile: "Einstellungen"
+            },
+            it: {
+                navStore: "Negozio", navLibrary: "Libreria", navCommunity: "Comunità", navAbout: "Chi siamo", navCart: "Carrello", navContact: "Contattaci",
+                searchPh: "Cerca un gioco...", onlineStatus: "Online",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Scopri la nuova grande espansione. Esplora nuovi territori e forgia il tuo destino.", bannerBtn: "Acquista Ora",
+                storeSubtitle: "Novità e Tendenze", searchResults: "Risultati della ricerca...", readyToPlay: "Pronto per giocare",
+                communityTitle: "Comunità Novaly", communityDesc: "Unisciti alla discussione, condividi le tue creazioni e trova compagni di squadra.",
+                commNews1Title: "📢 Aggiornamento v1.2: Note sulla patch", commNews1Desc: "Scopri tutte le novità, le correzioni di bug e i bilanciamenti apportati dall'ultimo aggiornamento.",
+                commNews2Title: "🏆 Torneo Galactic Warfare", commNews2Desc: "Le iscrizioni per il torneo estivo sono aperte! Forma la tua squadra e prova a vincere il primo premio.",
+                commNews3Title: "🎨 Creazioni della settimana", commNews3Desc: "Scopri le mod e le fan-art più popolari votate dai giocatori questa settimana.",
+                aboutTitle: "Informazioni su Novaly", aboutDesc1: "Novaly è la tua piattaforma di gioco di nuova generazione, progettata per offrire prestazioni ottimali e un'esperienza fluida.",
+                aboutVersion: "Versione Launcher: 1.0.4 (Build 2026)", aboutStatus: "Tutti i sistemi sono operativi.", aboutBtn: "Verifica aggiornamenti",
+                cartEmpty: "Il tuo carrello è vuoto", cartDesc: "Scopri le nostre novità nel negozio.", goStore: "Vai al negozio",
+                contactTitle: "Contattaci", contactSubject: "Oggetto", contactMessage: "Messaggio", contactBtn: "Invia messaggio",
+                tabPublic: "Profilo Pubblico", tabSecurity: "Sicurezza e Accesso", tabPayment: "Metodi di pagamento",
+                profName: "Nome utente", profSave: "Salva modifiche", profSaved: "Profilo aggiornato!",
+                footerAppsTitle: "Scarica Novaly", footerHelpTitle: "Aiuto", footerNovalyTitle: "Novaly", footerRights: "Tutti i diritti riservati.",
+                title_store: "Negozio", title_library: "Libreria", title_community: "Comunità", title_about: "Chi siamo", title_cart: "Il mio Carrello", title_contact: "Contattaci", title_profile: "Impostazioni"
+            }
+        };
+
+        let currentLang = 'fr';
+        let currentViewId = 'store';
+
+        function toggleLangMenu() {
+            document.getElementById('lang-menu').classList.toggle('show');
+        }
+
+        document.addEventListener('click', function(event) {
+            const langWrapper = document.querySelector('.lang-wrapper');
+            if (!langWrapper.contains(event.target)) {
+                document.getElementById('lang-menu').classList.remove('show');
+            }
+        });
+
+        // Fonction mise à jour pour changer l'image source
+        function changeLanguage(langCode, flagUrl) {
+            currentLang = langCode;
+            document.getElementById('lang-btn').innerHTML = `<img src="${flagUrl}" alt="${langCode}" class="flag-icon">`;
+            document.getElementById('lang-menu').classList.remove('show');
+
+            const t = translations[langCode] || translations['en'];
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.textContent = t[key];
+            });
+
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if(t[key]) el.placeholder = t[key];
+            });
+
+            updatePageTitle();
+        }
+
+        let currentUser = { username: "okk k", avatarUrl: "" };
+
+        const searchInput = document.getElementById('main-search-bar');
+        searchInput.addEventListener('input', function(e) {
+            const termeRecherche = e.target.value.toLowerCase();
+            document.querySelectorAll('.game-card').forEach(carte => {
+                const titreElement = carte.querySelector('.game-title');
+                if (titreElement) {
+                    carte.style.display = titreElement.textContent.toLowerCase().includes(termeRecherche) ? '' : 'none';
+                }
+            });
+
+            const banner = document.getElementById('store-banner');
+            const subtitle = document.getElementById('store-subtitle');
+            if(banner && subtitle) {
+                if(termeRecherche.length > 0) {
+                    banner.style.display = 'none';
+                    subtitle.textContent = translations[currentLang].searchResults;
+                } else {
+                    banner.style.display = 'flex';
+                    subtitle.textContent = translations[currentLang].storeSubtitle;
+                }
+            }
+        });
+
+        function navigateTo(path, viewId) {
+            currentViewId = viewId;
+            window.history.pushState({ viewId: viewId }, "", path);
+            renderView(viewId);
+        }
+
+        function renderView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item, .footer-link').forEach(el => el.classList.remove('active'));
+            
+            let viewElement = document.getElementById('view-' + viewId);
+            if (viewElement) viewElement.classList.add('active');
+            
+            let navItem = document.getElementById('nav-' + viewId);
+            if(navItem) navItem.classList.add('active');
+
+            if(searchInput.value !== "") {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input')); 
+            }
+
+            document.querySelector('.content').scrollTop = 0;
+            updatePageTitle();
+        }
+
+        function updatePageTitle() {
+            let pageTitleEl = document.getElementById('dynamic-page-title');
+            if (currentViewId === 'store') {
+                pageTitleEl.style.display = 'none';
+            } else {
+                pageTitleEl.style.display = 'block';
+                pageTitleEl.textContent = translations[currentLang]["title_" + currentViewId] || "";
+            }
+        }
+
+        function switchProfileTab(tabId, element) {
+            document.querySelectorAll('.profile-tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.profile-tab-content').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function previewAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                document.getElementById('profile-avatar-preview').style.backgroundImage = `url(${url})`;
+            }
+        }
+
+        function saveProfile() {
+            let msg = document.getElementById('save-msg');
+            msg.style.display = "block";
+            setTimeout(() => msg.style.display = "none", 3000);
+        }
+
+    </script>
+</body>
+</html>
