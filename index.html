@@ -170,6 +170,50 @@
         .footer-link { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-size: 13px; cursor: pointer; }
         .footer-link:hover, .footer-link.active { color: var(--text-main); }
         .footer-bottom { border-top: 1px solid #222; padding-top: 25px; font-size: 12px; display: flex; justify-content: space-between; }
+        /* --- VERSION MOBILE (Responsive) --- */
+        /* --- VERSION MOBILE (Responsive) --- */
+        .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; }
+
+        @media (max-width: 1024px) {
+            /* En-tête / Menu Hamburger */
+            .main-header { padding: 15px 20px; flex-wrap: wrap; height: auto; min-height: 70px; align-items: flex-start; position: relative; z-index: 100; }
+            .header-left { flex-wrap: wrap; width: 100%; height: auto; }
+            .logo-img { margin-right: 0; margin-top: 5px; }
+            .menu-toggle { display: block; position: absolute; right: 20px; top: 18px; }
+            
+            /* Les menus déroulants cachés */
+            .nav-links { display: none; width: 100%; flex-direction: column; align-items: flex-start; padding: 20px 0 0 0; gap: 15px; }
+            .header-right { display: none; width: 100%; flex-direction: column; align-items: flex-start; padding: 15px 0; gap: 15px; height: auto; border-top: 1px solid #333; margin-top: 15px; }
+            
+            .nav-item { height: auto; padding: 10px 0; width: 100%; }
+            .nav-item.active::after { bottom: -5px; }
+            .search-bar { width: 100%; box-sizing: border-box; }
+            .lang-dropdown { top: 100%; left: 0; right: auto; }
+            
+            /* Affichage quand le menu est cliqué */
+            .main-header.open .nav-links, .main-header.open .header-right { display: flex; }
+
+            /* Contenu principal */
+            .content { padding: 20px; }
+            .hero-banner { height: auto; padding: 30px 20px; text-align: left; align-items: flex-start; }
+            .hero-banner h1 { font-size: 32px; }
+            .hero-banner p { font-size: 15px; }
+            
+            /* Grille de jeux plus petite */
+            .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+            .game-cover { height: 200px; }
+            
+            /* Page Profil (Onglets horizontaux sur mobile) */
+            .profile-layout { flex-direction: column; gap: 20px; }
+            .profile-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; }
+            .profile-tab { white-space: nowrap; padding: 10px; }
+            .profile-tab.active { border-left: none; border-bottom: 3px solid var(--accent-color); border-radius: 6px 6px 0 0; }
+            
+            /* Footer empilé */
+            .footer-container { flex-direction: column; gap: 30px; }
+            .footer-links { flex-direction: column; gap: 30px; }
+            .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -177,6 +221,8 @@
     <header class="main-header">
         <div class="header-left">
             <div class="logo-img" onclick="navigateTo('#magasin', 'store')">NOVALY</div>
+            
+            <div class="menu-toggle" onclick="toggleMobileMenu()">☰</div>
             
             <nav class="nav-links">
                 <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
@@ -602,7 +648,17 @@
             msg.style.display = "block";
             setTimeout(() => msg.style.display = "none", 3000);
         }
+        // --- GESTION DU MENU MOBILE ---
+        function toggleMobileMenu() {
+            document.querySelector('.main-header').classList.toggle('open');
+        }
 
+        // Fermer automatiquement le menu mobile quand on clique sur un lien
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelector('.main-header').classList.remove('open');
+            });
+        });
     </script>
 </body>
 </html>
