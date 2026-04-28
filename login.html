@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - NOVA</title>
+    <title>Connexion - NOVALY</title>
     <style>
         body {
             margin: 0;
@@ -33,7 +33,7 @@
         .form-group label { display: block; margin-bottom: 8px; color: #a0a0a0; font-size: 14px; }
         .form-group input {
             width: 90%; padding: 12px; background: #222; border: 1px solid #444;
-            color: white; border-radius: 6px; outline: none; transition: border 0.2s;
+            color: white; border-radius: 6px; outline: none; transition: border 0.2s; box-sizing: border-box;
         }
         .form-group input:focus { border-color: #ffffff; }
 
@@ -46,46 +46,148 @@
         
         .back-link { display: block; margin-top: 20px; color: #a0a0a0; text-decoration: none; font-size: 14px; }
         .back-link:hover { color: #fff; }
+
+        /* Nouveaux styles pour la bascule Connexion/Inscription */
+        .toggle-text { font-size: 13px; color: #a0a0a0; margin-top: 20px; }
+        .toggle-text span { color: white; text-decoration: underline; cursor: pointer; font-weight: bold; }
+        .toggle-text span:hover { color: #d0d0d0; }
     </style>
 </head>
 <body>
 
     <div class="login-box">
-        <div class="logo">NOVA</div>
-        <h2>Bon retour</h2>
-        
-        <div class="form-group">
-            <label>Nom d'utilisateur</label>
-            <input type="text" id="login-username" placeholder="Entrez votre pseudo" onkeypress="handleEnter(event)">
+        <div class="logo">NOVALY</div>
+
+        <div id="login-section">
+            <h2>Bon retour</h2>
+            
+            <div class="form-group">
+                <label>Adresse e-mail</label>
+                <input type="email" id="login-email" placeholder="exemple@mail.com">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="login-password" placeholder="••••••••">
+            </div>
+            
+            <button class="btn" onclick="login()">Se connecter</button>
+            <p class="toggle-text">Pas encore de compte ? <span onclick="toggleForm()">S'inscrire</span></p>
+            <a href="index.html" class="back-link">Retour au magasin</a>
         </div>
-        <div class="form-group">
-            <label>Mot de passe</label>
-            <input type="password" placeholder="••••••••" onkeypress="handleEnter(event)">
+
+        <div id="register-section" style="display: none;">
+            <h2>Créer un compte</h2>
+            
+            <div class="form-group">
+                <label>Pseudo</label>
+                <input type="text" id="reg-username" placeholder="Votre pseudo">
+            </div>
+            <div class="form-group">
+                <label>Adresse e-mail</label>
+                <input type="email" id="reg-email" placeholder="exemple@mail.com">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="reg-password" placeholder="••••••••">
+            </div>
+            
+            <button class="btn" onclick="register()">Créer mon compte</button>
+            <p class="toggle-text">Déjà un compte ? <span onclick="toggleForm()">Se connecter</span></p>
+            <a href="index.html" class="back-link">Retour au magasin</a>
         </div>
-        
-        <button class="btn" onclick="login()">Se connecter</button>
-        <a href="index.html#magasin" class="back-link">Retour au magasin</a>
+
     </div>
 
-    <script>
-        function login() {
-            let inputName = document.getElementById('login-username').value;
-            
-            // On sauvegarde les infos dans le navigateur (localStorage)
-            localStorage.setItem('isLoggedIn', 'true');
-            if(inputName.trim() !== "") {
-                localStorage.setItem('username', inputName);
-            }
+    <script type="module">
+  // On importe les outils Firebase nécessaires
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    GoogleAuthProvider, 
+    signInWithPopup,
+    updateProfile 
+  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-            // On redirige vers la bibliothèque du launcher
-            window.location.href = 'index.html#bibliotheque';
-        }
+  // ==========================================
+  // COLLE TES CODES FIREBASE CI-DESSOUS :
+  // ==========================================
+    const firebaseConfig = {
+  apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
+  authDomain: "novaly-a80f7.firebaseapp.com",
+  projectId: "novaly-a80f7",
+  storageBucket: "novaly-a80f7.firebasestorage.app",
+  messagingSenderId: "58102958990",
+  appId: "1:58102958990:web:6bdc2d3f049015fd0672df",
+  measurementId: "G-HE39HWQB70"
+};
 
-        // Permet de se connecter en appuyant sur la touche "Entrée"
-        function handleEnter(event) {
-            if (event.key === "Enter") { login(); }
-        }
-    </script>
+  // On initialise Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // --- FONCTION INSCRIPTION ---
+  window.register = async function() {
+    const username = document.getElementById('reg-username').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+
+    if (!username || !email || !password) {
+      alert("Remplis tous les champs !");
+      return;
+    }
+
+    try {
+      // 1. Création du compte
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // 2. Ajout du Pseudo dans le profil Firebase
+      await updateProfile(userCredential.user, { displayName: username });
+      
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('username', username);
+      window.location.href = 'index.html';
+    } catch (error) {
+      alert("Erreur d'inscription : " + error.message);
+    }
+  };
+
+  // --- FONCTION CONNEXION ---
+  window.login = async function() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('username', userCredential.user.displayName || "Joueur");
+      window.location.href = 'index.html';
+    } catch (error) {
+      alert("Erreur : Email ou mot de passe incorrect.");
+    }
+  };
+
+  // --- FONCTION CONNEXION GOOGLE ---
+  window.loginWithGoogle = async function() {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('username', result.user.displayName);
+      window.location.href = 'index.html';
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // On garde ta fonction de bascule visuelle
+  window.toggleForm = function() {
+      let loginSec = document.getElementById('login-section');
+      let regSec = document.getElementById('register-section');
+      loginSec.style.display = (loginSec.style.display === "none") ? "block" : "none";
+      regSec.style.display = (regSec.style.display === "none") ? "block" : "none";
+  };
+</script>
 
 </body>
 </html>
