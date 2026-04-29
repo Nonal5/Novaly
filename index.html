@@ -264,7 +264,7 @@
 </head>
 <body>
 
-    <header class="main-header">
+<header class="main-header">
         <div class="header-left">
             <div class="logo-img" onclick="navigateTo('#magasin', 'store')">NOVALY</div>
             
@@ -274,13 +274,15 @@
                 <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
                 <div class="nav-item" id="nav-library" data-i18n="navLibrary" onclick="navigateTo('#bibliotheque', 'library')">Bibliothèque</div>
                 <div class="nav-item" id="nav-community" data-i18n="navCommunity" onclick="navigateTo('#communaute', 'community')">Communauté</div>
+                <!-- Le Panier est maintenant juste avant "À propos" -->
+                <div class="nav-item" id="nav-cart" data-i18n="navCart" onclick="navigateTo('#panier', 'cart')">Panier</div>
                 <div class="nav-item" id="nav-about" data-i18n="navAbout" onclick="navigateTo('#apropos', 'about')">À propos</div>
             </nav>
         </div>
 
-        <div class="header-right">           
-            <div class="nav-item" id="nav-cart" data-i18n="navCart" onclick="navigateTo('#panier', 'cart')">Panier</div>
-
+        <!-- Espacement réduit (gap de 10px au lieu de 20px) pour resserrer les éléments -->
+        <div class="header-right" style="gap: 12px;">           
+            
             <input type="text" id="main-search-bar" class="search-bar" data-i18n-ph="searchPh" placeholder="Rechercher un jeu...">
             
             <div class="lang-wrapper">
@@ -295,26 +297,43 @@
                     <div class="lang-option" onclick="changeLanguage('it', 'https://flagcdn.com/w40/it.png')"><img src="https://flagcdn.com/w40/it.png" alt="it" class="flag-icon"> Italiano</div>
                 </div>
             </div>
-            <div class="user-section">
+            
+            <div class="user-section" style="display: flex; height: 100%; align-items: center;">
                 
-                <div id="logged-out-view">
-                    <a href="login.html" class="login-btn">Se connecter / S'inscrire</a>
+                <!-- Vue Déconnecté : Bouton affiné -->
+                <div id="logged-out-view" style="height: 100%;">
+                    <!-- Padding horizontal réduit pour rapprocher du drapeau -->
+                    <div class="nav-item" style="padding-left: 5px; padding-right: 5px;">
+                        <a href="login.html" 
+                           onmouseover="this.style.backgroundColor='#e0e0e0'; this.style.transform='scale(1.03)';" 
+                           onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='scale(1)';" 
+                           style="background-color: #ffffff; color: #000000; padding: 8px 18px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 11px; transition: all 0.2s ease; display: block; text-transform: uppercase;">
+                            Se connecter / S'inscrire
+                        </a>
+                    </div>
                 </div>
 
-                <div id="logged-in-view" style="display: none; align-items: center; gap: 15px; position: relative;">
-                    <div class="profile-trigger" onclick="toggleUserMenu(event)" style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: 0.2s;">
-                        <div class="avatar" id="nav-avatar" style="width: 35px; height: 35px; background: #ffffff; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 16px;">?</div>
-                        <div class="user-info" style="display: flex; flex-direction: column; text-align: left;">
-                            <span id="nav-username" style="font-weight: bold; font-size: 14px; color: white;">Utilisateur</span>
-                            <span style="color: #4CAF50; font-size: 11px;">En ligne ●</span>
+                <!-- Vue Connecté : Menu Profil -->
+                <div id="logged-in-view" style="display: none; height: 100%; align-items: center; position: relative;">
+                    <div class="profile-trigger nav-item" onclick="toggleUserMenu(event)" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding-left: 5px; padding-right: 5px;">
+                        <div class="avatar" id="nav-avatar" style="width: 28px; height: 28px; background: #ffffff; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 12px;">?</div>
+                        <div class="user-info" style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
+                            <span id="nav-username" style="font-weight: 700; font-size: 12px; text-transform: uppercase; color: white;">Utilisateur</span>
+                            <span style="color: #4cd137; font-size: 9px; text-transform: none; letter-spacing: 0;">En ligne ●</span>
                         </div>
-                        <span style="font-size: 10px; color: #777; margin-left: 5px;">▼</span>
+                        <span style="font-size: 9px; color: var(--text-muted); margin-left: 3px;">▼</span>
                     </div>
 
-                    <div id="user-dropdown" class="user-dropdown">
-                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">👤 Mon Profil</div>
-                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">⚙️ Paramètres</div>
+                    <div id="user-dropdown" class="user-dropdown" style="width: 220px;">
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">🏆 Mes succès</div>
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">✨ Récompenses Novaly</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('payment', document.getElementById('tab-btn-payment')); navigateTo('#profile', 'profile')">💰 Solde du compte</div>
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">🎫 Bons</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('general', document.getElementById('tab-btn-general')); navigateTo('#profile', 'profile')">👤 Compte</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('code', document.getElementById('tab-btn-code')); navigateTo('#profile', 'profile')">🎁 Utiliser un code</div>
+                        <div class="dropdown-item" onclick="navigateTo('#bibliotheque', 'library')">🔖 Liste de souhaits</div>
                         <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">❓ Assistance <span style="float: right;">↗</span></div>
                         <div class="dropdown-item logout" onclick="logout()">🚪 Se déconnecter</div>
                     </div>
                 </div>
@@ -411,34 +430,211 @@
             </div>
         </div>
 
-        <div id="view-profile" class="view-section">
-            <div class="profile-layout">
-                <div class="profile-sidebar">
-                    <div class="profile-tab active" data-i18n="tabPublic" onclick="switchProfileTab('public', this)">Profil Public</div>
-                    <div class="profile-tab" data-i18n="tabSecurity" onclick="switchProfileTab('security', this)">Sécurité & Connexion</div>
-                    <div class="profile-tab" data-i18n="tabPayment" onclick="switchProfileTab('payment', this)">Moyens de paiement</div>
+<div id="view-profile" class="view-section">
+            <div class="profile-layout" style="max-width: 1200px;">
+                
+                <!-- MENU LATÉRAL DES PARAMÈTRES -->
+                <div class="profile-sidebar" style="width: 280px;">
+                    <div class="profile-tab active" id="tab-btn-general" onclick="switchProfileTab('general', this)">Paramètres du compte</div>
+                    <div class="profile-tab" id="tab-btn-security" onclick="switchProfileTab('security', this)">Mot de passe et sécurité</div>
+                    <div class="profile-tab" id="tab-btn-payment" onclick="switchProfileTab('payment', this)">Paiement et solde</div>
+                    <div class="profile-tab" id="tab-btn-links" onclick="switchProfileTab('links', this)">Comptes associés</div>
+                    <div class="profile-tab" id="tab-btn-code" onclick="switchProfileTab('code', this)">Utiliser un code</div>
+                    <div class="profile-tab" id="tab-btn-parental" onclick="switchProfileTab('parental', this)">Contrôle parental</div>
                 </div>
+
+                <!-- CONTENU DES PAGES -->
                 <div class="profile-content">
-                    <div id="tab-public" class="profile-tab-content active">
-                        <h3 data-i18n="tabPublic">Profil Public</h3>
+                    
+                    <!-- ONGLET 1 : COMPTE GÉNÉRAL -->
+                    <div id="tab-general" class="profile-tab-content active">
+                        <h3>Informations de compte</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Gérez les détails de votre compte.</p>
+                        
                         <div class="form-group">
-                            <label data-i18n="profName">Nom d'utilisateur</label>
-                            <input type="text" id="profile-username" value="okk k">
+                            <label>ID de compte (Public)</label>
+                            <input type="text" value="77068d5eac1f45e785e510749f764b0a" disabled style="background: #111; color: #555;">
                         </div>
-                        <button class="btn" onclick="saveProfile()" data-i18n="profSave">Enregistrer les modifications</button>
-                        <p id="save-msg" style="color: #4cd137; font-size: 13px; display: none; margin-top: 10px;" data-i18n="profSaved">Profil mis à jour !</p>
+                        <div class="form-group">
+                            <label>Nom d'affichage (Pseudo)</label>
+                            <input type="text" id="profile-username" value="Utilisateur">
+                        </div>
+                        <div class="form-group">
+                            <label>Adresse e-mail</label>
+                            <input type="email" id="profile-email" value="" disabled style="background: #111; color: #555;">
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
+
+                        <h3>Détails personnels</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Ces informations sont privées et ne seront pas affichées aux autres utilisateurs.</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group"><label>Prénom</label><input type="text"></div>
+                            <div class="form-group"><label>Nom de famille</label><input type="text"></div>
+                            <div class="form-group"><label>Adresse - Ligne 1</label><input type="text"></div>
+                            <div class="form-group"><label>Adresse - Ligne 2</label><input type="text"></div>
+                            <div class="form-group"><label>Ville</label><input type="text"></div>
+                            <div class="form-group"><label>Région / État</label><input type="text"></div>
+                            <div class="form-group"><label>Code Postal</label><input type="text"></div>
+                            <div class="form-group"><label>Pays / Région</label><input type="text"></div>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
+
+                        <h3>Entreprise</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Gérez les informations de votre entreprise pour les reçus professionnels de vos achats. Si vous êtes assujetti à la TVA, saisissez votre numéro de TVA.</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group"><label>Nom de l'entreprise *</label><input type="text"></div>
+                            <div class="form-group"><label>Numéro de TVA *</label><input type="text"></div>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
+
+                        <h3>Télécharger les données du compte</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Téléchargez une copie des données disponibles que vous avez partagées avec nous. Nous vous enverrons un e-mail quand ce sera prêt.</p>
+                        <button class="btn" style="background: transparent; border: 1px solid white; color: white;">Demander l'archive des données</button>
+
+                        <div style="margin-top: 40px;">
+                            <button class="btn" onclick="saveProfile()">Enregistrer les modifications</button>
+                            <p id="save-msg" style="color: #4cd137; font-size: 13px; display: none; margin-top: 10px;">Profil mis à jour !</p>
+                        </div>
                     </div>
+
+                    <!-- ONGLET 2 : SÉCURITÉ -->
                     <div id="tab-security" class="profile-tab-content">
-                        <h3 data-i18n="tabSecurity">Sécurité & Connexion</h3>
+                        <h3>Mot de passe et sécurité</h3>
                         <div class="form-group">
-                            <label>Adresse E-mail</label>
-                            <input type="email" value="joueur123@email.com" disabled>
+                            <label>Mot de passe actuel</label>
+                            <input type="password" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label>Nouveau mot de passe</label>
+                            <input type="password" placeholder="••••••••">
+                        </div>
+                        <button class="btn">Changer le mot de passe</button>
+
+                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
+
+                        <h3>Authentification à deux facteurs (A2F)</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés en exigeant un code supplémentaire lors de la connexion.</p>
+                        
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div>
+                                <strong>Application d'authentification</strong>
+                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Utilisez une application comme Google Authenticator ou Authy.</p>
+                            </div>
+                            <button class="btn" style="background: #4cd137; border: none; padding: 8px 15px;">Configurer</button>
+                        </div>
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Authentification par E-mail</strong>
+                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Recevez un code de sécurité à votre adresse e-mail.</p>
+                            </div>
+                            <button class="btn" style="background: #4cd137; border: none; padding: 8px 15px;">Configurer</button>
                         </div>
                     </div>
+
+                    <!-- ONGLET 3 : PAIEMENT ET SOLDE -->
                     <div id="tab-payment" class="profile-tab-content">
-                        <h3 data-i18n="tabPayment">Moyens de paiement</h3>
-                        <p style="color:#aaa;">💳 Visa **** 4242</p>
+                        <h3>Portefeuille Novaly</h3>
+                        <div style="background: linear-gradient(135deg, #2a2a35, #1a1a24); border: 1px solid #444; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 30px;">
+                            <p style="color: #aaa; margin: 0 0 10px 0; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Solde actuel</p>
+                            <h2 style="font-size: 48px; margin: 0; font-weight: 900;">0,00 €</h2>
+                            <button class="btn" style="margin-top: 20px;">Ajouter des fonds</button>
+                        </div>
+
+                        <h3>Moyens de paiement enregistrés</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Vos cartes de crédit et comptes PayPal enregistrés pour des achats rapides.</p>
+                        <div style="border: 1px dashed #555; border-radius: 8px; padding: 30px; text-align: center; color: #888; cursor: pointer;">
+                            + Ajouter un nouveau moyen de paiement
+                        </div>
                     </div>
+
+                    <!-- ONGLET 4 : COMPTES ASSOCIÉS -->
+                    <div id="tab-links" class="profile-tab-content">
+                        <h3>Comptes Associés</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Connectez d'autres comptes pour profiter de la progression croisée et retrouver vos amis.</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                            <!-- Composant générique pour chaque plateforme -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #000; border-radius: 5px; display: flex; align-items: center; justify-content: center;">🍏</div>
+                                    <strong>Apple</strong>
+                                </div>
+                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #00439c; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold;">PS</div>
+                                    <strong>PlayStation Network</strong>
+                                </div>
+                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #107c10; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold;">X</div>
+                                    <strong>Xbox Live</strong>
+                                </div>
+                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #e60012; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold;">N</div>
+                                    <strong>Nintendo Account</strong>
+                                </div>
+                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #171a21; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center;">S</div>
+                                    <strong>Steam</strong>
+                                </div>
+                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #333; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center;">GH</div>
+                                    <strong>GitHub</strong>
+                                </div>
+                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #000; color: #01F1E3; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold;">TT</div>
+                                    <strong>TikTok</strong>
+                                </div>
+                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ONGLET 5 : UTILISER UN CODE -->
+                    <div id="tab-code" class="profile-tab-content">
+                        <h3>Utiliser un code</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Saisissez un code pour débloquer des cosmétiques, des jeux, des V-Bucks ou des crédits Novaly.</p>
+                        
+                        <div class="form-group">
+                            <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
+                        </div>
+                        <button class="btn" style="width: 100%;">Échanger le code</button>
+                    </div>
+
+                    <!-- ONGLET 6 : CONTRÔLE PARENTAL -->
+                    <div id="tab-parental" class="profile-tab-content">
+                        <h3>Contrôle Parental</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez l'expérience de jeu des plus jeunes grâce au code PIN de contrôle parental.</p>
+                        
+                        <div style="background: #222; padding: 30px; border-radius: 8px; border: 1px solid #444; text-align: center;">
+                            <div style="font-size: 40px; margin-bottom: 15px;">🛡️</div>
+                            <h4>Le Contrôle Parental est désactivé</h4>
+                            <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Activez-le pour restreindre les achats, limiter le chat vocal et filtrer les jeux par classification d'âge.</p>
+                            <button class="btn" style="background: #0984e3; color: white; border: none;">Configurer le contrôle parental</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -695,12 +891,6 @@
                 document.getElementById('profile-avatar-preview').style.backgroundImage = `url(${url})`;
             }
         }
-
-        function saveProfile() {
-            let msg = document.getElementById('save-msg');
-            msg.style.display = "block";
-            setTimeout(() => msg.style.display = "none", 3000);
-        }
         // --- GESTION DU MENU MOBILE ---
         function toggleMobileMenu() {
             document.querySelector('.main-header').classList.toggle('open');
@@ -716,32 +906,30 @@
         // GESTION DES COMPTES (FIREBASE / LOCALSTORAGE)
         // ==========================================
         function updateUI() {
-            // 1. On lit la mémoire du navigateur
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const username = localStorage.getItem('username');
+                    const isLoggedIn = localStorage.getItem('isLoggedIn');
+                    const username = localStorage.getItem('username');
+                    const email = localStorage.getItem('email'); // <-- NOUVEAU
 
-            // 2. On récupère les éléments HTML à modifier
-            const loggedOutView = document.getElementById('logged-out-view');
-            const loggedInView = document.getElementById('logged-in-view');
-            const navUsername = document.getElementById('nav-username');
-            const navAvatar = document.getElementById('nav-avatar');
-            const profileUsernameInput = document.getElementById('profile-username'); // Pour la page profil
+                    const loggedOutView = document.getElementById('logged-out-view');
+                    const loggedInView = document.getElementById('logged-in-view');
+                    const navUsername = document.getElementById('nav-username');
+                    const navAvatar = document.getElementById('nav-avatar');
+                    const profileUsernameInput = document.getElementById('profile-username');
+                    const profileEmailInput = document.getElementById('profile-email'); // <-- NOUVEAU
 
-            // 3. On applique l'affichage
-            if (isLoggedIn === 'true' && loggedOutView && loggedInView) {
-                // Mode Connecté
-                loggedOutView.style.display = 'none';
-                loggedInView.style.display = 'flex'; 
-                
-                if (navUsername) navUsername.innerText = username || "Joueur";
-                if (navAvatar && username) navAvatar.innerText = username.charAt(0).toUpperCase(); // 1ère lettre du pseudo
-                if (profileUsernameInput) profileUsernameInput.value = username || "Joueur"; // Met à jour l'onglet profil
-            } else {
-                // Mode Déconnecté
-                if (loggedOutView) loggedOutView.style.display = 'block';
-                if (loggedInView) loggedInView.style.display = 'none';
-            }
-        }
+                    if (isLoggedIn === 'true' && loggedOutView && loggedInView) {
+                        loggedOutView.style.display = 'none';
+                        loggedInView.style.display = 'flex'; 
+                        
+                        if (navUsername) navUsername.innerText = username || "Joueur";
+                        if (navAvatar && username) navAvatar.innerText = username.charAt(0).toUpperCase();
+                        if (profileUsernameInput) profileUsernameInput.value = username || "Joueur";
+                        if (profileEmailInput) profileEmailInput.value = email || "Non renseigné"; // <-- NOUVEAU
+                    } else {
+                        if (loggedOutView) loggedOutView.style.display = 'block';
+                        if (loggedInView) loggedInView.style.display = 'none';
+                    }
+                }
 
         // On lance la vérification dès que la page s'ouvre
         window.addEventListener('DOMContentLoaded', updateUI);
@@ -771,6 +959,73 @@
         if (navAvatar && username) {
             navAvatar.innerText = username.charAt(0).toUpperCase();
         }
+    </script>
+    <!-- NOUVEAU BLOC FIREBASE POUR LES PARAMÈTRES -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        // Ta configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
+            authDomain: "novaly-a80f7.firebaseapp.com",
+            projectId: "novaly-a80f7",
+            storageBucket: "novaly-a80f7.firebasestorage.app",
+            messagingSenderId: "58102958990",
+            appId: "1:58102958990:web:6bdc2d3f049015fd0672df",
+            measurementId: "G-HE39HWQB70"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // La VRAIE fonction de sauvegarde
+        window.saveProfile = async function() {
+            const newUsername = document.getElementById('profile-username').value;
+            let msg = document.getElementById('save-msg');
+            const btn = document.querySelector('#tab-public .btn');
+
+            // On vérifie que Firebase sait bien qui est connecté en ce moment
+            if (auth.currentUser) {
+                const originalText = btn.innerText;
+                btn.innerText = "Sauvegarde en cours...";
+                btn.disabled = true; // Empêche de cliquer 15 fois d'affilée
+
+                try {
+                    // 1. L'action clé : On envoie le nouveau pseudo aux serveurs Firebase
+                    await updateProfile(auth.currentUser, { displayName: newUsername });
+                    
+                    // 2. On met à jour la mémoire du navigateur pour l'affichage immédiat
+                    localStorage.setItem('username', newUsername);
+                    
+                    // 3. On met à jour ton interface en haut à droite
+                    document.getElementById('nav-username').innerText = newUsername;
+                    document.getElementById('nav-avatar').innerText = newUsername.charAt(0).toUpperCase();
+
+                    // 4. Succès !
+                    msg.style.color = "#4cd137";
+                    msg.innerText = "Profil mis à jour définitivement sur les serveurs !";
+                    msg.style.display = "block";
+
+                } catch (error) {
+                    // S'il y a un problème de wifi ou de serveurs
+                    msg.style.color = "#ff4757";
+                    msg.innerText = "Erreur de connexion aux serveurs.";
+                    msg.style.display = "block";
+                    console.error("Erreur Firebase :", error);
+                } finally {
+                    // On remet le bouton à la normale après 3 secondes
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    setTimeout(() => msg.style.display = "none", 3000);
+                }
+            } else {
+                // Si la session a expiré
+                msg.style.color = "#ff4757";
+                msg.innerText = "Erreur : Session introuvable. Veuillez vous reconnecter.";
+                msg.style.display = "block";
+            }
+        };
     </script>
 </body>
 </html>

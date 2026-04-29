@@ -4,53 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - NOVALY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #121212 0%, #1a1a24 100%);
+            /* Fond d'écran gaming assombri */
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(15,15,20,0.9)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
             color: #f5f5f5;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
 
+        /* Effet de verre (Glassmorphism) */
         .login-box {
-            background: #18181c;
+            background: rgba(20, 20, 25, 0.65);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             padding: 40px;
-            border-radius: 12px;
+            border-radius: 16px;
             width: 100%;
-            max-width: 350px;
-            border: 1px solid #333;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 360px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
             text-align: center;
+            animation: slideUp 0.5s ease-out;
         }
 
-        .logo { font-size: 32px; font-weight: 800; margin-bottom: 30px; letter-spacing: 2px; }
-        
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 8px; color: #a0a0a0; font-size: 14px; }
-        .form-group input {
-            width: 90%; padding: 12px; background: #222; border: 1px solid #444;
-            color: white; border-radius: 6px; outline: none; transition: border 0.2s; box-sizing: border-box;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .form-group input:focus { border-color: #ffffff; }
+
+        .logo { 
+            font-size: 32px; 
+            font-weight: 800; 
+            margin-bottom: 10px; 
+            letter-spacing: 2px; 
+            color: #fff;
+        }
+        
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group { margin-bottom: 20px; text-align: left; position: relative; }
+        .form-group label { display: block; margin-bottom: 8px; color: #b0b0b0; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .form-group input {
+            width: 100%; padding: 14px 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
+            color: white; border-radius: 8px; outline: none; transition: all 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif;
+        }
+        .form-group input:focus { border-color: #ffffff; background: rgba(0,0,0,0.5); box-shadow: 0 0 0 3px rgba(255,255,255,0.1); }
 
         .btn {
-            background-color: #ffffff; color: black; border: none; padding: 12px;
-            width: 100%; font-size: 16px; font-weight: bold; border-radius: 6px;
-            cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s;
+            background-color: #ffffff; color: black; border: none; padding: 14px;
+            width: 100%; font-size: 14px; font-weight: 800; border-radius: 8px;
+            cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; letter-spacing: 1px;
         }
-        .btn:hover { background-color: #d0d0d0; }
-        
-        .back-link { display: block; margin-top: 20px; color: #a0a0a0; text-decoration: none; font-size: 14px; }
+        .btn:hover { background-color: #d0d0d0; transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
+
+        /* Style bouton Google */
+        .btn-google {
+            background-color: transparent; border: 1px solid rgba(255,255,255,0.2); color: white;
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
+        }
+        .btn-google:hover { background-color: rgba(255,255,255,0.05); color: white; }
+        .btn-google img { width: 18px; height: 18px; }
+
+        .divider {
+            display: flex; align-items: center; text-align: center; color: #777; font-size: 12px; margin: 20px 0;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .divider:not(:empty)::before { margin-right: .5em; }
+        .divider:not(:empty)::after { margin-left: .5em; }
+
+        .back-link { display: inline-block; margin-top: 25px; color: #777; text-decoration: none; font-size: 13px; transition: 0.2s; }
         .back-link:hover { color: #fff; }
 
-        /* Nouveaux styles pour la bascule Connexion/Inscription */
-        .toggle-text { font-size: 13px; color: #a0a0a0; margin-top: 20px; }
-        .toggle-text span { color: white; text-decoration: underline; cursor: pointer; font-weight: bold; }
+        .toggle-text { font-size: 13px; color: #a0a0a0; margin-top: 25px; }
+        .toggle-text span { color: white; text-decoration: underline; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .toggle-text span:hover { color: #d0d0d0; }
+
+        /* Animation entre connexion et inscription */
+        .section-fade { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Messages d'erreur stylisés */
+        .error-message {
+            background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; color: #ff4757;
+            padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; display: none; text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -58,9 +110,12 @@
     <div class="login-box">
         <div class="logo">NOVALY</div>
 
-        <div id="login-section">
-            <h2>Bon retour</h2>
+        <!-- SECTION CONNEXION -->
+        <div id="login-section" class="section-fade">
+            <div class="subtitle">Heureux de vous revoir</div>
             
+            <div id="login-error" class="error-message"></div>
+
             <div class="form-group">
                 <label>Adresse e-mail</label>
                 <input type="email" id="login-email" placeholder="exemple@mail.com">
@@ -71,16 +126,26 @@
             </div>
             
             <button class="btn" onclick="login()">Se connecter</button>
+
+            <div class="divider">OU</div>
+
+            <button class="btn btn-google" onclick="loginWithGoogle()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+                Continuer avec Google
+            </button>
+
             <p class="toggle-text">Pas encore de compte ? <span onclick="toggleForm()">S'inscrire</span></p>
-            <a href="index.html" class="back-link">Retour au magasin</a>
         </div>
 
-        <div id="register-section" style="display: none;">
-            <h2>Créer un compte</h2>
+        <!-- SECTION INSCRIPTION -->
+        <div id="register-section" class="section-fade" style="display: none;">
+            <div class="subtitle">Rejoignez l'écosystème</div>
             
+            <div id="reg-error" class="error-message"></div>
+
             <div class="form-group">
                 <label>Pseudo</label>
-                <input type="text" id="reg-username" placeholder="Votre pseudo">
+                <input type="text" id="reg-username" placeholder="Votre pseudo en jeu">
             </div>
             <div class="form-group">
                 <label>Adresse e-mail</label>
@@ -93,101 +158,146 @@
             
             <button class="btn" onclick="register()">Créer mon compte</button>
             <p class="toggle-text">Déjà un compte ? <span onclick="toggleForm()">Se connecter</span></p>
-            <a href="index.html" class="back-link">Retour au magasin</a>
         </div>
 
+        <a href="index.html" class="back-link">← Retour au magasin</a>
     </div>
 
     <script type="module">
-  // On importe les outils Firebase nécessaires
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword, 
-    GoogleAuthProvider, 
-    signInWithPopup,
-    updateProfile 
-  } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-  // ==========================================
-  // COLLE TES CODES FIREBASE CI-DESSOUS :
-  // ==========================================
-    const firebaseConfig = {
-  apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
-  authDomain: "novaly-a80f7.firebaseapp.com",
-  projectId: "novaly-a80f7",
-  storageBucket: "novaly-a80f7.firebasestorage.app",
-  messagingSenderId: "58102958990",
-  appId: "1:58102958990:web:6bdc2d3f049015fd0672df",
-  measurementId: "G-HE39HWQB70"
-};
+        // Ta configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
+            authDomain: "novaly-a80f7.firebaseapp.com",
+            projectId: "novaly-a80f7",
+            storageBucket: "novaly-a80f7.firebasestorage.app",
+            messagingSenderId: "58102958990",
+            appId: "1:58102958990:web:6bdc2d3f049015fd0672df",
+            measurementId: "G-HE39HWQB70"
+        };
 
-  // On initialise Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
-  // --- FONCTION INSCRIPTION ---
-  window.register = async function() {
-    const username = document.getElementById('reg-username').value;
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-password').value;
+        // Fonction utilitaire pour afficher les erreurs
+        function showError(elementId, message) {
+            const errorDiv = document.getElementById(elementId);
+            errorDiv.innerText = message;
+            errorDiv.style.display = "block";
+            // Fait trembler légèrement la box d'erreur pour attirer l'attention
+            errorDiv.animate([{ transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }], { duration: 300, iterations: 2 });
+        }
 
-    if (!username || !email || !password) {
-      alert("Remplis tous les champs !");
-      return;
-    }
+        function hideErrors() {
+            document.getElementById('login-error').style.display = "none";
+            document.getElementById('reg-error').style.display = "none";
+        }
 
-    try {
-      // 1. Création du compte
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // 2. Ajout du Pseudo dans le profil Firebase
-      await updateProfile(userCredential.user, { displayName: username });
-      
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', username);
-      window.location.href = 'index.html';
-    } catch (error) {
-      alert("Erreur d'inscription : " + error.message);
-    }
-  };
+        // --- INSCRIPTION ---
+        window.register = async function() {
+            hideErrors();
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
 
-  // --- FONCTION CONNEXION ---
-  window.login = async function() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+            if (!username || !email || !password) {
+                showError('reg-error', "Veuillez remplir tous les champs.");
+                return;
+            }
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', userCredential.user.displayName || "Joueur");
-      window.location.href = 'index.html';
-    } catch (error) {
-      alert("Erreur : Email ou mot de passe incorrect.");
-    }
-  };
+            // Changer le texte du bouton pendant le chargement
+            const btn = document.querySelector('#register-section .btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Création...";
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, { displayName: username });
+                
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', username);
+                localStorage.setItem('email', email); // <-- NOUVEAU
+                window.location.href = 'index.html';
+            } catch (error) {
+                // Traductions basiques des erreurs Firebase
+                let errorMsg = "Une erreur est survenue.";
+                if(error.code === 'auth/email-already-in-use') errorMsg = "Cet e-mail est déjà utilisé.";
+                if(error.code === 'auth/weak-password') errorMsg = "Le mot de passe doit faire au moins 6 caractères.";
+                showError('reg-error', errorMsg);
+                btn.innerText = originalText;
+            }
+        };
 
-  // --- FONCTION CONNEXION GOOGLE ---
-  window.loginWithGoogle = async function() {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', result.user.displayName);
-      window.location.href = 'index.html';
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        // --- CONNEXION CLASSIQUE ---
+        window.login = async function() {
+            hideErrors();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
 
-  // On garde ta fonction de bascule visuelle
-  window.toggleForm = function() {
-      let loginSec = document.getElementById('login-section');
-      let regSec = document.getElementById('register-section');
-      loginSec.style.display = (loginSec.style.display === "none") ? "block" : "none";
-      regSec.style.display = (regSec.style.display === "none") ? "block" : "none";
-  };
-</script>
+            if (!email || !password) {
+                showError('login-error', "Veuillez entrer vos identifiants.");
+                return;
+            }
 
+            const btn = document.querySelector('#login-section .btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Connexion...";
+
+            try {
+                // Remplace le bloc de succès par ça :
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('username', userCredential.user.displayName || "Joueur");
+            localStorage.setItem('email', userCredential.user.email); // <-- NOUVEAU
+            window.location.href = 'index.html';
+            } catch (error) {
+                showError('login-error', "Adresse e-mail ou mot de passe incorrect.");
+                btn.innerText = originalText;
+            }
+        };
+
+        // --- CONNEXION GOOGLE ---
+// --- CONNEXION GOOGLE (Version améliorée) ---
+        window.loginWithGoogle = async function() {
+            hideErrors();
+            try {
+                // Remplace le bloc de succès par ça :
+            const result = await signInWithPopup(auth, provider);
+            const pseudo = result.user.displayName || "Joueur";
+
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('username', pseudo);
+            localStorage.setItem('email', result.user.email); // <-- NOUVEAU
+            window.location.href = 'index.html';
+                            
+            } catch (error) {
+                // L'erreur fatale de Firebase quand les comptes se croisent mal
+                if (error.code === 'auth/account-exists-with-different-credential') {
+                    showError('login-error', "Un compte utilise déjà cet e-mail. Connectez-vous avec votre mot de passe !");
+                } else {
+                    showError('login-error', "La connexion Google a été annulée ou a échoué.");
+                    console.error("Détail de l'erreur :", error);
+                }
+            }
+        };
+
+        // --- BASCULE CONNEXION / INSCRIPTION ---
+        window.toggleForm = function() {
+            hideErrors();
+            let loginSec = document.getElementById('login-section');
+            let regSec = document.getElementById('register-section');
+            
+            if (loginSec.style.display === "none") {
+                loginSec.style.display = "block";
+                regSec.style.display = "none";
+            } else {
+                loginSec.style.display = "none";
+                regSec.style.display = "block";
+            }
+        };
+    </script>
 </body>
 </html>
