@@ -314,17 +314,47 @@
                 </div>
 
                 <!-- Vue Connecté : Menu Profil -->
+<!-- Vue Connecté : Menu Profil -->
                 <div id="logged-in-view" style="display: none; height: 100%; align-items: center; position: relative;">
-                    <div class="profile-trigger nav-item" onclick="toggleUserMenu(event)" style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding-left: 5px; padding-right: 5px;">
+                    
+                    <div class="profile-trigger nav-item" onclick="toggleUserMenu(event)" style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding-left: 10px; padding-right: 5px;">
+                        
+                        <!-- 1. LE TITRE COSMÉTIQUE (Maintenant à gauche, en blanc) -->
+                        <span id="nav-title" style="background: #ffffff; color: #000000; font-size: 9px; font-weight: 900; padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 0 8px rgba(255,255,255,0.1);">NOVICE</span>
+
+                        <!-- 2. L'AVATAR (Photo de profil) -->
                         <div class="avatar" id="nav-avatar" style="width: 28px; height: 28px; background: #ffffff; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 12px;">?</div>
+                        
+                        <!-- 3. LE PSEUDO ET LE STATUT -->
                         <div class="user-info" style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
                             <span id="nav-username" style="font-weight: 700; font-size: 12px; text-transform: uppercase; color: white;">Utilisateur</span>
                             <span style="color: #4cd137; font-size: 9px; text-transform: none; letter-spacing: 0;">En ligne ●</span>
                         </div>
+                        
+                        <!-- 4. LA PETITE FLÈCHE -->
                         <span style="font-size: 9px; color: var(--text-muted); margin-left: 3px;">▼</span>
                     </div>
 
-                    <div id="user-dropdown" class="user-dropdown" style="width: 220px;">
+                    <!-- LE MENU DÉROULANT (Ne change pas) -->
+<!-- LE MENU DÉROULANT AVEC LISTE D'AMIS -->
+                    <div id="user-dropdown" class="user-dropdown" style="width: 240px;">
+                        <!-- Section Amis (Nouveau) -->
+                        <div style="padding: 12px 15px; border-bottom: 1px solid #333;">
+                        <div style="padding: 12px 15px; border-bottom: 1px solid #333;">
+                            <!-- Groupe En Ligne -->
+                            <div style="font-size: 10px; font-weight: 800; color: #4cd137; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">En ligne</div>
+                            <div id="friends-online-list" style="margin-bottom: 12px;">
+                                <p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>
+                            </div>
+
+                            <!-- Groupe Hors Ligne -->
+                            <div style="font-size: 10px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Hors ligne</div>
+                            <div id="friends-offline-list">
+                                <p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>
+                            </div>
+                        </div>
+
+                        <!-- Liens classiques -->
                         <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">🏆 Mes succès</div>
                         <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">✨ Récompenses Novaly</div>
                         <div class="dropdown-item" onclick="switchProfileTab('payment', document.getElementById('tab-btn-payment')); navigateTo('#profile', 'profile')">💰 Solde du compte</div>
@@ -447,17 +477,51 @@
                 <div class="profile-content">
                     
                     <!-- ONGLET 1 : COMPTE GÉNÉRAL -->
+<!-- ONGLET 1 : COMPTE GÉNÉRAL -->
                     <div id="tab-general" class="profile-tab-content active">
                         <h3>Informations de compte</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Gérez les détails de votre compte.</p>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Gérez les détails de votre compte et votre apparence publique.</p>
                         
-                        <div class="form-group">
-                            <label>ID de compte (Public)</label>
-                            <input type="text" value="77068d5eac1f45e785e510749f764b0a" disabled style="background: #111; color: #555;">
+                        <!-- NOUVEAU : PHOTO DE PROFIL -->
+<div style="display: flex; gap: 10px;">
+                                <input type="text" id="friend-search-input" placeholder="Ex: DarkNinja99" style="flex-grow: 1; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif;">
+                                <button class="btn" onclick="sendFriendRequest()" style="background: #0984e3; color: white; border: none; padding: 0 20px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s;">Envoyer</button>
+                            </div>
+                            <p id="friend-msg" style="font-size: 12px; margin-top: 10px; display: none;"></p>
+
+                            <!-- NOUVEAU : BOÎTE DE RÉCEPTION DES DEMANDES -->
+                            <div id="pending-requests-container" style="margin-top: 25px; border-top: 1px solid #333; padding-top: 15px;">
+                                <strong style="font-size: 13px; color: white; display: block; margin-bottom: 12px;">Demandes reçues :</strong>
+                                <div id="friend-requests-list">
+                                    <p style="font-size: 12px; color: #666; font-style: italic; margin: 0;">Aucune demande pour le moment.</p>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- NOUVEAU : CODE D'AMI -->
+<!-- NOUVEAU : AJOUTER UN AMI PAR PSEUDO -->
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 25px;">
+                            <strong style="display: block; margin-bottom: 8px; font-size: 14px; color: white;">Ajouter un ami</strong>
+                            <p style="font-size: 12px; color: #888; margin-bottom: 15px;">Saisissez le pseudo exact du joueur pour lui envoyer une demande d'ami.</p>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="friend-search-input" placeholder="Ex: DarkNinja99" style="flex-grow: 1; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif;">
+                                <button class="btn" onclick="sendFriendRequest()" style="background: #0984e3; color: white; border: none; padding: 0 20px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s;">Envoyer</button>
+                            </div>
+                            <p id="friend-msg" style="font-size: 12px; margin-top: 10px; display: none;"></p>
+                        </div>
+
                         <div class="form-group">
                             <label>Nom d'affichage (Pseudo)</label>
                             <input type="text" id="profile-username" value="Utilisateur">
+                        </div>
+                        <div class="form-group">
+                            <label>Titre (Cosmétique)</label>
+                            <select id="profile-title" style="width: 100%; padding: 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; outline: none; font-family: 'Inter', sans-serif; cursor: pointer; appearance: none;">
+                                <option value="NOVICE" style="background: #222; color: white;">NOVICE (Défaut)</option>
+                                <option value="PIONNIER" style="background: #222; color: #f1c40f;">PIONNIER (Fondateur)</option>
+                                <option value="BETA TESTEUR" style="background: #222; color: #3498db;">BÊTA TESTEUR</option>
+                                <option value="VIP" style="background: #222; color: #e74c3c;">VIP</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Adresse e-mail</label>
@@ -470,14 +534,14 @@
                         <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Ces informations sont privées et ne seront pas affichées aux autres utilisateurs.</p>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group"><label>Prénom</label><input type="text"></div>
-                            <div class="form-group"><label>Nom de famille</label><input type="text"></div>
-                            <div class="form-group"><label>Adresse - Ligne 1</label><input type="text"></div>
-                            <div class="form-group"><label>Adresse - Ligne 2</label><input type="text"></div>
-                            <div class="form-group"><label>Ville</label><input type="text"></div>
-                            <div class="form-group"><label>Région / État</label><input type="text"></div>
-                            <div class="form-group"><label>Code Postal</label><input type="text"></div>
-                            <div class="form-group"><label>Pays / Région</label><input type="text"></div>
+                            <div class="form-group"><label>Prénom</label><input type="text" id="profile-firstname"></div>
+                            <div class="form-group"><label>Nom de famille</label><input type="text" id="profile-lastname"></div>
+                            <div class="form-group"><label>Adresse - Ligne 1</label><input type="text" id="profile-address1"></div>
+                            <div class="form-group"><label>Adresse - Ligne 2</label><input type="text" id="profile-address2"></div>
+                            <div class="form-group"><label>Ville</label><input type="text" id="profile-city"></div>
+                            <div class="form-group"><label>Région / État</label><input type="text" id="profile-region"></div>
+                            <div class="form-group"><label>Code Postal</label><input type="text" id="profile-zip"></div>
+                            <div class="form-group"><label>Pays / Région</label><input type="text" id="profile-country"></div>
                         </div>
 
                         <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
@@ -500,6 +564,34 @@
                             <button class="btn" onclick="saveProfile()">Enregistrer les modifications</button>
                             <p id="save-msg" style="color: #4cd137; font-size: 13px; display: none; margin-top: 10px;">Profil mis à jour !</p>
                         </div>
+                        <!-- ... le bouton enregistrer ... -->
+                        <div style="margin-top: 40px; margin-bottom: 30px;">
+                            <button class="btn" onclick="saveProfile()">Enregistrer les modifications</button>
+                            <p id="save-msg" style="color: #4cd137; font-size: 13px; display: none; margin-top: 10px;">Profil mis à jour !</p>
+                        </div>
+
+                        <!-- NOUVEAU : ZONE DE DANGER (SUPPRESSION DE COMPTE) -->
+                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
+                        <div style="background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; padding: 25px; border-radius: 8px;">
+                            <h3 style="color: #ff4757; margin-top: 0;">Zone de danger</h3>
+                            <p style="color: #ccc; font-size: 12px; margin-bottom: 15px;">La suppression de votre compte est définitive. Toutes vos données, vos jeux et votre solde Novaly seront définitivement effacés.</p>
+                            
+                            <button class="btn" style="background: #ff4757; color: white; border: none; font-weight: bold;" onclick="document.getElementById('delete-confirm-box').style.display='block'">Supprimer mon compte</button>
+                            
+                            <!-- Boîte de confirmation cachée par défaut -->
+                            <div id="delete-confirm-box" style="display: none; margin-top: 20px; background: #111; padding: 20px; border-radius: 6px; border: 1px solid #ff4757;">
+                                <p style="font-size: 13px; color: white; margin-top: 0; margin-bottom: 15px; font-weight: bold;">Confirmez votre identité pour procéder :</p>
+                                <input type="email" id="delete-email" placeholder="Adresse e-mail" style="width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                <input type="password" id="delete-password" placeholder="Mot de passe" style="width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn" style="background: transparent; color: white; border: 1px solid #555;" onclick="document.getElementById('delete-confirm-box').style.display='none'">Annuler</button>
+                                    <button class="btn" style="background: #ff4757; color: white; border: none; flex-grow: 1;" onclick="confirmDeleteAccount()">Confirmer la suppression définitive</button>
+                                </div>
+                                <p id="delete-msg" style="color: #ff4757; font-size: 12px; margin-top: 10px; display: none;"></p>
+                            </div>
+                        </div>
+                    </div> <!-- FIN DE L'ONGLET 1 -->
                     </div>
 
                     <!-- ONGLET 2 : SÉCURITÉ -->
@@ -905,41 +997,10 @@
         // ==========================================
         // GESTION DES COMPTES (FIREBASE / LOCALSTORAGE)
         // ==========================================
-        function updateUI() {
-                    const isLoggedIn = localStorage.getItem('isLoggedIn');
-                    const username = localStorage.getItem('username');
-                    const email = localStorage.getItem('email'); // <-- NOUVEAU
-
-                    const loggedOutView = document.getElementById('logged-out-view');
-                    const loggedInView = document.getElementById('logged-in-view');
-                    const navUsername = document.getElementById('nav-username');
-                    const navAvatar = document.getElementById('nav-avatar');
-                    const profileUsernameInput = document.getElementById('profile-username');
-                    const profileEmailInput = document.getElementById('profile-email'); // <-- NOUVEAU
-
-                    if (isLoggedIn === 'true' && loggedOutView && loggedInView) {
-                        loggedOutView.style.display = 'none';
-                        loggedInView.style.display = 'flex'; 
-                        
-                        if (navUsername) navUsername.innerText = username || "Joueur";
-                        if (navAvatar && username) navAvatar.innerText = username.charAt(0).toUpperCase();
-                        if (profileUsernameInput) profileUsernameInput.value = username || "Joueur";
-                        if (profileEmailInput) profileEmailInput.value = email || "Non renseigné"; // <-- NOUVEAU
-                    } else {
-                        if (loggedOutView) loggedOutView.style.display = 'block';
-                        if (loggedInView) loggedInView.style.display = 'none';
-                    }
-                }
 
         // On lance la vérification dès que la page s'ouvre
-        window.addEventListener('DOMContentLoaded', updateUI);
 
         // Fonction pour le bouton "Quitter"
-        window.logout = function() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('username');
-            window.location.reload(); // Rafraîchit la page pour appliquer la déconnexion
-        };
         // Fonction pour ouvrir/fermer le menu utilisateur
         function toggleUserMenu(event) {
             event.stopPropagation(); // Empêche la fermeture immédiate
@@ -961,11 +1022,13 @@
         }
     </script>
     <!-- NOUVEAU BLOC FIREBASE POUR LES PARAMÈTRES -->
+     <!-- LE CŒUR FIREBASE DE NOVALY -->
+ <!-- LE CŒUR FIREBASE DE NOVALY -->
+<!-- LE CŒUR FIREBASE DE NOVALY (AVEC VRAIES REQUÊTES D'AMIS) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-
-        // Ta configuration Firebase
+        import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
             authDomain: "novaly-a80f7.firebaseapp.com",
@@ -978,52 +1041,383 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // La VRAIE fonction de sauvegarde
-        window.saveProfile = async function() {
-            const newUsername = document.getElementById('profile-username').value;
-            let msg = document.getElementById('save-msg');
-            const btn = document.querySelector('#tab-public .btn');
+        window.currentAvatarDataUrl = null;
 
-            // On vérifie que Firebase sait bien qui est connecté en ce moment
-            if (auth.currentUser) {
-                const originalText = btn.innerText;
-                btn.innerText = "Sauvegarde en cours...";
-                btn.disabled = true; // Empêche de cliquer 15 fois d'affilée
+        // 1. SURVEILLANCE DU COMPTE
+        onAuthStateChanged(auth, async (user) => {
+            const loggedOutView = document.getElementById('logged-out-view');
+            const loggedInView = document.getElementById('logged-in-view');
+
+            if (user) {
+                if (loggedOutView) loggedOutView.style.display = 'none';
+                if (loggedInView) loggedInView.style.display = 'flex';
+
+                const displayName = user.displayName || "Joueur";
+                document.getElementById('nav-username').innerText = displayName;
+                document.getElementById('profile-username').value = displayName;
+                document.getElementById('profile-email').value = user.email || "";
+
+                const initial = displayName.charAt(0).toUpperCase();
+                document.getElementById('nav-avatar').innerText = initial;
+                document.getElementById('profile-avatar-preview').innerText = initial;
 
                 try {
-                    // 1. L'action clé : On envoie le nouveau pseudo aux serveurs Firebase
-                    await updateProfile(auth.currentUser, { displayName: newUsername });
+                    const userDocRef = doc(db, "users", user.uid);
                     
-                    // 2. On met à jour la mémoire du navigateur pour l'affichage immédiat
-                    localStorage.setItem('username', newUsername);
-                    
-                    // 3. On met à jour ton interface en haut à droite
-                    document.getElementById('nav-username').innerText = newUsername;
-                    document.getElementById('nav-avatar').innerText = newUsername.charAt(0).toUpperCase();
+                    // NOUVEAU : On s'assure que le pseudo du joueur est bien sauvegardé (en minuscules aussi) pour qu'on puisse le trouver dans la recherche !
+                    await setDoc(userDocRef, { 
+                        pseudo: displayName, 
+                        pseudoLower: displayName.toLowerCase() 
+                    }, { merge: true });
 
-                    // 4. Succès !
+                    const docSnap = await getDoc(userDocRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        
+                        if (data.avatarUrl) {
+                            document.getElementById('nav-avatar').innerText = "";
+                            document.getElementById('nav-avatar').style.backgroundImage = `url(${data.avatarUrl})`;
+                            document.getElementById('profile-avatar-preview').innerText = "";
+                            document.getElementById('profile-avatar-preview').style.backgroundImage = `url(${data.avatarUrl})`;
+                        }
+
+                        const titleVal = data.titre || "NOVICE";
+                        if(document.getElementById('profile-title')) document.getElementById('profile-title').value = titleVal;
+                        if(document.getElementById('nav-title')) document.getElementById('nav-title').innerText = titleVal;
+                        
+                        if(document.getElementById('profile-firstname')) document.getElementById('profile-firstname').value = data.prenom || "";
+                        if(document.getElementById('profile-lastname')) document.getElementById('profile-lastname').value = data.nom || "";
+                        if(document.getElementById('profile-address1')) document.getElementById('profile-address1').value = data.adresse1 || "";
+                        if(document.getElementById('profile-address2')) document.getElementById('profile-address2').value = data.adresse2 || "";
+                        if(document.getElementById('profile-city')) document.getElementById('profile-city').value = data.ville || "";
+                        if(document.getElementById('profile-region')) document.getElementById('profile-region').value = data.region || "";
+                        if(document.getElementById('profile-zip')) document.getElementById('profile-zip').value = data.zip || "";
+                        if(document.getElementById('profile-country')) document.getElementById('profile-country').value = data.country || "";
+                    }
+                } catch(error) {
+                    console.error("Erreur Firestore:", error);
+                }
+            } else {
+                if (loggedOutView) loggedOutView.style.display = 'block';
+                if (loggedInView) loggedInView.style.display = 'none';
+            }
+            // --- CHARGEMENT DE LA LISTE D'AMIS DANS LE MENU DÉROULANT ---
+// --- CHARGEMENT DE LA LISTE D'AMIS (EN LIGNE & HORS LIGNE) ---
+// --- CHARGEMENT ET TRI DES AMIS (EN LIGNE / HORS LIGNE) ---
+                const friendsRef = collection(db, "users", user.uid, "friends");
+                onSnapshot(friendsRef, async (snapshot) => {
+                    const onlineList = document.getElementById('friends-online-list');
+                    const offlineList = document.getElementById('friends-offline-list');
+                    
+                    let onlineHtml = "";
+                    let offlineHtml = "";
+                    let onlineCount = 0;
+                    let offlineCount = 0;
+
+                    // On parcourt chaque ami pour vérifier son statut réel dans Firestore
+                    for (const docFriend of snapshot.docs) {
+                        const friendLink = docFriend.data();
+                        const friendId = docFriend.id;
+                        
+                        const friendSnap = await getDoc(doc(db, "users", friendId));
+                        const friendData = friendSnap.data();
+                        const isOnline = friendData ? friendData.isOnline : false;
+
+                        // On crée le petit bloc HTML pour cet ami
+                        const itemHtml = `
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 2px 0; opacity: ${isOnline ? '1' : '0.5'};">
+                            <div style="width: 7px; height: 7px; background: ${isOnline ? '#4cd137' : '#555'}; border-radius: 50%; ${isOnline ? 'box-shadow: 0 0 5px #4cd137;' : ''}"></div>
+                            <span style="font-size: 13px; color: ${isOnline ? '#eee' : '#777'}; font-weight: 500;">${friendLink.pseudo}</span>
+                        </div>`;
+
+                        if (isOnline) {
+                            onlineHtml += itemHtml;
+                            onlineCount++;
+                        } else {
+                            offlineHtml += itemHtml;
+                            offlineCount++;
+                        }
+                    }
+
+                    // On met à jour les deux listes ou on affiche un message si vide
+                    onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
+                    offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
+                });
+        });
+
+        // 2. PRÉVISUALISER L'IMAGE
+        window.previewAvatar = function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) {
+                    alert("L'image est trop lourde ! Choisissez une image de moins de 2 Mo.");
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    window.currentAvatarDataUrl = e.target.result;
+                    const preview = document.getElementById('profile-avatar-preview');
+                    preview.style.backgroundImage = `url(${e.target.result})`;
+                    preview.innerText = "";
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // 3. LA VRAIE FONCTION POUR ENVOYER UNE DEMANDE D'AMI
+        window.sendFriendRequest = async function() {
+            const pseudoInput = document.getElementById('friend-search-input');
+            const msg = document.getElementById('friend-msg');
+            const targetPseudo = pseudoInput.value.trim();
+
+            if (targetPseudo === "") {
+                msg.style.color = "#ff4757";
+                msg.innerText = "Veuillez entrer un pseudo.";
+                msg.style.display = "block";
+                return;
+            }
+
+            if (!auth.currentUser) return;
+
+            const myPseudo = document.getElementById('profile-username').value;
+            
+            // Sécurité : On ne peut pas s'ajouter soi-même
+            if (targetPseudo.toLowerCase() === myPseudo.toLowerCase()) {
+                msg.style.color = "#ff4757";
+                msg.innerText = "Vous ne pouvez pas vous ajouter vous-même !";
+                msg.style.display = "block";
+                return;
+            }
+
+            // Animation du bouton
+            const btn = document.querySelector('button[onclick="sendFriendRequest()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "Recherche...";
+            btn.disabled = true;
+
+            try {
+                // ÉTAPE A : On cherche le joueur dans la base de données Firestore
+                const usersRef = collection(db, "users");
+                // On compare en minuscules pour éviter les problèmes de majuscules (ex: dArKNiNjA)
+                const q = query(usersRef, where("pseudoLower", "==", targetPseudo.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    // Le joueur n'existe pas
+                    msg.style.color = "#ff4757";
+                    msg.innerText = "Joueur introuvable. Vérifiez l'orthographe.";
+                    msg.style.display = "block";
+                } else {
+                    // ÉTAPE B : Le joueur existe ! On récupère ses infos
+                    const targetUserDoc = querySnapshot.docs[0];
+                    const targetUserId = targetUserDoc.id;
+                    const realTargetPseudo = targetUserDoc.data().pseudo;
+
+                    // ÉTAPE C : On crée un vrai document de demande d'ami dans Firestore
+                    await addDoc(collection(db, "friend_requests"), {
+                        senderId: auth.currentUser.uid,
+                        senderPseudo: myPseudo,
+                        receiverId: targetUserId,
+                        receiverPseudo: realTargetPseudo,
+                        status: "pending", // "En attente"
+                        timestamp: serverTimestamp()
+                    });
+
+                    // Succès !
                     msg.style.color = "#4cd137";
-                    msg.innerText = "Profil mis à jour définitivement sur les serveurs !";
+                    msg.innerText = "Demande d'ami envoyée à " + realTargetPseudo + " !";
+                    msg.style.display = "block";
+                    pseudoInput.value = "";
+                }
+            } catch(error) {
+                console.error("Erreur d'ajout d'ami:", error);
+                msg.style.color = "#ff4757";
+                msg.innerText = "Erreur de connexion aux serveurs.";
+                msg.style.display = "block";
+            } finally {
+                // On remet le bouton à la normale
+                btn.innerText = originalText;
+                btn.disabled = false;
+                setTimeout(() => msg.style.display = "none", 4000);
+            }
+        };
+
+        // 4. SAUVEGARDE DU PROFIL
+// 4. SAUVEGARDE DU PROFIL (AVEC VÉRIFICATION DU PSEUDO)
+        window.saveProfile = async function() {
+            const btn = document.querySelector('button[onclick="saveProfile()"]');
+            let msg = document.getElementById('save-msg');
+
+            if (auth.currentUser) {
+                const originalText = btn.innerText;
+                btn.innerText = "Vérification...";
+                btn.disabled = true;
+
+                try {
+                    const newUsername = document.getElementById('profile-username').value.trim();
+                    const newTitle = document.getElementById('profile-title').value;
+
+                    // VÉRIFICATION : Ce pseudo est-il déjà pris par QUELQU'UN D'AUTRE ?
+                    const usersRef = collection(db, "users");
+                    const q = query(usersRef, where("pseudoLower", "==", newUsername.toLowerCase()));
+                    const querySnapshot = await getDocs(q);
+                    
+                    let isTaken = false;
+                    querySnapshot.forEach((doc) => {
+                        // Si le document trouvé n'appartient pas à l'utilisateur actuel
+                        if (doc.id !== auth.currentUser.uid) {
+                            isTaken = true;
+                        }
+                    });
+
+                    if (isTaken) {
+                        msg.style.color = "#ff4757";
+                        msg.innerText = "Erreur : Ce pseudo est déjà utilisé par un autre joueur.";
+                        msg.style.display = "block";
+                        return; // On arrête tout !
+                    }
+
+                    btn.innerText = "Sauvegarde...";
+
+                    await updateProfile(auth.currentUser, { displayName: newUsername });
+                    const userDocRef = doc(db, "users", auth.currentUser.uid);
+
+                    // On signale au serveur que je suis EN LIGNE
+                    await setDoc(userDocRef, { isOnline: true }, { merge: true });
+
+                    // On prépare la déconnexion automatique si on ferme l'onglet
+                    window.addEventListener('beforeunload', () => {
+                        setDoc(userDocRef, { isOnline: false }, { merge: true });
+                    });
+                    
+                    let dataToSave = {
+                        pseudo: newUsername,
+                        pseudoLower: newUsername.toLowerCase(),
+                        titre: newTitle,
+                        prenom: document.getElementById('profile-firstname').value,
+                        nom: document.getElementById('profile-lastname').value,
+                        adresse1: document.getElementById('profile-address1').value,
+                        adresse2: document.getElementById('profile-address2').value || "",
+                        ville: document.getElementById('profile-city').value,
+                        region: document.getElementById('profile-region').value || "",
+                        zip: document.getElementById('profile-zip').value || "",
+                        country: document.getElementById('profile-country').value || ""
+                    };
+
+                    if (window.currentAvatarDataUrl) {
+                        dataToSave.avatarUrl = window.currentAvatarDataUrl;
+                    }
+
+                    await setDoc(userDocRef, dataToSave, { merge: true });
+
+                    document.getElementById('nav-username').innerText = newUsername;
+                    document.getElementById('nav-title').innerText = newTitle;
+                    
+                    if (window.currentAvatarDataUrl) {
+                        document.getElementById('nav-avatar').innerText = "";
+                        document.getElementById('nav-avatar').style.backgroundImage = `url(${window.currentAvatarDataUrl})`;
+                    } else if (!document.getElementById('nav-avatar').style.backgroundImage) {
+                        document.getElementById('nav-avatar').innerText = newUsername.charAt(0).toUpperCase();
+                    }
+
+                    msg.style.color = "#4cd137";
+                    msg.innerText = "Données sauvegardées sur les serveurs Novaly !";
                     msg.style.display = "block";
 
                 } catch (error) {
-                    // S'il y a un problème de wifi ou de serveurs
                     msg.style.color = "#ff4757";
-                    msg.innerText = "Erreur de connexion aux serveurs.";
+                    msg.innerText = "Erreur de connexion à la base de données.";
                     msg.style.display = "block";
-                    console.error("Erreur Firebase :", error);
                 } finally {
-                    // On remet le bouton à la normale après 3 secondes
                     btn.innerText = originalText;
                     btn.disabled = false;
-                    setTimeout(() => msg.style.display = "none", 3000);
+                    setTimeout(() => msg.style.display = "none", 4000);
                 }
-            } else {
-                // Si la session a expiré
-                msg.style.color = "#ff4757";
-                msg.innerText = "Erreur : Session introuvable. Veuillez vous reconnecter.";
+            }
+        };
+        // FONCTION DE SUPPRESSION DE COMPTE
+        window.confirmDeleteAccount = async function() {
+            const email = document.getElementById('delete-email').value;
+            const password = document.getElementById('delete-password').value;
+            const msg = document.getElementById('delete-msg');
+
+            if(!email || !password) {
+                msg.innerText = "Veuillez remplir votre e-mail et mot de passe.";
                 msg.style.display = "block";
+                return;
+            }
+
+            try {
+                const user = auth.currentUser;
+                // 1. Re-authentifier le joueur (Sécurité exigée par Google)
+                const credential = EmailAuthProvider.credential(email, password);
+                await reauthenticateWithCredential(user, credential);
+                
+                // 2. Supprimer la fiche dans Firestore
+                await deleteDoc(doc(db, "users", user.uid));
+                
+                // 3. Supprimer le compte Firebase Auth
+                await deleteUser(user);
+                
+                // 4. Nettoyer et renvoyer à l'accueil
+                localStorage.clear();
+                alert("Votre compte a été définitivement supprimé. Au revoir !");
+                window.location.href = "index.html";
+
+            } catch (error) {
+                msg.innerText = "Identifiants incorrects (ou compte créé avec Google).";
+                msg.style.display = "block";
+                console.error("Erreur de suppression:", error);
+            }
+        };
+        // FONCTION : ACCEPTER UN AMI
+        window.acceptFriend = async function(requestId, senderId, senderPseudo) {
+            try {
+                // 1. On supprime la demande (elle n'est plus "en attente")
+                await deleteDoc(doc(db, "friend_requests", requestId));
+                
+                // 2. On ajoute l'ami dans TON dossier
+                await setDoc(doc(db, "users", auth.currentUser.uid, "friends", senderId), { 
+                    pseudo: senderPseudo, 
+                    addedAt: serverTimestamp() 
+                });
+                
+                // 3. On t'ajoute dans SON dossier (pour que ce soit réciproque)
+                const myPseudo = document.getElementById('profile-username').value;
+                await setDoc(doc(db, "users", senderId, "friends", auth.currentUser.uid), { 
+                    pseudo: myPseudo, 
+                    addedAt: serverTimestamp() 
+                });
+
+                alert("Ami ajouté !");
+            } catch (error) {
+                console.error("Erreur acceptation:", error);
+            }
+        };
+
+        // FONCTION : REFUSER UN AMI
+        window.declineFriend = async function(requestId) {
+            try {
+                await deleteDoc(doc(db, "friend_requests", requestId));
+            } catch (error) {
+                console.error("Erreur refus:", error);
+            }
+        };
+        // 5. DÉCONNEXION
+        window.logout = async function() {
+            try {
+                // On passe en hors-ligne avant de quitter
+                if (auth.currentUser) {
+                    await setDoc(doc(db, "users", auth.currentUser.uid), { isOnline: false }, { merge: true });
+                }
+                localStorage.clear();
+                await signOut(auth);
+                window.location.reload();
+            } catch (error) {
+                console.error("Erreur lors de la déconnexion", error);
             }
         };
     </script>

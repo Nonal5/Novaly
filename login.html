@@ -164,9 +164,10 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-
+        // NOUVEAU IMPORT FIRESTORE
+        import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         // Ta configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
@@ -181,6 +182,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
+        const db = getFirestore(app);
 
         // Fonction utilitaire pour afficher les erreurs
         function showError(elementId, message) {
@@ -197,9 +199,10 @@
         }
 
         // --- INSCRIPTION ---
+// --- INSCRIPTION (AVEC ANTI-DOUBLON DE PSEUDO) ---
         window.register = async function() {
             hideErrors();
-            const username = document.getElementById('reg-username').value;
+            const username = document.getElementById('reg-username').value.trim();
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-password').value;
 
@@ -208,21 +211,37 @@
                 return;
             }
 
-            // Changer le texte du bouton pendant le chargement
             const btn = document.querySelector('#register-section .btn');
             const originalText = btn.innerText;
-            btn.innerText = "Création...";
+            btn.innerText = "Vérification...";
             
             try {
+                // 1. On vérifie si le pseudo est libre dans la base de données !
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("pseudoLower", "==", username.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    // Le pseudo existe déjà !
+                    showError('reg-error', "Ce pseudo est déjà pris par un autre joueur.");
+                    btn.innerText = originalText;
+                    return; // On annule la création
+                }
+
+                // 2. Si c'est libre, on crée le compte
+                btn.innerText = "Création...";
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: username });
                 
+                // 3. On initialise son dossier dans Firestore
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    pseudo: username,
+                    pseudoLower: username.toLowerCase()
+                });
+                
                 localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', username);
-                localStorage.setItem('email', email); // <-- NOUVEAU
                 window.location.href = 'index.html';
             } catch (error) {
-                // Traductions basiques des erreurs Firebase
                 let errorMsg = "Une erreur est survenue.";
                 if(error.code === 'auth/email-already-in-use') errorMsg = "Cet e-mail est déjà utilisé.";
                 if(error.code === 'auth/weak-password') errorMsg = "Le mot de passe doit faire au moins 6 caractères.";
