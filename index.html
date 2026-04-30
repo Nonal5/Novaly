@@ -32,6 +32,7 @@
         .main-header {
             height: 75px; background-color: var(--bg-header); display: flex; align-items: center;
             justify-content: space-between; padding: 0 40px; border-bottom: 1px solid #222; flex-shrink: 0;
+            position: relative; z-index: 100;
         }
 
         .header-left { display: flex; align-items: center; height: 100%; }
@@ -51,7 +52,7 @@
         .nav-item:hover, .nav-item.active { color: var(--text-main); }
         .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background-color: var(--accent-color); }
 
-        .header-right { display: flex; align-items: center; gap: 20px; height: 100%; }
+        .header-right { display: flex; align-items: center; gap: 12px; height: 100%; }
 
         .search-bar {
             background-color: transparent; border: 1px solid #444; padding: 8px 16px; border-radius: 20px; color: white;
@@ -59,52 +60,66 @@
         }
         .search-bar:focus { border-color: #888; }
 
-        /* --- SÉLECTEUR DE LANGUE & MENU DÉROULANT --- */
+        /* --- SÉLECTEUR DE LANGUE --- */
         .lang-wrapper { position: relative; display: flex; align-items: center; }
-        
         .lang-selector {
             width: 36px; height: 36px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center;
             justify-content: center; cursor: pointer; transition: all 0.2s ease; color: white; background: #1a1a1a;
         }
         .lang-selector:hover { background-color: var(--hover-bg); border-color: white; }
-
         .lang-dropdown {
             position: absolute; top: 120%; right: 0; background: var(--bg-header); border: 1px solid #333;
             border-radius: 8px; width: 160px; max-height: 300px; overflow-y: auto; display: none; flex-direction: column;
             z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.7);
         }
         .lang-dropdown.show { display: flex; }
-
         .lang-option {
             padding: 12px 15px; display: flex; align-items: center; gap: 12px; cursor: pointer;
             font-size: 13px; font-weight: 500; color: var(--text-muted); transition: 0.2s; border-bottom: 1px solid #222;
         }
         .lang-option:last-child { border-bottom: none; }
         .lang-option:hover { background: var(--hover-bg); color: white; }
-        
-        /* CSS POUR FORCER LES DRAPEAUX EN CERCLE */
-        .flag-icon { 
-            width: 20px; 
-            height: 20px; 
-            border-radius: 50%; 
-            object-fit: cover; /* Coupe l'image rectangulaire pour qu'elle remplisse le cercle proprement */
-            display: block;
-        }
+        .flag-icon { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: block; }
 
         /* --- PROFIL HEADER --- */
-        .profile-container { display: flex; align-items: center; gap: 12px; cursor: pointer; padding-left: 10px; border-left: 1px solid #333; }
-        .avatar { width: 36px; height: 36px; background-color: #555; border-radius: 50%; background-size: cover; background-position: center; }
-        .profile-info { display: flex; flex-direction: column; line-height: 1.2; }
-        .profile-name { font-weight: 600; font-size: 13px; }
-        .profile-status { color: #4cd137; font-size: 11px; font-weight: 500; }
+        .user-section { display: flex; height: 100%; align-items: center; }
+        .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; padding-left: 10px; padding-right: 5px; }
+        .profile-trigger:hover { background: #222; border-radius: 8px; }
+        .nav-title { background: #ffffff; color: #000000; font-size: 9px; font-weight: 900; padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .avatar { width: 28px; height: 28px; background-color: #ffffff; background-size: cover; background-position: center; background-repeat: no-repeat; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+        .user-info { display: flex; flex-direction: column; text-align: left; line-height: 1.2; }
+        .nav-username { font-weight: 700; font-size: 12px; text-transform: uppercase; color: white; }
+        .online-dot { color: #4cd137; font-size: 9px; text-transform: none; letter-spacing: 0; }
 
-        /* --- CONTENU --- */
+        /* --- BOUTON AMIS --- */
+        .friends-btn {
+            display: flex; align-items: center; gap: 8px; background: #1a1a1a; border: 1px solid #333; 
+            padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: 0.2s; color: white; font-weight: bold; font-size: 12px;
+        }
+        .friends-btn:hover { background: #2a2a2a; border-color: #555; }
+
+        /* --- MENUS DÉROULANTS (PROFIL & AMIS) --- */
+        .user-dropdown {
+            position: absolute; top: 110%; right: 0; background: #18181c; border: 1px solid #333;
+            border-radius: 8px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        .user-dropdown.show { display: flex; }
+        .dropdown-item { padding: 12px 15px; font-size: 13px; color: #ccc; cursor: pointer; transition: 0.2s; text-align: left; display: flex; align-items: center;}
+        .dropdown-item img { width: 14px; filter: invert(1); opacity: 0.8; margin-right: 8px; vertical-align: middle; }
+        .dropdown-item:hover { background: #2a2a2a; color: white; }
+        .dropdown-divider { height: 1px; background: #333; margin: 5px 0; }
+        .dropdown-item.logout { color: #ff4757; }
+        .dropdown-item.logout img { filter: invert(34%) sepia(98%) saturate(3501%) hue-rotate(333deg) brightness(101%) contrast(106%); }
+        .dropdown-item.logout:hover { background: #ff475722; }
+
+        /* --- CONTENU & VUES --- */
         .content { flex-grow: 1; padding: 40px 80px; overflow-y: auto; display: flex; flex-direction: column; }
         .page-title { margin: 0 0 30px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; display: none; }
         .view-section { display: none; flex-grow: 1; }
-        .view-section.active { display: block; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- BANNIÈRE --- */
+        /* --- BANNIÈRE & GRILLES --- */
         .hero-banner {
             background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
             height: 450px; border-radius: 12px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; padding: 40px; margin-bottom: 40px;
@@ -113,22 +128,16 @@
         .hero-banner p { font-size: 18px; color: #ddd; margin: 0 0 25px; max-width: 600px; }
         .btn-hero { background: transparent; color: white; border: 2px solid white; padding: 12px 35px; font-size: 15px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
         .btn-hero:hover { background: white; color: black; }
+        .btn-hero:disabled { background: transparent !important; border-color: #333 !important; color: #555 !important; cursor: not-allowed; }
 
-        /* --- GRILLES --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; margin-bottom: 60px; }
         .game-card { cursor: pointer; transition: transform 0.2s ease; }
         .game-card:hover { transform: scale(1.03); }
-        .game-cover { height: 300px; border-radius: 8px; margin-bottom: 12px; background-color: #222; }
+        .game-cover { height: 300px; border-radius: 8px; margin-bottom: 12px; background-color: #222; position: relative; overflow: hidden;}
         .game-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .game-price { background: #2a2a2a; color: #eee; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block; }
-        .game-status { color: var(--text-muted); font-size: 13px; }
 
-        .cover-orange { background: linear-gradient(135deg, #f39c12, #e67e22); }
-        .cover-purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
-        .cover-teal { background: linear-gradient(135deg, #1abc9c, #16a085); }
-        .cover-gray { background: #333; }
-
-        /* --- PROFIL & DIVERS --- */
+        /* --- PROFIL & PARAMÈTRES --- */
         .profile-layout { display: flex; gap: 40px; max-width: 1000px; margin-bottom: 60px; }
         .profile-sidebar { width: 250px; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
         .profile-tab { padding: 12px 15px; color: var(--text-muted); cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 14px; transition: all 0.2s ease; }
@@ -137,14 +146,15 @@
         .profile-content { flex-grow: 1; }
         .profile-tab-content { display: none; background: var(--card-bg); padding: 35px; border-radius: 8px; border: 1px solid #333; }
         .profile-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; }
-        .form-group input { width: 90%; padding: 10px; background: #121212; border: 1px solid #444; color: white; border-radius: 4px; outline: none; }
-        .btn { background: white; color: black; border: none; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; }
-        .generic-view-content { background: var(--card-bg); padding: 40px; border-radius: 8px; text-align: center; color: var(--text-muted); margin-bottom: 60px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; box-sizing: border-box; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif;}
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: white; }
+        .btn { background: white; color: black; border: none; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn:hover { opacity: 0.9; }
         
+        .generic-view-content { background: var(--card-bg); padding: 40px; border-radius: 8px; text-align: center; color: var(--text-muted); margin-bottom: 60px; }
         .news-card { background: #222; border: 1px solid #333; border-radius: 8px; padding: 20px; text-align: left; transition: 0.2s; cursor: pointer; }
         .news-card:hover { border-color: #555; background: #2a2a2a; }
         .news-card h4 { margin: 0 0 10px 0; color: white; font-size: 16px; }
@@ -153,113 +163,75 @@
         /* --- FOOTER --- */
         .site-footer { background-color: var(--bg-main); border-top: 1px solid #222; padding: 50px 0 20px 0; margin-top: auto; font-size: 13px; color: var(--text-muted); }
         .site-footer h4 { color: var(--text-main); font-size: 14px; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 0.5px; }
-        
         .footer-downloads { margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 40px; }
         .app-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
-        .app-btn { 
-            background: transparent; border: 1px solid #444; color: white; padding: 12px 25px; 
-            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; 
-            display: flex; align-items: center; gap: 10px; transition: all 0.2s; 
-        }
+        .app-btn { background: transparent; border: 1px solid #444; color: white; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
         .app-btn svg { width: 18px; height: 18px; fill: currentColor; }
         .app-btn:hover { background-color: var(--hover-bg); border-color: white; transform: translateY(-2px); }
-
         .footer-container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; margin-bottom: 50px; }
         .footer-links { display: flex; gap: 80px; }
         .footer-column { display: flex; flex-direction: column; gap: 15px; }
         .footer-link { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-size: 13px; cursor: pointer; }
         .footer-link:hover, .footer-link.active { color: var(--text-main); }
         .footer-bottom { border-top: 1px solid #222; padding-top: 25px; font-size: 12px; display: flex; justify-content: space-between; }
-        /* --- VERSION MOBILE (Responsive) --- */
-        /* --- VERSION MOBILE (Responsive) --- */
+
+        /* ========================================================= */
+        /* ================== RESPONSIVE MOBILE ==================== */
+        /* ========================================================= */
         .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; }
 
         @media (max-width: 1024px) {
             /* En-tête / Menu Hamburger */
-            .main-header { padding: 15px 20px; flex-wrap: wrap; height: auto; min-height: 70px; align-items: flex-start; position: relative; z-index: 100; }
-            .header-left { flex-wrap: wrap; width: 100%; height: auto; }
+            .main-header { padding: 15px 20px; flex-wrap: wrap; height: auto; min-height: 70px; align-items: flex-start; }
+            .header-left { flex-wrap: wrap; width: 100%; height: auto; justify-content: space-between; }
             .logo-img { margin-right: 0; margin-top: 5px; }
-            .menu-toggle { display: block; position: absolute; right: 20px; top: 18px; }
+            .menu-toggle { display: block; margin-top: 8px;}
             
-            /* Les menus déroulants cachés */
+            /* Cacher les menus de navigation sur mobile par défaut */
             .nav-links { display: none; width: 100%; flex-direction: column; align-items: flex-start; padding: 20px 0 0 0; gap: 15px; }
-            .header-right { display: none; width: 100%; flex-direction: column; align-items: flex-start; padding: 15px 0; gap: 15px; height: auto; border-top: 1px solid #333; margin-top: 15px; }
+            .header-right { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 15px 0; gap: 15px; height: auto; border-top: 1px solid #333; margin-top: 15px; }
             
+            /* Actions du Header sur mobile */
+            .main-header.open .nav-links, .main-header.open .header-right { display: flex; }
             .nav-item { height: auto; padding: 10px 0; width: 100%; }
             .nav-item.active::after { bottom: -5px; }
-            .search-bar { width: 100%; box-sizing: border-box; }
-            .lang-dropdown { top: 100%; left: 0; right: auto; }
+            .search-bar { width: 100%; }
+            .lang-dropdown { top: 100%; left: 0; right: auto; width: 100%; }
             
-            /* Affichage quand le menu est cliqué */
-            .main-header.open .nav-links, .main-header.open .header-right { display: flex; }
-
-            /* Contenu principal */
+            /* Ajustement Amis & Profil Mobile */
+            #friends-menu-container { width: 100%; justify-content: center; margin: 10px 0; }
+            .friends-btn { width: 100%; justify-content: center; }
+            .user-section { width: 100%; justify-content: center; }
+            .profile-trigger { width: 100%; justify-content: center; background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333;}
+            .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444;}
+            
+            /* Contenu principal Mobile */
             .content { padding: 20px; }
-            .hero-banner { height: auto; padding: 30px 20px; text-align: left; align-items: flex-start; }
-            .hero-banner h1 { font-size: 32px; }
-            .hero-banner p { font-size: 15px; }
+            .hero-banner { height: auto; padding: 30px 20px; text-align: center; align-items: center; }
+            .hero-banner h1 { font-size: 36px; text-transform: uppercase; margin-bottom: 10px;}
+            .hero-banner p { font-size: 14px; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+            .game-cover { height: 220px; }
             
-            /* Grille de jeux plus petite */
-            .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-            .game-cover { height: 200px; }
-            
-            /* Page Profil (Onglets horizontaux sur mobile) */
+            /* Paramètres du Profil Mobile */
             .profile-layout { flex-direction: column; gap: 20px; }
-            .profile-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; }
-            .profile-tab { white-space: nowrap; padding: 10px; }
-            .profile-tab.active { border-left: none; border-bottom: 3px solid var(--accent-color); border-radius: 6px 6px 0 0; }
+            .profile-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid #333; white-space: nowrap;}
+            .profile-sidebar::-webkit-scrollbar { height: 4px; }
+            .profile-sidebar::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+            .profile-tab { padding: 10px 15px; }
+            .profile-tab.active { border-left: none; border-bottom: 3px solid var(--accent-color); border-radius: 0; }
+            .profile-tab-content { padding: 20px; }
             
-            /* Footer empilé */
+            /* Grilles intérieures profil */
+            .profile-tab-content > div[style*="display: grid"] { grid-template-columns: 1fr !important; }
+            .profile-tab-content > div[style*="display: flex; gap: 20px"] { flex-direction: column; align-items: flex-start; }
+
+            /* Footer Mobile */
             .footer-container { flex-direction: column; gap: 30px; }
             .footer-links { flex-direction: column; gap: 30px; }
             .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
-            
-            .hero-banner h1 {
-            text-transform: uppercase;
-            margin-bottom: 5px;
-            }
-
-/* Style pour désactiver le bouton proprement */
-            .btn-hero:disabled {
-                background: transparent !important;
-                border-color: #333 !important;
-                color: #555 !important;
-            }
-            }
-            .user-dropdown {
-            position: absolute;
-            top: 110%;
-            right: 0;
-            background: #18181c;
-            border: 1px solid #333;
-            border-radius: 8px;
-            width: 180px;
-            display: none; /* Caché par défaut */
-            flex-direction: column;
-            z-index: 1000;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            overflow: hidden;
+            .app-buttons { justify-content: center; }
         }
-
-        .user-dropdown.show { display: flex; }
-
-        .dropdown-item {
-            padding: 12px 15px;
-            font-size: 13px;
-            color: #ccc;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: left;
-        }
-
-        .dropdown-item:hover { background: #2a2a2a; color: white; }
-
-        .dropdown-divider { height: 1px; background: #333; margin: 5px 0; }
-
-        .dropdown-item.logout { color: #ff4757; }
-        .dropdown-item.logout:hover { background: #ff475722; }
-
-        .profile-trigger:hover { background: #222; }
     </style>
 </head>
 <body>
@@ -267,23 +239,55 @@
 <header class="main-header">
         <div class="header-left">
             <div class="logo-img" onclick="navigateTo('#magasin', 'store')">NOVALY</div>
-            
             <div class="menu-toggle" onclick="toggleMobileMenu()">☰</div>
-            
             <nav class="nav-links">
                 <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
                 <div class="nav-item" id="nav-library" data-i18n="navLibrary" onclick="navigateTo('#bibliotheque', 'library')">Bibliothèque</div>
                 <div class="nav-item" id="nav-community" data-i18n="navCommunity" onclick="navigateTo('#communaute', 'community')">Communauté</div>
-                <!-- Le Panier est maintenant juste avant "À propos" -->
                 <div class="nav-item" id="nav-cart" data-i18n="navCart" onclick="navigateTo('#panier', 'cart')">Panier</div>
                 <div class="nav-item" id="nav-about" data-i18n="navAbout" onclick="navigateTo('#apropos', 'about')">À propos</div>
             </nav>
         </div>
 
-        <!-- Espacement réduit (gap de 10px au lieu de 20px) pour resserrer les éléments -->
-        <div class="header-right" style="gap: 12px;">           
-            
+        <div class="header-right">   
             <input type="text" id="main-search-bar" class="search-bar" data-i18n-ph="searchPh" placeholder="Rechercher un jeu...">
+            
+            <!-- MENU AMIS SÉPARÉ (Masqué par défaut, géré par JS) -->
+            <div id="friends-menu-container" style="position: relative; display: none; align-items: center;">
+                <div class="friends-btn" onclick="toggleFriendsMenu(event)">
+                    <svg viewBox="0 0 640 512" style="width: 14px; height: 14px; fill: currentColor;"><path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
+                    AMIS
+                </div>
+                
+                <div id="friends-dropdown" class="user-dropdown" style="width: 280px; right: 0;">
+                    <!-- NOUVEAU : AJOUTER UN AMI -->
+                    <div style="padding: 15px; border-bottom: 1px solid #333; background: #151515;">
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="friend-search-input" placeholder="Ajouter un pseudo..." style="flex-grow: 1; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: white; border-radius: 4px; outline: none; font-size: 12px; font-family: 'Inter', sans-serif;">
+                            <button class="btn" onclick="sendFriendRequest()" style="background: #0984e3; color: white; border: none; padding: 0 15px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px;">+</button>
+                        </div>
+                        <p id="friend-msg" style="font-size: 11px; margin-top: 8px; margin-bottom: 0; display: none;"></p>
+                    </div>
+
+                    <!-- NOUVEAU : DEMANDES REÇUES (Caché si vide) -->
+                    <div id="pending-requests-container" style="padding: 12px 15px; border-bottom: 1px solid #333; display: none; background: rgba(241, 196, 15, 0.05);">
+                        <div style="font-size: 10px; font-weight: 800; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Demandes d'ami</div>
+                        <div id="friend-requests-list"></div>
+                    </div>
+
+                    <div style="padding: 15px;">
+                        <div style="font-size: 10px; font-weight: 800; color: #4cd137; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">En ligne</div>
+                        <div id="friends-online-list" style="margin-bottom: 15px; max-height: 150px; overflow-y: auto;">
+                            <p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>
+                        </div>
+
+                        <div style="font-size: 10px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Hors ligne</div>
+                        <div id="friends-offline-list" style="max-height: 150px; overflow-y: auto;">
+                            <p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>         
             
             <div class="lang-wrapper">
                 <div class="lang-selector" id="lang-btn" onclick="toggleLangMenu()">
@@ -298,73 +302,41 @@
                 </div>
             </div>
             
-            <div class="user-section" style="display: flex; height: 100%; align-items: center;">
-                
-                <!-- Vue Déconnecté : Bouton affiné -->
+            <div class="user-section">
                 <div id="logged-out-view" style="height: 100%;">
-                    <!-- Padding horizontal réduit pour rapprocher du drapeau -->
                     <div class="nav-item" style="padding-left: 5px; padding-right: 5px;">
                         <a href="login.html" 
                            onmouseover="this.style.backgroundColor='#e0e0e0'; this.style.transform='scale(1.03)';" 
                            onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='scale(1)';" 
-                           style="background-color: #ffffff; color: #000000; padding: 8px 18px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 11px; transition: all 0.2s ease; display: block; text-transform: uppercase;">
+                           style="background-color: #ffffff; color: #000000; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 11px; transition: all 0.2s ease; display: block; text-transform: uppercase; text-align: center;">
                             Se connecter / S'inscrire
                         </a>
                     </div>
                 </div>
 
                 <!-- Vue Connecté : Menu Profil -->
-<!-- Vue Connecté : Menu Profil -->
-                <div id="logged-in-view" style="display: none; height: 100%; align-items: center; position: relative;">
-                    
-                    <div class="profile-trigger nav-item" onclick="toggleUserMenu(event)" style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding-left: 10px; padding-right: 5px;">
-                        
-                        <!-- 1. LE TITRE COSMÉTIQUE (Maintenant à gauche, en blanc) -->
-                        <span id="nav-title" style="background: #ffffff; color: #000000; font-size: 9px; font-weight: 900; padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 0 8px rgba(255,255,255,0.1);">NOVICE</span>
-
-                        <!-- 2. L'AVATAR (Photo de profil) -->
-                        <div class="avatar" id="nav-avatar" style="width: 28px; height: 28px; background: #ffffff; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 12px;">?</div>
-                        
-                        <!-- 3. LE PSEUDO ET LE STATUT -->
-                        <div class="user-info" style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
-                            <span id="nav-username" style="font-weight: 700; font-size: 12px; text-transform: uppercase; color: white;">Utilisateur</span>
-                            <span style="color: #4cd137; font-size: 9px; text-transform: none; letter-spacing: 0;">En ligne ●</span>
+                <div id="logged-in-view" style="display: none; height: 100%; position: relative;">
+                    <div class="profile-trigger nav-item" onclick="toggleUserMenu(event)">
+                        <span class="nav-title" id="nav-title">NOVICE</span>
+                        <div class="avatar" id="nav-avatar">?</div>
+                        <div class="user-info">
+                            <span class="nav-username" id="nav-username">Utilisateur</span>
+                            <span class="online-dot">En ligne ●</span>
                         </div>
-                        
-                        <!-- 4. LA PETITE FLÈCHE -->
                         <span style="font-size: 9px; color: var(--text-muted); margin-left: 3px;">▼</span>
                     </div>
 
-                    <!-- LE MENU DÉROULANT (Ne change pas) -->
-<!-- LE MENU DÉROULANT AVEC LISTE D'AMIS -->
                     <div id="user-dropdown" class="user-dropdown" style="width: 240px;">
-                        <!-- Section Amis (Nouveau) -->
-                        <div style="padding: 12px 15px; border-bottom: 1px solid #333;">
-                        <div style="padding: 12px 15px; border-bottom: 1px solid #333;">
-                            <!-- Groupe En Ligne -->
-                            <div style="font-size: 10px; font-weight: 800; color: #4cd137; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">En ligne</div>
-                            <div id="friends-online-list" style="margin-bottom: 12px;">
-                                <p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>
-                            </div>
-
-                            <!-- Groupe Hors Ligne -->
-                            <div style="font-size: 10px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Hors ligne</div>
-                            <div id="friends-offline-list">
-                                <p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>
-                            </div>
-                        </div>
-
-                        <!-- Liens classiques -->
-                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">🏆 Mes succès</div>
-                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">✨ Récompenses Novaly</div>
-                        <div class="dropdown-item" onclick="switchProfileTab('payment', document.getElementById('tab-btn-payment')); navigateTo('#profile', 'profile')">💰 Solde du compte</div>
-                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')">🎫 Bons</div>
-                        <div class="dropdown-item" onclick="switchProfileTab('general', document.getElementById('tab-btn-general')); navigateTo('#profile', 'profile')">👤 Compte</div>
-                        <div class="dropdown-item" onclick="switchProfileTab('code', document.getElementById('tab-btn-code')); navigateTo('#profile', 'profile')">🎁 Utiliser un code</div>
-                        <div class="dropdown-item" onclick="navigateTo('#bibliotheque', 'library')">🔖 Liste de souhaits</div>
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/trophy.svg"> Mes succès</div>
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/sparkles.svg"> Récompenses Novaly</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('payment', document.getElementById('tab-btn-payment')); navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/wallet.svg"> Solde du compte</div>
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/ticket.svg"> Bons</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('general', document.getElementById('tab-btn-general')); navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/user.svg"> Compte</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('code', document.getElementById('tab-btn-code')); navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/gift.svg"> Utiliser un code</div>
+                        <div class="dropdown-item" onclick="navigateTo('#bibliotheque', 'library')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/bookmark.svg"> Liste de souhaits</div>
                         <div class="dropdown-divider"></div>
-                        <div class="dropdown-item">❓ Assistance <span style="float: right;">↗</span></div>
-                        <div class="dropdown-item logout" onclick="logout()">🚪 Se déconnecter</div>
+                        <div class="dropdown-item"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/help-circle.svg"> Assistance <span style="float: right; margin-left: auto;">↗</span></div>
+                        <div class="dropdown-item logout" onclick="logout()"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/log-out.svg"> Se déconnecter</div>
                     </div>
                 </div>
             </div>
@@ -372,29 +344,28 @@
     </header>
 
     <main class="content">
-        
         <h1 class="page-title" id="dynamic-page-title">Titre</h1>
 
         <div id="view-store" class="view-section active">
-    <div class="hero-banner" id="store-banner" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1600&q=80') center/cover;">
-        <div style="background: #ffffff; color: #000; padding: 5px 15px; border-radius: 4px; font-weight: 800; font-size: 12px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Coming Soon</div>
-        <h1 style="font-size: 80px; letter-spacing: 5px;">CLUTCH</h1>
-        <p>Préparez-vous pour l'expérience ultime. Le futur du gaming arrive sur Novaly.</p>
-        <button class="btn-hero" style="border-color: #555; color: #888; cursor: not-allowed;" disabled>Indisponible</button>
-    </div>
-
-    <h2 style="font-size: 18px; margin-bottom: 20px;">Prochainement</h2>
-    <div class="grid" id="store-grid">
-        <div class="game-card">
-            <div class="game-cover" style="background: linear-gradient(135deg, #333, #000); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-                <span style="font-weight: 900; font-size: 20px; letter-spacing: 2px; opacity: 0.5;">CLUTCH</span>
-                <div style="position: absolute; top: 10px; right: 10px; background: white; color: black; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 900;">SOON</div>
+            <div class="hero-banner" id="store-banner">
+                <div style="background: #ffffff; color: #000; padding: 5px 15px; border-radius: 4px; font-weight: 800; font-size: 12px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Coming Soon</div>
+                <h1>CLUTCH</h1>
+                <p>Préparez-vous pour l'expérience ultime. Le futur du gaming arrive sur Novaly.</p>
+                <button class="btn-hero" disabled>Indisponible</button>
             </div>
-            <div class="game-title">CLUTCH : Standard Edition</div>
-            <div class="game-price">À venir</div>
+
+            <h2 style="font-size: 18px; margin-bottom: 20px;">Prochainement</h2>
+            <div class="grid" id="store-grid">
+                <div class="game-card">
+                    <div class="game-cover" style="background: linear-gradient(135deg, #333, #000); display: flex; align-items: center; justify-content: center;">
+                        <span style="font-weight: 900; font-size: 20px; letter-spacing: 2px; opacity: 0.5;">CLUTCH</span>
+                        <div style="position: absolute; top: 10px; right: 10px; background: white; color: black; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 900;">SOON</div>
+                    </div>
+                    <div class="game-title">CLUTCH : Standard Edition</div>
+                    <div class="game-price">À venir</div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
         <div id="view-library" class="view-section">
             <div class="generic-view-content">
@@ -407,7 +378,6 @@
             <div class="generic-view-content" style="background: transparent; text-align: left; padding: 0;">
                 <h2 data-i18n="communityTitle" style="color: white; margin-bottom: 10px;">Communauté Novaly</h2>
                 <p data-i18n="communityDesc" style="margin-bottom: 30px;">Rejoignez la discussion, partagez vos créations et trouvez des coéquipiers.</p>
-                
                 <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
                     <div class="news-card">
                         <h4 data-i18n="commNews1Title">📢 Mise à jour v1.2 : Patch Notes</h4>
@@ -450,21 +420,21 @@
                 <h2 data-i18n="contactTitle">Nous contacter</h2>
                 <div class="form-group">
                     <label data-i18n="contactSubject">Sujet</label>
-                    <input type="text" style="width: 100%; box-sizing: border-box;">
+                    <input type="text" style="width: 100%;">
                 </div>
                 <div class="form-group">
                     <label data-i18n="contactMessage">Message</label>
-                    <textarea style="width: 100%; height: 100px; background: #121212; border: 1px solid #444; color: white; padding: 10px; box-sizing: border-box;"></textarea>
+                    <textarea style="width: 100%; height: 100px;"></textarea>
                 </div>
                 <button class="btn" data-i18n="contactBtn">Envoyer le message</button>
             </div>
         </div>
 
-<div id="view-profile" class="view-section">
+        <!-- =================== PROFIL =================== -->
+        <div id="view-profile" class="view-section">
             <div class="profile-layout" style="max-width: 1200px;">
                 
-                <!-- MENU LATÉRAL DES PARAMÈTRES -->
-                <div class="profile-sidebar" style="width: 280px;">
+                <div class="profile-sidebar" id="profileSidebar">
                     <div class="profile-tab active" id="tab-btn-general" onclick="switchProfileTab('general', this)">Paramètres du compte</div>
                     <div class="profile-tab" id="tab-btn-security" onclick="switchProfileTab('security', this)">Mot de passe et sécurité</div>
                     <div class="profile-tab" id="tab-btn-payment" onclick="switchProfileTab('payment', this)">Paiement et solde</div>
@@ -473,41 +443,19 @@
                     <div class="profile-tab" id="tab-btn-parental" onclick="switchProfileTab('parental', this)">Contrôle parental</div>
                 </div>
 
-                <!-- CONTENU DES PAGES -->
                 <div class="profile-content">
                     
-                    <!-- ONGLET 1 : COMPTE GÉNÉRAL -->
-<!-- ONGLET 1 : COMPTE GÉNÉRAL -->
                     <div id="tab-general" class="profile-tab-content active">
                         <h3>Informations de compte</h3>
                         <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Gérez les détails de votre compte et votre apparence publique.</p>
                         
-                        <!-- NOUVEAU : PHOTO DE PROFIL -->
-<div style="display: flex; gap: 10px;">
-                                <input type="text" id="friend-search-input" placeholder="Ex: DarkNinja99" style="flex-grow: 1; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif;">
-                                <button class="btn" onclick="sendFriendRequest()" style="background: #0984e3; color: white; border: none; padding: 0 20px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s;">Envoyer</button>
+                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 25px; background: #222; padding: 20px; border-radius: 8px; border: 1px solid #333;">
+                            <div id="profile-avatar-preview" style="width: 80px; height: 80px; background-color: #111; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; background-size: cover; background-position: center; background-repeat: no-repeat; border: 2px solid #444; flex-shrink: 0;">?</div>                            
+                            <div>
+                                <label for="avatar-upload" class="btn" style="background: #fff; color: #000; padding: 8px 15px; font-size: 13px;">Téléverser une image</label>
+                                <input type="file" id="avatar-upload" accept="image/png, image/jpeg" style="display: none;" onchange="previewAvatar(event)">
+                                <p style="font-size: 11px; color: #888; margin-top: 8px; margin-bottom: 0;">Format JPG ou PNG. Max 1 Mo.</p>
                             </div>
-                            <p id="friend-msg" style="font-size: 12px; margin-top: 10px; display: none;"></p>
-
-                            <!-- NOUVEAU : BOÎTE DE RÉCEPTION DES DEMANDES -->
-                            <div id="pending-requests-container" style="margin-top: 25px; border-top: 1px solid #333; padding-top: 15px;">
-                                <strong style="font-size: 13px; color: white; display: block; margin-bottom: 12px;">Demandes reçues :</strong>
-                                <div id="friend-requests-list">
-                                    <p style="font-size: 12px; color: #666; font-style: italic; margin: 0;">Aucune demande pour le moment.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- NOUVEAU : CODE D'AMI -->
-<!-- NOUVEAU : AJOUTER UN AMI PAR PSEUDO -->
-                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 25px;">
-                            <strong style="display: block; margin-bottom: 8px; font-size: 14px; color: white;">Ajouter un ami</strong>
-                            <p style="font-size: 12px; color: #888; margin-bottom: 15px;">Saisissez le pseudo exact du joueur pour lui envoyer une demande d'ami.</p>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" id="friend-search-input" placeholder="Ex: DarkNinja99" style="flex-grow: 1; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif;">
-                                <button class="btn" onclick="sendFriendRequest()" style="background: #0984e3; color: white; border: none; padding: 0 20px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s;">Envoyer</button>
-                            </div>
-                            <p id="friend-msg" style="font-size: 12px; margin-top: 10px; display: none;"></p>
                         </div>
 
                         <div class="form-group">
@@ -516,7 +464,7 @@
                         </div>
                         <div class="form-group">
                             <label>Titre (Cosmétique)</label>
-                            <select id="profile-title" style="width: 100%; padding: 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px; outline: none; font-family: 'Inter', sans-serif; cursor: pointer; appearance: none;">
+                            <select id="profile-title">
                                 <option value="NOVICE" style="background: #222; color: white;">NOVICE (Défaut)</option>
                                 <option value="PIONNIER" style="background: #222; color: #f1c40f;">PIONNIER (Fondateur)</option>
                                 <option value="BETA TESTEUR" style="background: #222; color: #3498db;">BÊTA TESTEUR</option>
@@ -531,231 +479,156 @@
                         <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
 
                         <h3>Détails personnels</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Ces informations sont privées et ne seront pas affichées aux autres utilisateurs.</p>
-                        
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Ces informations sont privées et ne seront pas affichées.</p>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                             <div class="form-group"><label>Prénom</label><input type="text" id="profile-firstname"></div>
                             <div class="form-group"><label>Nom de famille</label><input type="text" id="profile-lastname"></div>
-                            <div class="form-group"><label>Adresse - Ligne 1</label><input type="text" id="profile-address1"></div>
-                            <div class="form-group"><label>Adresse - Ligne 2</label><input type="text" id="profile-address2"></div>
+                            <div class="form-group"><label>Adresse 1</label><input type="text" id="profile-address1"></div>
+                            <div class="form-group"><label>Adresse 2</label><input type="text" id="profile-address2"></div>
                             <div class="form-group"><label>Ville</label><input type="text" id="profile-city"></div>
                             <div class="form-group"><label>Région / État</label><input type="text" id="profile-region"></div>
                             <div class="form-group"><label>Code Postal</label><input type="text" id="profile-zip"></div>
-                            <div class="form-group"><label>Pays / Région</label><input type="text" id="profile-country"></div>
+                            <div class="form-group"><label>Pays</label><input type="text" id="profile-country"></div>
                         </div>
 
-                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
-
-                        <h3>Entreprise</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Gérez les informations de votre entreprise pour les reçus professionnels de vos achats. Si vous êtes assujetti à la TVA, saisissez votre numéro de TVA.</p>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group"><label>Nom de l'entreprise *</label><input type="text"></div>
-                            <div class="form-group"><label>Numéro de TVA *</label><input type="text"></div>
-                        </div>
-
-                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
-
-                        <h3>Télécharger les données du compte</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Téléchargez une copie des données disponibles que vous avez partagées avec nous. Nous vous enverrons un e-mail quand ce sera prêt.</p>
-                        <button class="btn" style="background: transparent; border: 1px solid white; color: white;">Demander l'archive des données</button>
-
-                        <div style="margin-top: 40px;">
-                            <button class="btn" onclick="saveProfile()">Enregistrer les modifications</button>
-                            <p id="save-msg" style="color: #4cd137; font-size: 13px; display: none; margin-top: 10px;">Profil mis à jour !</p>
-                        </div>
-                        <!-- ... le bouton enregistrer ... -->
                         <div style="margin-top: 40px; margin-bottom: 30px;">
                             <button class="btn" onclick="saveProfile()">Enregistrer les modifications</button>
                             <p id="save-msg" style="color: #4cd137; font-size: 13px; display: none; margin-top: 10px;">Profil mis à jour !</p>
                         </div>
 
-                        <!-- NOUVEAU : ZONE DE DANGER (SUPPRESSION DE COMPTE) -->
                         <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
                         <div style="background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; padding: 25px; border-radius: 8px;">
                             <h3 style="color: #ff4757; margin-top: 0;">Zone de danger</h3>
-                            <p style="color: #ccc; font-size: 12px; margin-bottom: 15px;">La suppression de votre compte est définitive. Toutes vos données, vos jeux et votre solde Novaly seront définitivement effacés.</p>
+                            <p style="color: #ccc; font-size: 12px; margin-bottom: 15px;">La suppression de votre compte est définitive.</p>
+                            <button class="btn" style="background: #ff4757; color: white; border: none;" onclick="document.getElementById('delete-confirm-box').style.display='block'">Supprimer mon compte</button>
                             
-                            <button class="btn" style="background: #ff4757; color: white; border: none; font-weight: bold;" onclick="document.getElementById('delete-confirm-box').style.display='block'">Supprimer mon compte</button>
-                            
-                            <!-- Boîte de confirmation cachée par défaut -->
                             <div id="delete-confirm-box" style="display: none; margin-top: 20px; background: #111; padding: 20px; border-radius: 6px; border: 1px solid #ff4757;">
-                                <p style="font-size: 13px; color: white; margin-top: 0; margin-bottom: 15px; font-weight: bold;">Confirmez votre identité pour procéder :</p>
-                                <input type="email" id="delete-email" placeholder="Adresse e-mail" style="width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
-                                <input type="password" id="delete-password" placeholder="Mot de passe" style="width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 15px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
-                                
-                                <div style="display: flex; gap: 10px;">
-                                    <button class="btn" style="background: transparent; color: white; border: 1px solid #555;" onclick="document.getElementById('delete-confirm-box').style.display='none'">Annuler</button>
-                                    <button class="btn" style="background: #ff4757; color: white; border: none; flex-grow: 1;" onclick="confirmDeleteAccount()">Confirmer la suppression définitive</button>
+                                <p style="font-size: 13px; color: white; margin-top: 0; margin-bottom: 15px; font-weight: bold;">Confirmez votre identité :</p>
+                                <input type="email" id="delete-email" placeholder="Adresse e-mail" style="width: 100%; margin-bottom: 10px; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                <input type="password" id="delete-password" placeholder="Mot de passe" style="width: 100%; margin-bottom: 15px; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button class="btn" style="background: transparent; color: white; border: 1px solid #555; flex-grow: 1;" onclick="document.getElementById('delete-confirm-box').style.display='none'">Annuler</button>
+                                    <button class="btn" style="background: #ff4757; color: white; border: none; flex-grow: 2;" onclick="confirmDeleteAccount()">Confirmer la suppression</button>
                                 </div>
                                 <p id="delete-msg" style="color: #ff4757; font-size: 12px; margin-top: 10px; display: none;"></p>
                             </div>
                         </div>
-                    </div> <!-- FIN DE L'ONGLET 1 -->
                     </div>
 
-                    <!-- ONGLET 2 : SÉCURITÉ -->
                     <div id="tab-security" class="profile-tab-content">
-                        <h3>Mot de passe et sécurité</h3>
-                        <div class="form-group">
-                            <label>Mot de passe actuel</label>
-                            <input type="password" placeholder="••••••••">
-                        </div>
-                        <div class="form-group">
-                            <label>Nouveau mot de passe</label>
-                            <input type="password" placeholder="••••••••">
-                        </div>
-                        <button class="btn">Changer le mot de passe</button>
-
-                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
-
                         <h3>Authentification à deux facteurs (A2F)</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés en exigeant un code supplémentaire lors de la connexion.</p>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés.</p>
                         
-                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
                             <div>
                                 <strong>Application d'authentification</strong>
-                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Utilisez une application comme Google Authenticator ou Authy.</p>
+                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Utilisez Google Authenticator ou Authy.</p>
                             </div>
-                            <button class="btn" style="background: #4cd137; border: none; padding: 8px 15px;">Configurer</button>
+                            <button class="btn" id="btn-a2f-app" onclick="toggleA2F('app')" style="background: #4cd137; border: none; width: 100px;">Activer</button>
                         </div>
-                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                             <div>
                                 <strong>Authentification par E-mail</strong>
-                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Recevez un code de sécurité à votre adresse e-mail.</p>
+                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Recevez un code à votre e-mail.</p>
                             </div>
-                            <button class="btn" style="background: #4cd137; border: none; padding: 8px 15px;">Configurer</button>
+                            <button class="btn" id="btn-a2f-email" onclick="toggleA2F('email')" style="background: #4cd137; border: none; width: 100px;">Activer</button>
                         </div>
+                        <p id="a2f-msg" style="color: #4cd137; font-size: 12px; margin-top: 15px; display: none;"></p>
                     </div>
 
-                    <!-- ONGLET 3 : PAIEMENT ET SOLDE -->
                     <div id="tab-payment" class="profile-tab-content">
                         <h3>Portefeuille Novaly</h3>
                         <div style="background: linear-gradient(135deg, #2a2a35, #1a1a24); border: 1px solid #444; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 30px;">
-                            <p style="color: #aaa; margin: 0 0 10px 0; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Solde actuel</p>
-                            <h2 style="font-size: 48px; margin: 0; font-weight: 900;">0,00 €</h2>
-                            <button class="btn" style="margin-top: 20px;">Ajouter des fonds</button>
+                            <p style="color: #aaa; margin: 0 0 10px 0; text-transform: uppercase; font-size: 12px;">Solde actuel</p>
+                            <h2 style="font-size: 48px; margin: 0; font-weight: 900;" id="wallet-balance">0,00 €</h2>
+                            <button class="btn" style="margin-top: 20px;" onclick="alert('Module Stripe en cours de développement !')">Ajouter des fonds</button>
                         </div>
 
-                        <h3>Moyens de paiement enregistrés</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Vos cartes de crédit et comptes PayPal enregistrés pour des achats rapides.</p>
-                        <div style="border: 1px dashed #555; border-radius: 8px; padding: 30px; text-align: center; color: #888; cursor: pointer;">
-                            + Ajouter un nouveau moyen de paiement
+                        <h3>Moyens de paiement</h3>
+                        <div id="saved-cards-list" style="display: none; margin-bottom: 15px;">
+                            <div style="background: #111; border: 1px solid #333; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap:10px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="background: #fff; color: #000; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">VISA</div>
+                                    <span style="color: white; font-family: monospace; font-size: 14px;">•••• •••• •••• <span id="card-last4"></span></span>
+                                </div>
+                                <button class="btn" onclick="removeCard()" style="background: transparent; border: 1px solid #ff4757; color: #ff4757; padding: 5px 10px; font-size: 11px;">Supprimer</button>
+                            </div>
+                        </div>
+
+                        <div id="add-card-btn" style="border: 1px dashed #555; border-radius: 8px; padding: 20px; text-align: center; color: #888; cursor: pointer;" onclick="document.getElementById('stripe-modal').style.display='block'">
+                            + Ajouter une carte de crédit
+                        </div>
+
+                        <div id="stripe-modal" style="display: none; background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #4cd137; margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <strong style="color: white;">Ajouter une carte</strong>
+                                <span style="font-size: 10px; color: #aaa;">🔒 SSL Sécurisé</span>
+                            </div>
+                            <input type="text" id="fake-card-num" placeholder="Numéro (16 chiffres)" maxlength="16" style="width: 100%; box-sizing: border-box; padding: 12px; background: #111; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 4px; font-family: monospace;">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <input type="text" placeholder="MM/AA" maxlength="5" style="width: 50%; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; font-family: monospace;">
+                                <input type="text" placeholder="CVC" maxlength="3" style="width: 50%; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; font-family: monospace;">
+                            </div>
+                            <button class="btn" style="width: 100%; background: #4cd137;" onclick="saveFakeCard()">Sauvegarder la carte</button>
                         </div>
                     </div>
 
-                    <!-- ONGLET 4 : COMPTES ASSOCIÉS -->
                     <div id="tab-links" class="profile-tab-content">
                         <h3>Comptes Associés</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Connectez d'autres comptes pour profiter de la progression croisée et retrouver vos amis.</p>
-                        
                         <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
-                            <!-- Composant générique pour chaque plateforme -->
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="width: 30px; height: 30px; background: #000; border-radius: 5px; display: flex; align-items: center; justify-content: center;">🍏</div>
-                                    <strong>Apple</strong>
+                                    <div style="width: 30px; height: 30px; background: #5865F2; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg" style="width: 18px; filter: invert(1);">
+                                    </div>
+                                    <strong>Discord</strong>
                                 </div>
-                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                                <button id="link-discord-btn" class="btn" style="padding: 6px 15px; font-size: 12px;" onclick="linkAccount('discord')">Associer</button>
                             </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="width: 30px; height: 30px; background: #00439c; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold;">PS</div>
-                                    <strong>PlayStation Network</strong>
-                                </div>
-                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="width: 30px; height: 30px; background: #107c10; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold;">X</div>
-                                    <strong>Xbox Live</strong>
-                                </div>
-                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="width: 30px; height: 30px; background: #e60012; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold;">N</div>
-                                    <strong>Nintendo Account</strong>
-                                </div>
-                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="width: 30px; height: 30px; background: #171a21; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center;">S</div>
+                                    <div style="width: 30px; height: 30px; background: #171a21; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/steam.svg" style="width: 18px; filter: invert(1);">
+                                    </div>
                                     <strong>Steam</strong>
                                 </div>
-                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="width: 30px; height: 30px; background: #333; color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center;">GH</div>
-                                    <strong>GitHub</strong>
-                                </div>
-                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="width: 30px; height: 30px; background: #000; color: #01F1E3; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold;">TT</div>
-                                    <strong>TikTok</strong>
-                                </div>
-                                <button class="btn" style="padding: 6px 15px; font-size: 12px;">Associer</button>
+                                <button id="link-steam-btn" class="btn" style="padding: 6px 15px; font-size: 12px;" onclick="linkAccount('steam')">Associer</button>
                             </div>
                         </div>
+                        <p id="link-msg" style="color: #4cd137; font-size: 12px; margin-top: 15px; display: none;"></p>
                     </div>
 
-                    <!-- ONGLET 5 : UTILISER UN CODE -->
                     <div id="tab-code" class="profile-tab-content">
                         <h3>Utiliser un code</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Saisissez un code pour débloquer des cosmétiques, des jeux, des V-Bucks ou des crédits Novaly.</p>
-                        
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Saisissez un code pour débloquer des cosmétiques ou des crédits Novaly.</p>
                         <div class="form-group">
                             <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
                         </div>
                         <button class="btn" style="width: 100%;">Échanger le code</button>
                     </div>
 
-                    <!-- ONGLET 6 : CONTRÔLE PARENTAL -->
                     <div id="tab-parental" class="profile-tab-content">
                         <h3>Contrôle Parental</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez l'expérience de jeu des plus jeunes grâce au code PIN de contrôle parental.</p>
-                        
                         <div style="background: #222; padding: 30px; border-radius: 8px; border: 1px solid #444; text-align: center;">
-                            <div style="font-size: 40px; margin-bottom: 15px;">🛡️</div>
+                            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/shield-alert.svg" style="width: 40px; height: 40px; filter: invert(1); opacity: 0.8; margin-bottom: 15px;">
                             <h4>Le Contrôle Parental est désactivé</h4>
                             <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Activez-le pour restreindre les achats, limiter le chat vocal et filtrer les jeux par classification d'âge.</p>
-                            <button class="btn" style="background: #0984e3; color: white; border: none;">Configurer le contrôle parental</button>
+                            <button class="btn" style="background: #0984e3; color: white; border: none; width: 100%;">Configurer le contrôle parental</button>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
 
         <footer class="site-footer">
-            
             <div class="footer-downloads">
                 <h4 data-i18n="footerAppsTitle">Téléchargez Novaly</h4>
                 <div class="app-buttons">
-                    <button class="app-btn">
-                        <svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> 
-                        App Store
-                    </button>
-                    <button class="app-btn">
-                        <svg viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg> 
-                        Google Play
-                    </button>
-                    <button class="app-btn">
-                        <svg viewBox="0 0 448 512"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg> 
-                        Windows
-                    </button>
-                    <button class="app-btn">
-                        <svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> 
-                        Mac
-                    </button>
-                    <button class="app-btn">
-                        <svg viewBox="0 0 448 512"><path d="M220.8 123.3c1.1 0 2.6-.4 2.6-.4 44.4-7.6 62.4-56.5 62.4-56.5 12.8-33.1-23-45.7-23-45.7-25-10.4-58.4-1.5-74 15.9-18.7 20.8-12.7 61.2-12.7 61.2 1.4 16.9 24.2 25.4 44.7 25.5zm199.1 154c-13.6-24.5-22.3-15-22.3-15-46.2 36.9-106.3 34.4-106.3 34.4-44.8.4-78.5-19.1-78.5-19.1-12.8-7.8-21.7-18.4-21.7-18.4-25.5-35.3-51.5-24.1-51.5-24.1-26.6 6.3-33.6 28.4-33.6 28.4-6.4 20.2-2.1 36.3-2.1 36.3 22.3 46 62.1 38.3 62.1 38.3 32.1-4 68-18.8 68-18.8 45.3-22.1 91.5-11.8 91.5-11.8 35.8 7.3 53.6 33.3 53.6 33.3 18.2 25.8 12 40.8 12 40.8-6.1 19.3-30.8 25.4-30.8 25.4-29.4 6-64.8-17.7-64.8-17.7-25-14.8-51.2-9-51.2-9-19.6 4-29.3 15-29.3 15-13.9 14.7-24 41.5-24 41.5-9.1 27.6-5.8 45.4-5.8 45.4 3 17.5 13.9 24.6 13.9 24.6 18.3 11 41.6 3.1 41.6 3.1 25.9-9.1 52.8-28.5 52.8-28.5 45.7-32.9 116.5-29 116.5-29 48.7-.9 87.2 21.6 87.2 21.6 16.5 9.7 28.3 23.3 28.3 23.3 24.6 32.7 13.9 66 13.9 66-12.4 35.7-44.1 48-44.1 48-28.8 11.2-61.6 2.3-61.6 2.3-33.1-9.9-63.5-31.5-63.5-31.5-40.4-30-101.4-27.1-101.4-27.1-41.9.4-74.9-16.7-74.9-16.7-24.9-14-42.5-33.2-42.5-33.2-22-26.6-21.2-56-21.2-56-1-31.3 14.1-57.1 14.1-57.1 16-29.2 41.1-43 41.1-43 27-14.7 57.6-11.4 57.6-11.4 36.3 3.9 68.7 22.8 68.7 22.8 39.5 24.8 95.8 28.2 95.8 28.2 45.2.2 82.5-16.8 82.5-16.8 21.3-10 35.7-25.2 35.7-25.2 24.1-27 18.5-56.1 18.5-56.1-5.7-28-25.5-44.1-25.5-44.1zM140.4 316.5c-15.6-10.6-21.9-27.9-21.9-27.9-7-20.9 2-41.4 2-41.4 12-24.8 33.6-35.4 33.6-35.4 22.5-10.8 48.7-6 48.7-6 26.6 4.7 47.7 21 47.7 21 17.5 14.8 24.7 34 24.7 34 8.7 23.3-1.6 45.2-1.6 45.2-14.4 26.5-38.6 37.3-38.6 37.3-25.1 11.9-52.9 6-52.9 6-25-4.4-41.7-22.8-41.7-22.8z"/></svg> 
-                        Linux
-                    </button>
+                    <button class="app-btn"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> App Store</button>
+                    <button class="app-btn"><svg viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg> Google Play</button>
+                    <button class="app-btn"><svg viewBox="0 0 448 512"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg> Windows</button>
+                    <button class="app-btn"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> Mac</button>
+                    <button class="app-btn"><svg viewBox="0 0 448 512"><path d="M220.8 123.3c1.1 0 2.6-.4 2.6-.4 44.4-7.6 62.4-56.5 62.4-56.5 12.8-33.1-23-45.7-23-45.7-25-10.4-58.4-1.5-74 15.9-18.7 20.8-12.7 61.2-12.7 61.2 1.4 16.9 24.2 25.4 44.7 25.5zm199.1 154c-13.6-24.5-22.3-15-22.3-15-46.2 36.9-106.3 34.4-106.3 34.4-44.8.4-78.5-19.1-78.5-19.1-12.8-7.8-21.7-18.4-21.7-18.4-25.5-35.3-51.5-24.1-51.5-24.1-26.6 6.3-33.6 28.4-33.6 28.4-6.4 20.2-2.1 36.3-2.1 36.3 22.3 46 62.1 38.3 62.1 38.3 32.1-4 68-18.8 68-18.8 45.3-22.1 91.5-11.8 91.5-11.8 35.8 7.3 53.6 33.3 53.6 33.3 18.2 25.8 12 40.8 12 40.8-6.1 19.3-30.8 25.4-30.8 25.4-29.4 6-64.8-17.7-64.8-17.7-25-14.8-51.2-9-51.2-9-19.6 4-29.3 15-29.3 15-13.9 14.7-24 41.5-24 41.5-9.1 27.6-5.8 45.4-5.8 45.4 3 17.5 13.9 24.6 13.9 24.6 18.3 11 41.6 3.1 41.6 3.1 25.9-9.1 52.8-28.5 52.8-28.5 45.7-32.9 116.5-29 116.5-29 48.7-.9 87.2 21.6 87.2 21.6 16.5 9.7 28.3 23.3 28.3 23.3 24.6 32.7 13.9 66 13.9 66-12.4 35.7-44.1 48-44.1 48-28.8 11.2-61.6 2.3-61.6 2.3-33.1-9.9-63.5-31.5-63.5-31.5-40.4-30-101.4-27.1-101.4-27.1-41.9.4-74.9-16.7-74.9-16.7-24.9-14-42.5-33.2-42.5-33.2-22-26.6-21.2-56-21.2-56-1-31.3 14.1-57.1 14.1-57.1 16-29.2 41.1-43 41.1-43 27-14.7 57.6-11.4 57.6-11.4 36.3 3.9 68.7 22.8 68.7 22.8 39.5 24.8 95.8 28.2 95.8 28.2 45.2.2 82.5-16.8 82.5-16.8 21.3-10 35.7-25.2 35.7-25.2 24.1-27 18.5-56.1 18.5-56.1-5.7-28-25.5-44.1-25.5-44.1zM140.4 316.5c-15.6-10.6-21.9-27.9-21.9-27.9-7-20.9 2-41.4 2-41.4 12-24.8 33.6-35.4 33.6-35.4 22.5-10.8 48.7-6 48.7-6 26.6 4.7 47.7 21 47.7 21 17.5 14.8 24.7 34 24.7 34 8.7 23.3-1.6 45.2-1.6 45.2-14.4 26.5-38.6 37.3-38.6 37.3-25.1 11.9-52.9 6-52.9 6-25-4.4-41.7-22.8-41.7-22.8z"/></svg> Linux</button>
                 </div>
             </div>
 
@@ -881,14 +754,6 @@
             document.getElementById('lang-menu').classList.toggle('show');
         }
 
-        document.addEventListener('click', function(event) {
-            const langWrapper = document.querySelector('.lang-wrapper');
-            if (!langWrapper.contains(event.target)) {
-                document.getElementById('lang-menu').classList.remove('show');
-            }
-        });
-
-        // Fonction mise à jour pour changer l'image source
         function changeLanguage(langCode, flagUrl) {
             currentLang = langCode;
             document.getElementById('lang-btn').innerHTML = `<img src="${flagUrl}" alt="${langCode}" class="flag-icon">`;
@@ -908,8 +773,6 @@
 
             updatePageTitle();
         }
-
-        let currentUser = { username: "okk k", avatarUrl: "" };
 
         const searchInput = document.getElementById('main-search-bar');
         searchInput.addEventListener('input', function(e) {
@@ -956,6 +819,13 @@
             }
 
             document.querySelector('.content').scrollTop = 0;
+            
+            // Gestion du scroll du sidebar de profil sur mobile
+            if (viewId === 'profile') {
+                const sidebar = document.getElementById('profileSidebar');
+                if (sidebar) sidebar.scrollLeft = 0;
+            }
+
             updatePageTitle();
         }
 
@@ -974,6 +844,15 @@
             document.querySelectorAll('.profile-tab-content').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
             document.getElementById('tab-' + tabId).classList.add('active');
+            
+            // Auto-scroll pour rendre l'onglet visible sur mobile
+            const sidebar = document.getElementById('profileSidebar');
+            if (sidebar && window.innerWidth <= 1024) {
+                sidebar.scrollTo({
+                    left: element.offsetLeft - 20,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         function previewAvatar(event) {
@@ -983,52 +862,59 @@
                 document.getElementById('profile-avatar-preview').style.backgroundImage = `url(${url})`;
             }
         }
-        // --- GESTION DU MENU MOBILE ---
+
         function toggleMobileMenu() {
             document.querySelector('.main-header').classList.toggle('open');
         }
 
-        // Fermer automatiquement le menu mobile quand on clique sur un lien
         document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelector('.main-header').classList.remove('open');
-            });
-        });
-        // ==========================================
-        // GESTION DES COMPTES (FIREBASE / LOCALSTORAGE)
-        // ==========================================
-
-        // On lance la vérification dès que la page s'ouvre
-
-        // Fonction pour le bouton "Quitter"
-        // Fonction pour ouvrir/fermer le menu utilisateur
-        function toggleUserMenu(event) {
-            event.stopPropagation(); // Empêche la fermeture immédiate
-            document.getElementById('user-dropdown').classList.toggle('show');
-        }
-
-        // Fermer le menu si on clique n'importe où ailleurs sur l'écran
-        window.addEventListener('click', function() {
-            const dropdown = document.getElementById('user-dropdown');
-            if (dropdown && dropdown.classList.contains('show')) {
-                dropdown.classList.remove('show');
+            // Ne pas fermer si on clique sur un trigger de dropdown
+            if(!item.classList.contains('profile-trigger') && !item.classList.contains('friends-btn')) {
+                item.addEventListener('click', () => {
+                    document.querySelector('.main-header').classList.remove('open');
+                });
             }
         });
 
-        // Modifier ta fonction updateUI existante pour s'assurer que l'avatar est propre
-        // (Cherche ta fonction updateUI et vérifie cette ligne) :
-        if (navAvatar && username) {
-            navAvatar.innerText = username.charAt(0).toUpperCase();
+        // ================= GESTION DES MENUS (PROFIL & AMIS) =================
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            document.getElementById('user-dropdown').classList.toggle('show');
+            const friendsMenu = document.getElementById('friends-dropdown');
+            if(friendsMenu) friendsMenu.classList.remove('show');
         }
+
+        function toggleFriendsMenu(event) {
+            event.stopPropagation();
+            document.getElementById('friends-dropdown').classList.toggle('show');
+            const userMenu = document.getElementById('user-dropdown');
+            if(userMenu) userMenu.classList.remove('show');
+        }
+
+        window.addEventListener('click', function(event) {
+            const langWrapper = document.querySelector('.lang-wrapper');
+            if (langWrapper && !langWrapper.contains(event.target)) {
+                document.getElementById('lang-menu').classList.remove('show');
+            }
+
+            const userDropdown = document.getElementById('user-dropdown');
+            if (userDropdown && userDropdown.classList.contains('show') && !event.target.closest('.user-section')) {
+                userDropdown.classList.remove('show');
+            }
+            
+            const friendsDropdown = document.getElementById('friends-dropdown');
+            if (friendsDropdown && friendsDropdown.classList.contains('show') && !event.target.closest('#friends-menu-container')) {
+                friendsDropdown.classList.remove('show');
+            }
+        });
     </script>
-    <!-- NOUVEAU BLOC FIREBASE POUR LES PARAMÈTRES -->
-     <!-- LE CŒUR FIREBASE DE NOVALY -->
- <!-- LE CŒUR FIREBASE DE NOVALY -->
-<!-- LE CŒUR FIREBASE DE NOVALY (AVEC VRAIES REQUÊTES D'AMIS) -->
+
+    <!-- LE CŒUR FIREBASE DE NOVALY -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
             authDomain: "novaly-a80f7.firebaseapp.com",
@@ -1045,14 +931,16 @@
 
         window.currentAvatarDataUrl = null;
 
-        // 1. SURVEILLANCE DU COMPTE
+        // SURVEILLANCE DU COMPTE
         onAuthStateChanged(auth, async (user) => {
             const loggedOutView = document.getElementById('logged-out-view');
             const loggedInView = document.getElementById('logged-in-view');
+            const friendsMenuContainer = document.getElementById('friends-menu-container');
 
             if (user) {
                 if (loggedOutView) loggedOutView.style.display = 'none';
                 if (loggedInView) loggedInView.style.display = 'flex';
+                if (friendsMenuContainer) friendsMenuContainer.style.display = 'flex'; 
 
                 const displayName = user.displayName || "Joueur";
                 document.getElementById('nav-username').innerText = displayName;
@@ -1066,11 +954,15 @@
                 try {
                     const userDocRef = doc(db, "users", user.uid);
                     
-                    // NOUVEAU : On s'assure que le pseudo du joueur est bien sauvegardé (en minuscules aussi) pour qu'on puisse le trouver dans la recherche !
                     await setDoc(userDocRef, { 
                         pseudo: displayName, 
-                        pseudoLower: displayName.toLowerCase() 
+                        pseudoLower: displayName.toLowerCase(),
+                        isOnline: true 
                     }, { merge: true });
+
+                    window.addEventListener('beforeunload', () => {
+                        setDoc(userDocRef, { isOnline: false }, { merge: true });
+                    });
 
                     const docSnap = await getDoc(userDocRef);
 
@@ -1096,17 +988,76 @@
                         if(document.getElementById('profile-region')) document.getElementById('profile-region').value = data.region || "";
                         if(document.getElementById('profile-zip')) document.getElementById('profile-zip').value = data.zip || "";
                         if(document.getElementById('profile-country')) document.getElementById('profile-country').value = data.country || "";
+
+                        if (data.paymentCardLast4) {
+                            document.getElementById('add-card-btn').style.display = 'none';
+                            document.getElementById('saved-cards-list').style.display = 'block';
+                            document.getElementById('card-last4').innerText = data.paymentCardLast4;
+                        }
+
+                        if (data.a2f_app) {
+                            const btn = document.getElementById('btn-a2f-app');
+                            btn.innerText = "Désactiver";
+                            btn.style.background = "transparent";
+                            btn.style.color = "#ff4757";
+                            btn.style.border = "1px solid #ff4757";
+                        }
+                        if (data.a2f_email) {
+                            const btn = document.getElementById('btn-a2f-email');
+                            btn.innerText = "Désactiver";
+                            btn.style.background = "transparent";
+                            btn.style.color = "#ff4757";
+                            btn.style.border = "1px solid #ff4757";
+                        }
+
+                        if (data.linked_discord) {
+                            const btn = document.getElementById('link-discord-btn');
+                            btn.innerText = "Dissocier";
+                            btn.style.background = "#ff4757";
+                            btn.style.color = "white";
+                        }
+                        if (data.linked_steam) {
+                            const btn = document.getElementById('link-steam-btn');
+                            btn.innerText = "Dissocier";
+                            btn.style.background = "#ff4757";
+                            btn.style.color = "white";
+                        }
                     }
                 } catch(error) {
                     console.error("Erreur Firestore:", error);
                 }
-            } else {
-                if (loggedOutView) loggedOutView.style.display = 'block';
-                if (loggedInView) loggedInView.style.display = 'none';
-            }
-            // --- CHARGEMENT DE LA LISTE D'AMIS DANS LE MENU DÉROULANT ---
-// --- CHARGEMENT DE LA LISTE D'AMIS (EN LIGNE & HORS LIGNE) ---
-// --- CHARGEMENT ET TRI DES AMIS (EN LIGNE / HORS LIGNE) ---
+
+                // GESTION DES REQUÊTES D'AMIS
+                const requestsRef = collection(db, "friend_requests");
+                const qRequests = query(requestsRef, where("receiverId", "==", user.uid), where("status", "==", "pending"));
+                
+                onSnapshot(qRequests, (snapshot) => {
+                    const listEl = document.getElementById('friend-requests-list');
+                    const container = document.getElementById('pending-requests-container');
+                    
+                    if (snapshot.empty) {
+                        container.style.display = 'none';
+                        listEl.innerHTML = '';
+                        return;
+                    }
+                    
+                    container.style.display = 'block';
+                    let html = "";
+                    snapshot.forEach(docRequest => {
+                        const req = docRequest.data();
+                        html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 10px; border-radius: 4px; margin-bottom: 5px; border: 1px solid #333;">
+                            <span style="color: white; font-weight: bold; font-size: 11px;">${req.senderPseudo}</span>
+                            <div style="display: flex; gap: 5px;">
+                                <button onclick="acceptFriend('${docRequest.id}', '${req.senderId}', '${req.senderPseudo}')" style="background: #4cd137; color: black; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 800;">OK</button>
+                                <button onclick="declineFriend('${docRequest.id}')" style="background: transparent; color: #ff4757; border: 1px solid #ff4757; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 800;">X</button>
+                            </div>
+                        </div>`;
+                    });
+                    listEl.innerHTML = html;
+                });
+
+                // CHARGEMENT ET TRI DES AMIS (EN LIGNE / HORS LIGNE)
                 const friendsRef = collection(db, "users", user.uid, "friends");
                 onSnapshot(friendsRef, async (snapshot) => {
                     const onlineList = document.getElementById('friends-online-list');
@@ -1117,7 +1068,6 @@
                     let onlineCount = 0;
                     let offlineCount = 0;
 
-                    // On parcourt chaque ami pour vérifier son statut réel dans Firestore
                     for (const docFriend of snapshot.docs) {
                         const friendLink = docFriend.data();
                         const friendId = docFriend.id;
@@ -1126,7 +1076,6 @@
                         const friendData = friendSnap.data();
                         const isOnline = friendData ? friendData.isOnline : false;
 
-                        // On crée le petit bloc HTML pour cet ami
                         const itemHtml = `
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 2px 0; opacity: ${isOnline ? '1' : '0.5'};">
                             <div style="width: 7px; height: 7px; background: ${isOnline ? '#4cd137' : '#555'}; border-radius: 50%; ${isOnline ? 'box-shadow: 0 0 5px #4cd137;' : ''}"></div>
@@ -1142,13 +1091,17 @@
                         }
                     }
 
-                    // On met à jour les deux listes ou on affiche un message si vide
-                    onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
-                    offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
+                    if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
+                    if(offlineList) offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
                 });
+
+            } else {
+                if (loggedOutView) loggedOutView.style.display = 'block';
+                if (loggedInView) loggedInView.style.display = 'none';
+                if (friendsMenuContainer) friendsMenuContainer.style.display = 'none'; 
+            }
         });
 
-        // 2. PRÉVISUALISER L'IMAGE
         window.previewAvatar = function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -1167,7 +1120,6 @@
             }
         };
 
-        // 3. LA VRAIE FONCTION POUR ENVOYER UNE DEMANDE D'AMI
         window.sendFriendRequest = async function() {
             const pseudoInput = document.getElementById('friend-search-input');
             const msg = document.getElementById('friend-msg');
@@ -1184,7 +1136,6 @@
 
             const myPseudo = document.getElementById('profile-username').value;
             
-            // Sécurité : On ne peut pas s'ajouter soi-même
             if (targetPseudo.toLowerCase() === myPseudo.toLowerCase()) {
                 msg.style.color = "#ff4757";
                 msg.innerText = "Vous ne pouvez pas vous ajouter vous-même !";
@@ -1192,61 +1143,79 @@
                 return;
             }
 
-            // Animation du bouton
             const btn = document.querySelector('button[onclick="sendFriendRequest()"]');
             const originalText = btn.innerText;
-            btn.innerText = "Recherche...";
+            btn.innerText = "...";
             btn.disabled = true;
 
             try {
-                // ÉTAPE A : On cherche le joueur dans la base de données Firestore
                 const usersRef = collection(db, "users");
-                // On compare en minuscules pour éviter les problèmes de majuscules (ex: dArKNiNjA)
                 const q = query(usersRef, where("pseudoLower", "==", targetPseudo.toLowerCase()));
                 const querySnapshot = await getDocs(q);
 
                 if (querySnapshot.empty) {
-                    // Le joueur n'existe pas
                     msg.style.color = "#ff4757";
-                    msg.innerText = "Joueur introuvable. Vérifiez l'orthographe.";
+                    msg.innerText = "Joueur introuvable.";
                     msg.style.display = "block";
                 } else {
-                    // ÉTAPE B : Le joueur existe ! On récupère ses infos
                     const targetUserDoc = querySnapshot.docs[0];
                     const targetUserId = targetUserDoc.id;
                     const realTargetPseudo = targetUserDoc.data().pseudo;
 
-                    // ÉTAPE C : On crée un vrai document de demande d'ami dans Firestore
                     await addDoc(collection(db, "friend_requests"), {
                         senderId: auth.currentUser.uid,
                         senderPseudo: myPseudo,
                         receiverId: targetUserId,
                         receiverPseudo: realTargetPseudo,
-                        status: "pending", // "En attente"
+                        status: "pending",
                         timestamp: serverTimestamp()
                     });
 
-                    // Succès !
                     msg.style.color = "#4cd137";
-                    msg.innerText = "Demande d'ami envoyée à " + realTargetPseudo + " !";
+                    msg.innerText = "Demande envoyée !";
                     msg.style.display = "block";
                     pseudoInput.value = "";
                 }
             } catch(error) {
                 console.error("Erreur d'ajout d'ami:", error);
                 msg.style.color = "#ff4757";
-                msg.innerText = "Erreur de connexion aux serveurs.";
+                msg.innerText = "Erreur de connexion.";
                 msg.style.display = "block";
             } finally {
-                // On remet le bouton à la normale
                 btn.innerText = originalText;
                 btn.disabled = false;
                 setTimeout(() => msg.style.display = "none", 4000);
             }
         };
 
-        // 4. SAUVEGARDE DU PROFIL
-// 4. SAUVEGARDE DU PROFIL (AVEC VÉRIFICATION DU PSEUDO)
+        window.acceptFriend = async function(requestId, senderId, senderPseudo) {
+            try {
+                await deleteDoc(doc(db, "friend_requests", requestId));
+                await setDoc(doc(db, "users", auth.currentUser.uid, "friends", senderId), { 
+                    pseudo: senderPseudo, 
+                    addedAt: serverTimestamp() 
+                });
+                
+                const myPseudo = document.getElementById('profile-username').value;
+                await setDoc(doc(db, "users", senderId, "friends", auth.currentUser.uid), { 
+                    pseudo: myPseudo, 
+                    addedAt: serverTimestamp() 
+                });
+
+                alert("Ami ajouté !");
+            } catch (error) {
+                console.error("Erreur acceptation:", error);
+            }
+        };
+
+        window.declineFriend = async function(requestId) {
+            try {
+                await deleteDoc(doc(db, "friend_requests", requestId));
+            } catch (error) {
+                console.error("Erreur refus:", error);
+            }
+        };
+
         window.saveProfile = async function() {
             const btn = document.querySelector('button[onclick="saveProfile()"]');
             let msg = document.getElementById('save-msg');
@@ -1260,38 +1229,28 @@
                     const newUsername = document.getElementById('profile-username').value.trim();
                     const newTitle = document.getElementById('profile-title').value;
 
-                    // VÉRIFICATION : Ce pseudo est-il déjà pris par QUELQU'UN D'AUTRE ?
                     const usersRef = collection(db, "users");
                     const q = query(usersRef, where("pseudoLower", "==", newUsername.toLowerCase()));
                     const querySnapshot = await getDocs(q);
                     
                     let isTaken = false;
-                    querySnapshot.forEach((doc) => {
-                        // Si le document trouvé n'appartient pas à l'utilisateur actuel
-                        if (doc.id !== auth.currentUser.uid) {
-                            isTaken = true;
-                        }
+                    querySnapshot.forEach((docSnap) => {
+                        if (docSnap.id !== auth.currentUser.uid) isTaken = true;
                     });
 
                     if (isTaken) {
                         msg.style.color = "#ff4757";
                         msg.innerText = "Erreur : Ce pseudo est déjà utilisé par un autre joueur.";
                         msg.style.display = "block";
-                        return; // On arrête tout !
+                        return;
                     }
 
                     btn.innerText = "Sauvegarde...";
 
                     await updateProfile(auth.currentUser, { displayName: newUsername });
                     const userDocRef = doc(db, "users", auth.currentUser.uid);
-
-                    // On signale au serveur que je suis EN LIGNE
+                    
                     await setDoc(userDocRef, { isOnline: true }, { merge: true });
-
-                    // On prépare la déconnexion automatique si on ferme l'onglet
-                    window.addEventListener('beforeunload', () => {
-                        setDoc(userDocRef, { isOnline: false }, { merge: true });
-                    });
                     
                     let dataToSave = {
                         pseudo: newUsername,
@@ -1324,7 +1283,7 @@
                     }
 
                     msg.style.color = "#4cd137";
-                    msg.innerText = "Données sauvegardées sur les serveurs Novaly !";
+                    msg.innerText = "Données sauvegardées !";
                     msg.style.display = "block";
 
                 } catch (error) {
@@ -1338,7 +1297,7 @@
                 }
             }
         };
-        // FONCTION DE SUPPRESSION DE COMPTE
+
         window.confirmDeleteAccount = async function() {
             const email = document.getElementById('delete-email').value;
             const password = document.getElementById('delete-password').value;
@@ -1352,64 +1311,107 @@
 
             try {
                 const user = auth.currentUser;
-                // 1. Re-authentifier le joueur (Sécurité exigée par Google)
                 const credential = EmailAuthProvider.credential(email, password);
                 await reauthenticateWithCredential(user, credential);
                 
-                // 2. Supprimer la fiche dans Firestore
                 await deleteDoc(doc(db, "users", user.uid));
-                
-                // 3. Supprimer le compte Firebase Auth
                 await deleteUser(user);
                 
-                // 4. Nettoyer et renvoyer à l'accueil
                 localStorage.clear();
                 alert("Votre compte a été définitivement supprimé. Au revoir !");
                 window.location.href = "index.html";
 
             } catch (error) {
-                msg.innerText = "Identifiants incorrects (ou compte créé avec Google).";
+                msg.innerText = "Identifiants incorrects (ou compte Google).";
                 msg.style.display = "block";
                 console.error("Erreur de suppression:", error);
             }
         };
-        // FONCTION : ACCEPTER UN AMI
-        window.acceptFriend = async function(requestId, senderId, senderPseudo) {
-            try {
-                // 1. On supprime la demande (elle n'est plus "en attente")
-                await deleteDoc(doc(db, "friend_requests", requestId));
-                
-                // 2. On ajoute l'ami dans TON dossier
-                await setDoc(doc(db, "users", auth.currentUser.uid, "friends", senderId), { 
-                    pseudo: senderPseudo, 
-                    addedAt: serverTimestamp() 
-                });
-                
-                // 3. On t'ajoute dans SON dossier (pour que ce soit réciproque)
-                const myPseudo = document.getElementById('profile-username').value;
-                await setDoc(doc(db, "users", senderId, "friends", auth.currentUser.uid), { 
-                    pseudo: myPseudo, 
-                    addedAt: serverTimestamp() 
-                });
 
-                alert("Ami ajouté !");
-            } catch (error) {
-                console.error("Erreur acceptation:", error);
+        window.toggleA2F = async function(type) {
+            const btnId = type === 'app' ? 'btn-a2f-app' : 'btn-a2f-email';
+            const btn = document.getElementById(btnId);
+            const msg = document.getElementById('a2f-msg');
+            const userDocRef = doc(db, "users", auth.currentUser.uid);
+
+            if (btn.innerText === "Activer") {
+                btn.innerText = "Désactiver";
+                btn.style.background = "transparent";
+                btn.style.color = "#ff4757";
+                btn.style.border = "1px solid #ff4757";
+                msg.innerText = "Sécurité A2F activée avec succès !";
+                await setDoc(userDocRef, { ["a2f_" + type]: true }, { merge: true });
+            } else {
+                btn.innerText = "Activer";
+                btn.style.background = "#4cd137";
+                btn.style.color = "black";
+                btn.style.border = "none";
+                msg.innerText = "Sécurité A2F désactivée.";
+                await setDoc(userDocRef, { ["a2f_" + type]: false }, { merge: true });
+            }
+            msg.style.display = "block";
+            setTimeout(() => msg.style.display = "none", 3000);
+        };
+
+        window.saveFakeCard = async function() {
+            const cardNum = document.getElementById('fake-card-num').value;
+            if (cardNum.length < 16) {
+                alert("Veuillez entrer une fausse carte à 16 chiffres.");
+                return;
+            }
+            const last4 = cardNum.substring(12, 16);
+            
+            document.getElementById('stripe-modal').style.display = 'none';
+            document.getElementById('add-card-btn').style.display = 'none';
+            document.getElementById('saved-cards-list').style.display = 'block';
+            document.getElementById('card-last4').innerText = last4;
+
+            const userDocRef = doc(db, "users", auth.currentUser.uid);
+            await setDoc(userDocRef, { paymentCardLast4: last4 }, { merge: true });
+        };
+
+        window.removeCard = async function() {
+            if(confirm("Supprimer ce moyen de paiement ?")) {
+                document.getElementById('saved-cards-list').style.display = 'none';
+                document.getElementById('add-card-btn').style.display = 'block';
+                document.getElementById('fake-card-num').value = "";
+                
+                const userDocRef = doc(db, "users", auth.currentUser.uid);
+                await setDoc(userDocRef, { paymentCardLast4: null }, { merge: true });
             }
         };
 
-        // FONCTION : REFUSER UN AMI
-        window.declineFriend = async function(requestId) {
-            try {
-                await deleteDoc(doc(db, "friend_requests", requestId));
-            } catch (error) {
-                console.error("Erreur refus:", error);
+        window.linkAccount = async function(platform) {
+            const btnId = "link-" + platform + "-btn";
+            const btn = document.getElementById(btnId);
+            const msg = document.getElementById('link-msg');
+            const userDocRef = doc(db, "users", auth.currentUser.uid);
+
+            if (btn.innerText === "Associer") {
+                let popup = window.open("", "Connexion", "width=500,height=600");
+                popup.document.write(`<div style="font-family:sans-serif;text-align:center;margin-top:50px;"><h2>Connexion à ${platform.toUpperCase()}</h2><p>Veuillez patienter pendant l'autorisation sécurisée...</p></div>`);
+                
+                setTimeout(async () => {
+                    popup.close();
+                    btn.innerText = "Dissocier";
+                    btn.style.background = "#ff4757";
+                    btn.style.color = "white";
+                    msg.innerText = `Compte ${platform.toUpperCase()} associé avec succès !`;
+                    msg.style.display = "block";
+                    
+                    await setDoc(userDocRef, { ["linked_" + platform]: true }, { merge: true });
+                    setTimeout(() => msg.style.display = "none", 3000);
+                }, 2000);
+            } else {
+                btn.innerText = "Associer";
+                btn.style.background = "#fff";
+                btn.style.color = "black";
+                await setDoc(userDocRef, { ["linked_" + platform]: false }, { merge: true });
             }
         };
-        // 5. DÉCONNEXION
+
         window.logout = async function() {
             try {
-                // On passe en hors-ligne avant de quitter
                 if (auth.currentUser) {
                     await setDoc(doc(db, "users", auth.currentUser.uid), { isOnline: false }, { merge: true });
                 }

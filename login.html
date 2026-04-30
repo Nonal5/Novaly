@@ -9,8 +9,8 @@
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
-            /* Fond d'écran gaming assombri */
             background: linear-gradient(rgba(0,0,0,0.6), rgba(15,15,20,0.9)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
+            background-repeat: no-repeat;
             color: #f5f5f5;
             display: flex;
             justify-content: center;
@@ -19,7 +19,6 @@
             overflow: hidden;
         }
 
-        /* Effet de verre (Glassmorphism) */
         .login-box {
             background: rgba(20, 20, 25, 0.65);
             backdrop-filter: blur(15px);
@@ -39,19 +38,8 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .logo { 
-            font-size: 32px; 
-            font-weight: 800; 
-            margin-bottom: 10px; 
-            letter-spacing: 2px; 
-            color: #fff;
-        }
-        
-        .subtitle {
-            color: #a0a0a0;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
+        .logo { font-size: 32px; font-weight: 800; margin-bottom: 10px; letter-spacing: 2px; color: #fff; }
+        .subtitle { color: #a0a0a0; font-size: 14px; margin-bottom: 30px; }
         
         .form-group { margin-bottom: 20px; text-align: left; position: relative; }
         .form-group label { display: block; margin-bottom: 8px; color: #b0b0b0; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -70,7 +58,6 @@
         .btn:hover { background-color: #d0d0d0; transform: translateY(-2px); }
         .btn:active { transform: translateY(0); }
 
-        /* Style bouton Google */
         .btn-google {
             background-color: transparent; border: 1px solid rgba(255,255,255,0.2); color: white;
             display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
@@ -78,12 +65,8 @@
         .btn-google:hover { background-color: rgba(255,255,255,0.05); color: white; }
         .btn-google img { width: 18px; height: 18px; }
 
-        .divider {
-            display: flex; align-items: center; text-align: center; color: #777; font-size: 12px; margin: 20px 0;
-        }
-        .divider::before, .divider::after {
-            content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
+        .divider { display: flex; align-items: center; text-align: center; color: #777; font-size: 12px; margin: 20px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .divider:not(:empty)::before { margin-right: .5em; }
         .divider:not(:empty)::after { margin-left: .5em; }
 
@@ -94,11 +77,9 @@
         .toggle-text span { color: white; text-decoration: underline; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .toggle-text span:hover { color: #d0d0d0; }
 
-        /* Animation entre connexion et inscription */
         .section-fade { animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Messages d'erreur stylisés */
         .error-message {
             background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; color: #ff4757;
             padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; display: none; text-align: left;
@@ -110,10 +91,8 @@
     <div class="login-box">
         <div class="logo">NOVALY</div>
 
-        <!-- SECTION CONNEXION -->
         <div id="login-section" class="section-fade">
             <div class="subtitle">Heureux de vous revoir</div>
-            
             <div id="login-error" class="error-message"></div>
 
             <div class="form-group">
@@ -126,21 +105,19 @@
             </div>
             
             <button class="btn" onclick="login()">Se connecter</button>
-
             <div class="divider">OU</div>
 
+            <!-- LE VRAI LOGO GOOGLE EST ICI -->
             <button class="btn btn-google" onclick="loginWithGoogle()">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 Continuer avec Google
             </button>
 
             <p class="toggle-text">Pas encore de compte ? <span onclick="toggleForm()">S'inscrire</span></p>
         </div>
 
-        <!-- SECTION INSCRIPTION -->
         <div id="register-section" class="section-fade" style="display: none;">
             <div class="subtitle">Rejoignez l'écosystème</div>
-            
             <div id="reg-error" class="error-message"></div>
 
             <div class="form-group">
@@ -164,11 +141,10 @@
     </div>
 
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        // NOUVEAU IMPORT FIRESTORE
         import { getFirestore, collection, query, where, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-        // Ta configuration Firebase
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
             authDomain: "novaly-a80f7.firebaseapp.com",
@@ -184,12 +160,10 @@
         const provider = new GoogleAuthProvider();
         const db = getFirestore(app);
 
-        // Fonction utilitaire pour afficher les erreurs
         function showError(elementId, message) {
             const errorDiv = document.getElementById(elementId);
             errorDiv.innerText = message;
             errorDiv.style.display = "block";
-            // Fait trembler légèrement la box d'erreur pour attirer l'attention
             errorDiv.animate([{ transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }], { duration: 300, iterations: 2 });
         }
 
@@ -198,8 +172,6 @@
             document.getElementById('reg-error').style.display = "none";
         }
 
-        // --- INSCRIPTION ---
-// --- INSCRIPTION (AVEC ANTI-DOUBLON DE PSEUDO) ---
         window.register = async function() {
             hideErrors();
             const username = document.getElementById('reg-username').value.trim();
@@ -216,24 +188,20 @@
             btn.innerText = "Vérification...";
             
             try {
-                // 1. On vérifie si le pseudo est libre dans la base de données !
                 const usersRef = collection(db, "users");
                 const q = query(usersRef, where("pseudoLower", "==", username.toLowerCase()));
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
-                    // Le pseudo existe déjà !
                     showError('reg-error', "Ce pseudo est déjà pris par un autre joueur.");
                     btn.innerText = originalText;
-                    return; // On annule la création
+                    return; 
                 }
 
-                // 2. Si c'est libre, on crée le compte
                 btn.innerText = "Création...";
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: username });
                 
-                // 3. On initialise son dossier dans Firestore
                 await setDoc(doc(db, "users", userCredential.user.uid), {
                     pseudo: username,
                     pseudoLower: username.toLowerCase()
@@ -250,7 +218,6 @@
             }
         };
 
-        // --- CONNEXION CLASSIQUE ---
         window.login = async function() {
             hideErrors();
             const email = document.getElementById('login-email').value;
@@ -266,34 +233,29 @@
             btn.innerText = "Connexion...";
 
             try {
-                // Remplace le bloc de succès par ça :
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('username', userCredential.user.displayName || "Joueur");
-            localStorage.setItem('email', userCredential.user.email); // <-- NOUVEAU
-            window.location.href = 'index.html';
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', userCredential.user.displayName || "Joueur");
+                localStorage.setItem('email', userCredential.user.email);
+                window.location.href = 'index.html';
             } catch (error) {
                 showError('login-error', "Adresse e-mail ou mot de passe incorrect.");
                 btn.innerText = originalText;
             }
         };
 
-        // --- CONNEXION GOOGLE ---
-// --- CONNEXION GOOGLE (Version améliorée) ---
         window.loginWithGoogle = async function() {
             hideErrors();
             try {
-                // Remplace le bloc de succès par ça :
-            const result = await signInWithPopup(auth, provider);
-            const pseudo = result.user.displayName || "Joueur";
+                const result = await signInWithPopup(auth, provider);
+                const pseudo = result.user.displayName || "Joueur";
 
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('username', pseudo);
-            localStorage.setItem('email', result.user.email); // <-- NOUVEAU
-            window.location.href = 'index.html';
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', pseudo);
+                localStorage.setItem('email', result.user.email);
+                window.location.href = 'index.html';
                             
             } catch (error) {
-                // L'erreur fatale de Firebase quand les comptes se croisent mal
                 if (error.code === 'auth/account-exists-with-different-credential') {
                     showError('login-error', "Un compte utilise déjà cet e-mail. Connectez-vous avec votre mot de passe !");
                 } else {
@@ -303,7 +265,6 @@
             }
         };
 
-        // --- BASCULE CONNEXION / INSCRIPTION ---
         window.toggleForm = function() {
             hideErrors();
             let loginSec = document.getElementById('login-section');
