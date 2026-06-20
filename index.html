@@ -1471,7 +1471,7 @@
 // ================= GESTION DES JEUX ONLINE =================
         window.currentGameSelected = "";
 
-        // Ouvre la fenêtre de lobby
+        // Ouvre la petite fenêtre de présentation du jeu
         window.lancerJeu = function(jeuId) {
             window.currentGameSelected = jeuId;
             const titles = {
@@ -1482,62 +1482,48 @@
             document.getElementById('lobby-game-title').innerText = titles[jeuId];
             document.getElementById('game-lobby-modal').style.display = 'flex';
             
-            // On réinitialise la fenêtre
             document.getElementById('private-match-section').style.display = 'none';
             document.getElementById('private-room-code').value = '';
         };
 
-        // Ferme la fenêtre
         window.closeGameModal = function() {
             document.getElementById('game-lobby-modal').style.display = 'none';
         };
 
-        // Affiche/Masque la zone pour le code
         window.togglePrivateMatchInput = function() {
             const sec = document.getElementById('private-match-section');
             sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
         };
 
-window.startPublicMatch = function() {
+        // --- NOUVEAU : OUVERTURE DU VRAI JEU DANS L'IFRAME ---
+        function chargerLeJeuEnPleinEcran() {
             window.closeGameModal();
-            // On cache les autres vues
+            
+            // On cache tout le magasin
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             
-            // On affiche le conteneur du jeu
+            // On affiche la zone d'iframe (le jeu)
             document.getElementById('game-container').style.display = 'block';
             
-            // On charge le bon fichier html selon le jeu
+            // On charge le fichier HTML correspondant
             if(window.currentGameSelected === 'nolimite') {
                 document.getElementById('game-frame').src = 'nolimite.html';
             } else if (window.currentGameSelected === 'imposteur') {
-                document.getElementById('game-frame').src = 'imposteur.html';
+                document.getElementById('game-frame').src = 'imposteur.html'; // Plus tard
             }
-        };
+        }
 
+        window.startPublicMatch = function() { chargerLeJeuEnPleinEcran(); };
+        window.joinPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
+        window.createPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
+
+        // Quitter le jeu et revenir au menu
         window.quitterJeu = function() {
-            if(confirm("Êtes-vous sûr de vouloir quitter la partie en cours ?")) {
+            if(confirm("Êtes-vous sûr de vouloir quitter le jeu en cours ?")) {
                 document.getElementById('game-container').style.display = 'none';
                 document.getElementById('game-frame').src = '';
-                // On retourne au magasin
                 navigateTo('#magasin', 'store');
             }
-        };
-
-        // Lancement : Rejoindre Privé
-        window.joinPrivateMatch = function() {
-            const code = document.getElementById('private-room-code').value.trim();
-            if(!code) {
-                alert("Veuillez entrer un code de salle !");
-                return;
-            }
-            alert(`Connexion à la salle privée [${code}] pour ${window.currentGameSelected}... \n\n(Plus tard, Firebase vérifiera si ce code existe.)`);
-            window.closeGameModal();
-        };
-
-        // Lancement : Créer Privé
-        window.createPrivateMatch = function() {
-            alert(`Création d'une salle privée pour ${window.currentGameSelected}... \n\n(Plus tard, Firebase générera un code aléatoire à partager à vos amis !)`);
-            window.closeGameModal();
         };
     </script>
 </body>
