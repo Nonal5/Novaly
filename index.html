@@ -242,6 +242,7 @@
             <div class="menu-toggle" onclick="toggleMobileMenu()">☰</div>
             <nav class="nav-links">
                 <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
+                <div class="nav-item" id="nav-online" data-i18n="navOnline" onclick="navigateTo('#jeuxonline', 'online')">Jeux rapide</div>
                 <div class="nav-item" id="nav-library" data-i18n="navLibrary" onclick="navigateTo('#bibliotheque', 'library')">Bibliothèque</div>
                 <div class="nav-item" id="nav-community" data-i18n="navCommunity" onclick="navigateTo('#communaute', 'community')">Communauté</div>
                 <div class="nav-item" id="nav-cart" data-i18n="navCart" onclick="navigateTo('#panier', 'cart')">Panier</div>
@@ -252,7 +253,6 @@
         <div class="header-right">   
             <input type="text" id="main-search-bar" class="search-bar" data-i18n-ph="searchPh" placeholder="Rechercher un jeu...">
             
-            <!-- MENU AMIS SÉPARÉ (Masqué par défaut, géré par JS) -->
             <div id="friends-menu-container" style="position: relative; display: none; align-items: center;">
                 <div class="friends-btn" onclick="toggleFriendsMenu(event)">
                     <svg viewBox="0 0 640 512" style="width: 14px; height: 14px; fill: currentColor;"><path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
@@ -260,7 +260,6 @@
                 </div>
                 
                 <div id="friends-dropdown" class="user-dropdown" style="width: 280px; right: 0;">
-                    <!-- NOUVEAU : AJOUTER UN AMI -->
                     <div style="padding: 15px; border-bottom: 1px solid #333; background: #151515;">
                         <div style="display: flex; gap: 8px;">
                             <input type="text" id="friend-search-input" placeholder="Ajouter un pseudo..." style="flex-grow: 1; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: white; border-radius: 4px; outline: none; font-size: 12px; font-family: 'Inter', sans-serif;">
@@ -269,7 +268,6 @@
                         <p id="friend-msg" style="font-size: 11px; margin-top: 8px; margin-bottom: 0; display: none;"></p>
                     </div>
 
-                    <!-- NOUVEAU : DEMANDES REÇUES (Caché si vide) -->
                     <div id="pending-requests-container" style="padding: 12px 15px; border-bottom: 1px solid #333; display: none; background: rgba(241, 196, 15, 0.05);">
                         <div style="font-size: 10px; font-weight: 800; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Demandes d'ami</div>
                         <div id="friend-requests-list"></div>
@@ -309,12 +307,11 @@
                            onmouseover="this.style.backgroundColor='#e0e0e0'; this.style.transform='scale(1.03)';" 
                            onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='scale(1)';" 
                            style="background-color: #ffffff; color: #000000; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 11px; transition: all 0.2s ease; display: block; text-transform: uppercase; text-align: center;">
-                            Se connecter / S'inscrire
+                             Se connecter / S'inscrire
                         </a>
                     </div>
                 </div>
 
-                <!-- Vue Connecté : Menu Profil -->
                 <div id="logged-in-view" style="display: none; height: 100%; position: relative;">
                     <div class="profile-trigger nav-item" onclick="toggleUserMenu(event)">
                         <span class="nav-title" id="nav-title">NOVICE</span>
@@ -343,6 +340,30 @@
         </div>
     </header>
 
+    <div id="game-lobby-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 12px; width: 400px; padding: 30px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+            <span onclick="closeGameModal()" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#888'">&times;</span>
+            
+            <h2 id="lobby-game-title" style="margin-top: 0; font-weight: 800; font-size: 24px;">Titre du jeu</h2>
+            <p style="color: #aaa; font-size: 13px; margin-bottom: 25px;">Choisissez votre mode de jeu :</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button class="btn" style="background: #0984e3; color: white; padding: 15px; font-size: 14px;" onclick="startPublicMatch()">🌍 Lancer publiquement</button>
+                <button class="btn" style="background: transparent; color: white; border: 1px solid #555; padding: 15px; font-size: 14px;" onclick="togglePrivateMatchInput()">🔒 Partie privée</button>
+            </div>
+
+            <div id="private-match-section" style="display: none; margin-top: 20px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; animation: fadeIn 0.3s ease;">
+                <label style="display: block; font-size: 12px; color: #888; margin-bottom: 8px; text-align: left;">Rejoindre avec un code :</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="private-room-code" placeholder="EX: 4A8B" maxlength="6" style="flex-grow: 1; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 4px; text-transform: uppercase; text-align: center; font-weight: bold; letter-spacing: 2px; font-size: 16px; outline: none;">
+                    <button class="btn" style="background: #4cd137; color: black; border: none; padding: 0 20px; font-weight: 800;" onclick="joinPrivateMatch()">GO</button>
+                </div>
+                <div style="margin-top: 15px; border-top: 1px solid #222; padding-top: 15px;">
+                    <button class="btn" style="background: transparent; color: #ccc; border: 1px dashed #555; width: 100%; font-size: 12px;" onclick="createPrivateMatch()">+ Créer une nouvelle salle privée</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <main class="content">
         <h1 class="page-title" id="dynamic-page-title">Titre</h1>
 
@@ -363,6 +384,28 @@
                     </div>
                     <div class="game-title">CLUTCH : Standard Edition</div>
                     <div class="game-price">À venir</div>
+                </div>
+            </div>
+        </div>
+
+<!-- =================== NOUVELLE VUE : JEUX ONLINE =================== -->
+        <div id="view-online" class="view-section">
+            <h2 style="font-size: 18px; margin-bottom: 20px;">Nos Jeux en Ligne</h2>
+            <div class="grid">
+                <!-- JEU 1 : The Imposteur -->
+                <div class="game-card" onclick="lancerJeu('imposteur')">
+                    <div class="game-cover" style="background: linear-gradient(135deg, #2c3e50, #000); display: flex; align-items: center; justify-content: center;">
+                        <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">
+                    </div>
+                    <div class="game-title">The Imposteur</div>
+                    <div class="game-price">Jouer à l'alpha</div>
+                </div>
+                <!-- JEU 2 : Nolimite -->
+                <div class="game-card" onclick="lancerJeu('nolimite')">
+                    <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;">
+                        </div>
+                    <div class="game-title">Nolimite</div>
+                    <div class="game-price">Jouer à l'alpha</div>
                 </div>
             </div>
         </div>
@@ -430,7 +473,6 @@
             </div>
         </div>
 
-        <!-- =================== PROFIL =================== -->
         <div id="view-profile" class="view-section">
             <div class="profile-layout" style="max-width: 1200px;">
                 
@@ -650,13 +692,17 @@
                 <div>© 2026 Novaly Games, LLC. <span data-i18n="footerRights">Tous droits réservés.</span></div>
             </div>
         </footer>
-
+        <!-- ================= ZONE DE JEU (IFRAME) ================= -->
+        <div id="game-container" style="display: none; position: absolute; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); z-index: 50; background: #000;">
+            <button onclick="quitterJeu()" style="position: absolute; top: 10px; left: 10px; z-index: 60; background: rgba(255, 71, 87, 0.8); color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">Quitter le jeu</button>
+            <iframe id="game-frame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
     </main>
 
     <script>
         const translations = {
             fr: {
-                navStore: "Magasin", navLibrary: "Bibliothèque", navCommunity: "Communauté", navAbout: "À propos", navCart: "Panier", navContact: "Contactez-nous",
+                navStore: "Magasin", navOnline: "Jeux Rapide", navLibrary: "Bibliothèque", navCommunity: "Communauté", navAbout: "À propos", navCart: "Panier", navContact: "Contactez-nous",
                 searchPh: "Rechercher un jeu...", onlineStatus: "En ligne",
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Découvrez la nouvelle extension majeure. Explorez de nouveaux territoires et forgez votre propre destin.", bannerBtn: "Acheter Maintenant",
                 storeSubtitle: "Nouveautés et Tendances", searchResults: "Résultats de recherche...", readyToPlay: "Prêt à jouer",
@@ -671,10 +717,10 @@
                 tabPublic: "Profil Public", tabSecurity: "Sécurité & Connexion", tabPayment: "Moyens de paiement",
                 profName: "Nom d'utilisateur", profSave: "Enregistrer les modifications", profSaved: "Profil mis à jour !",
                 footerAppsTitle: "Téléchargez Novaly", footerHelpTitle: "Aide", footerNovalyTitle: "Novaly", footerRights: "Tous droits réservés.",
-                title_store: "Magasin", title_library: "Bibliothèque", title_community: "Communauté", title_about: "À propos", title_cart: "Mon Panier", title_contact: "Nous Contacter", title_profile: "Paramètres"
+                title_store: "Magasin", title_online: "Jeux Rapide", title_library: "Bibliothèque", title_community: "Communauté", title_about: "À propos", title_cart: "Mon Panier", title_contact: "Nous Contacter", title_profile: "Paramètres"
             },
             en: {
-                navStore: "Store", navLibrary: "Library", navCommunity: "Community", navAbout: "About", navCart: "Cart", navContact: "Contact Us",
+                navStore: "Store", navOnline: "Online Games", navLibrary: "Library", navCommunity: "Community", navAbout: "About", navCart: "Cart", navContact: "Contact Us",
                 searchPh: "Search for a game...", onlineStatus: "Online",
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Discover the new major expansion. Explore new territories and forge your own destiny.", bannerBtn: "Buy Now",
                 storeSubtitle: "New & Trending", searchResults: "Search Results...", readyToPlay: "Ready to Play",
@@ -689,10 +735,10 @@
                 tabPublic: "Public Profile", tabSecurity: "Security & Login", tabPayment: "Payment Methods",
                 profName: "Username", profSave: "Save Changes", profSaved: "Profile updated!",
                 footerAppsTitle: "Download Novaly", footerHelpTitle: "Help", footerNovalyTitle: "Novaly", footerRights: "All rights reserved.",
-                title_store: "Store", title_library: "Library", title_community: "Community", title_about: "About", title_cart: "My Cart", title_contact: "Contact Us", title_profile: "Settings"
+                title_store: "Store", title_online: "Online Games", title_library: "Library", title_community: "Community", title_about: "About", title_cart: "My Cart", title_contact: "Contact Us", title_profile: "Settings"
             },
             es: {
-                navStore: "Tienda", navLibrary: "Biblioteca", navCommunity: "Comunidad", navAbout: "Acerca de", navCart: "Carrito", navContact: "Contáctenos",
+                navStore: "Tienda", navOnline: "Juegos Online", navLibrary: "Biblioteca", navCommunity: "Comunidad", navAbout: "Acerca de", navCart: "Carrito", navContact: "Contáctenos",
                 searchPh: "Buscar un juego...", onlineStatus: "En línea",
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Descubre la nueva expansión mayor. Explora nuevos territorios y forja tu propio destino.", bannerBtn: "Comprar Ahora",
                 storeSubtitle: "Novedades y Tendencias", searchResults: "Resultados de búsqueda...", readyToPlay: "Listo para jugar",
@@ -707,10 +753,10 @@
                 tabPublic: "Perfil Público", tabSecurity: "Seguridad e Inicio", tabPayment: "Métodos de pago",
                 profName: "Nombre de usuario", profSave: "Guardar cambios", profSaved: "¡Perfil actualizado!",
                 footerAppsTitle: "Descargar Novaly", footerHelpTitle: "Ayuda", footerNovalyTitle: "Novaly", footerRights: "Todos los derechos reservados.",
-                title_store: "Tienda", title_library: "Biblioteca", title_community: "Comunidad", title_about: "Acerca de", title_cart: "Mi Carrito", title_contact: "Contáctenos", title_profile: "Ajustes"
+                title_store: "Tienda", title_online: "Juegos Online", title_library: "Biblioteca", title_community: "Comunidad", title_about: "Acerca de", title_cart: "Mi Carrito", title_contact: "Contáctenos", title_profile: "Ajustes"
             },
             de: {
-                navStore: "Shop", navLibrary: "Bibliothek", navCommunity: "Gemeinschaft", navAbout: "Über uns", navCart: "Warenkorb", navContact: "Kontakt",
+                navStore: "Shop", navOnline: "Online-Spiele", navLibrary: "Bibliothek", navCommunity: "Gemeinschaft", navAbout: "Über uns", navCart: "Warenkorb", navContact: "Kontakt",
                 searchPh: "Spiel suchen...", onlineStatus: "Online",
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Entdecken Sie die neue große Erweiterung. Erkunden Sie neue Gebiete und schmieden Sie Ihr eigenes Schicksal.", bannerBtn: "Jetzt Kaufen",
                 storeSubtitle: "Neu & im Trend", searchResults: "Suchergebnisse...", readyToPlay: "Bereit zum Spielen",
@@ -725,10 +771,10 @@
                 tabPublic: "Öffentliches Profil", tabSecurity: "Sicherheit & Login", tabPayment: "Zahlungsmethoden",
                 profName: "Benutzername", profSave: "Änderungen speichern", profSaved: "Profil aktualisiert!",
                 footerAppsTitle: "Novaly Herunterladen", footerHelpTitle: "Hilfe", footerNovalyTitle: "Novaly", footerRights: "Alle Rechte vorbehalten.",
-                title_store: "Shop", title_library: "Bibliothek", title_community: "Gemeinschaft", title_about: "Über uns", title_cart: "Mein Warenkorb", title_contact: "Kontakt", title_profile: "Einstellungen"
+                title_store: "Shop", title_online: "Online-Spiele", title_library: "Bibliothek", title_community: "Gemeinschaft", title_about: "Über uns", title_cart: "Mein Warenkorb", title_contact: "Kontakt", title_profile: "Einstellungen"
             },
             it: {
-                navStore: "Negozio", navLibrary: "Libreria", navCommunity: "Comunità", navAbout: "Chi siamo", navCart: "Carrello", navContact: "Contattaci",
+                navStore: "Negozio", navOnline: "Giochi Online", navLibrary: "Libreria", navCommunity: "Comunità", navAbout: "Chi siamo", navCart: "Carrello", navContact: "Contattaci",
                 searchPh: "Cerca un gioco...", onlineStatus: "Online",
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Scopri la nuova grande espansione. Esplora nuovi territori e forgia il tuo destino.", bannerBtn: "Acquista Ora",
                 storeSubtitle: "Novità e Tendenze", searchResults: "Risultati della ricerca...", readyToPlay: "Pronto per giocare",
@@ -743,7 +789,7 @@
                 tabPublic: "Profilo Pubblico", tabSecurity: "Sicurezza e Accesso", tabPayment: "Metodi di pagamento",
                 profName: "Nome utente", profSave: "Salva modifiche", profSaved: "Profilo aggiornato!",
                 footerAppsTitle: "Scarica Novaly", footerHelpTitle: "Aiuto", footerNovalyTitle: "Novaly", footerRights: "Tutti i diritti riservati.",
-                title_store: "Negozio", title_library: "Libreria", title_community: "Comunità", title_about: "Chi siamo", title_cart: "Il mio Carrello", title_contact: "Contattaci", title_profile: "Impostazioni"
+                title_store: "Negozio", title_online: "Giochi Online", title_library: "Libreria", title_community: "Comunità", title_about: "Chi siamo", title_cart: "Il mio Carrello", title_contact: "Contattaci", title_profile: "Impostazioni"
             }
         };
 
@@ -909,7 +955,6 @@
         });
     </script>
 
-    <!-- LE CŒUR FIREBASE DE NOVALY -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
@@ -1421,6 +1466,78 @@
             } catch (error) {
                 console.error("Erreur lors de la déconnexion", error);
             }
+        };
+
+// ================= GESTION DES JEUX ONLINE =================
+        window.currentGameSelected = "";
+
+        // Ouvre la fenêtre de lobby
+        window.lancerJeu = function(jeuId) {
+            window.currentGameSelected = jeuId;
+            const titles = {
+                'imposteur': 'The Imposteur',
+                'nolimite': 'Nolimite'
+            };
+            
+            document.getElementById('lobby-game-title').innerText = titles[jeuId];
+            document.getElementById('game-lobby-modal').style.display = 'flex';
+            
+            // On réinitialise la fenêtre
+            document.getElementById('private-match-section').style.display = 'none';
+            document.getElementById('private-room-code').value = '';
+        };
+
+        // Ferme la fenêtre
+        window.closeGameModal = function() {
+            document.getElementById('game-lobby-modal').style.display = 'none';
+        };
+
+        // Affiche/Masque la zone pour le code
+        window.togglePrivateMatchInput = function() {
+            const sec = document.getElementById('private-match-section');
+            sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+        };
+
+window.startPublicMatch = function() {
+            window.closeGameModal();
+            // On cache les autres vues
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            
+            // On affiche le conteneur du jeu
+            document.getElementById('game-container').style.display = 'block';
+            
+            // On charge le bon fichier html selon le jeu
+            if(window.currentGameSelected === 'nolimite') {
+                document.getElementById('game-frame').src = 'nolimite.html';
+            } else if (window.currentGameSelected === 'imposteur') {
+                document.getElementById('game-frame').src = 'imposteur.html';
+            }
+        };
+
+        window.quitterJeu = function() {
+            if(confirm("Êtes-vous sûr de vouloir quitter la partie en cours ?")) {
+                document.getElementById('game-container').style.display = 'none';
+                document.getElementById('game-frame').src = '';
+                // On retourne au magasin
+                navigateTo('#magasin', 'store');
+            }
+        };
+
+        // Lancement : Rejoindre Privé
+        window.joinPrivateMatch = function() {
+            const code = document.getElementById('private-room-code').value.trim();
+            if(!code) {
+                alert("Veuillez entrer un code de salle !");
+                return;
+            }
+            alert(`Connexion à la salle privée [${code}] pour ${window.currentGameSelected}... \n\n(Plus tard, Firebase vérifiera si ce code existe.)`);
+            window.closeGameModal();
+        };
+
+        // Lancement : Créer Privé
+        window.createPrivateMatch = function() {
+            alert(`Création d'une salle privée pour ${window.currentGameSelected}... \n\n(Plus tard, Firebase générera un code aléatoire à partager à vos amis !)`);
+            window.closeGameModal();
         };
     </script>
 </body>
