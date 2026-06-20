@@ -75,16 +75,16 @@
             <label>Photo (Optionnel)</label>
             <div class="file-input-wrapper">
                 📷 Prendre une photo / Galerie
-                <input type="file" accept="image/*" onchange="previewAvatar(event)">
+                <input type="file" accept="image/*" onchange="window.previewAvatar(event)">
             </div>
         </div>
 
         <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-            <button class="btn-primary" onclick="creerSalon()">Créer un nouveau salon</button>
+            <button class="btn-primary" onclick="window.creerSalon()">Créer un nouveau salon</button>
             <p style="margin: 5px 0; color: #888; font-size: 12px; font-weight: bold;">- OU -</p>
             <div style="display: flex; gap: 10px;">
                 <input type="text" id="join-code" placeholder="CODE SALON" maxlength="4" style="flex-grow: 1; text-transform: uppercase; text-align: center; font-size: 18px; font-weight: bold; letter-spacing: 2px;">
-                <button class="btn-secondary" style="width: auto; padding: 0 20px;" onclick="rejoindreSalon()">Go</button>
+                <button class="btn-secondary" style="width: auto; padding: 0 20px;" onclick="window.rejoindreSalon()">Go</button>
             </div>
         </div>
         <p id="setup-error" style="color: #ff4757; font-size: 12px; margin-top: 15px; display: none;"></p>
@@ -102,7 +102,7 @@
         <div id="waiting-players-list" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin: 20px 0; width: 100%;">
             </div>
 
-        <button id="btn-start-game" class="btn-primary" disabled onclick="demarrerLaPartieFirebase()">Seul le créateur peut lancer</button>
+        <button id="btn-start-game" class="btn-primary" disabled onclick="window.demarrerLaPartieFirebase()">Seul le créateur peut lancer</button>
     </div>
 
     <div id="game-screen" class="container" style="display: none;">
@@ -116,7 +116,7 @@
                 Chargement de la question...
             </div>
 
-            <button class="btn-primary" id="confirm-btn" style="display: none; border-radius: 30px; margin-top: 10px; max-width: 250px;" onclick="validerCarteFirebase()">Confirmer mon choix</button>
+            <button class="btn-primary" id="confirm-btn" style="display: none; border-radius: 30px; margin-top: 10px; max-width: 250px;" onclick="window.validerCarteFirebase()">Confirmer mon choix</button>
             
             <div id="judge-area" class="submitted-cards-container" style="display: none;">
                 </div>
@@ -215,6 +215,8 @@
         }
 
         window.creerSalon = async function() {
+            if (!myUid) return afficherErreur("Connexion en cours, réessayez dans un instant.");
+            
             const joueur = preparerInfosJoueur();
             currentRoomId = genererCode();
             isHost = true;
@@ -236,6 +238,8 @@
         };
 
         window.rejoindreSalon = async function() {
+             if (!myUid) return afficherErreur("Connexion en cours, réessayez dans un instant.");
+             
             const codeInput = document.getElementById('join-code').value.trim().toUpperCase();
             if(codeInput.length !== 4) return afficherErreur("Code invalide.");
 
