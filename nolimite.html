@@ -6,103 +6,55 @@
     <title>Nolimite</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
-            background-color: #1a1a24; color: white; display: flex;
-            flex-direction: column; height: 100vh; overflow: hidden;
-        }
-
-        /* --- EN TÊTE --- */
-        .header {
-            text-align: center; padding: 15px; background: #111; font-weight: 900;
-            font-size: 18px; letter-spacing: 2px; text-transform: uppercase;
-            border-bottom: 2px solid #8e44ad; flex-shrink: 0;
-        }
-
-        /* --- SCORES (EN HAUT DU JEU) --- */
-        .scoreboard {
-            display: flex; gap: 15px; padding: 10px 15px; background: #15151e;
-            overflow-x: auto; border-bottom: 1px solid #333; flex-shrink: 0;
-            scrollbar-width: none;
-        }
-        .scoreboard::-webkit-scrollbar { display: none; }
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #1a1a24; color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .header { text-align: center; padding: 15px; background: #111; font-weight: 900; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid #8e44ad; flex-shrink: 0; }
         
-        .player-score-box {
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            min-width: 60px; position: relative; opacity: 0.5; transition: 0.3s;
-        }
+        /* Scores */
+        .scoreboard { display: flex; gap: 15px; padding: 10px 15px; background: #15151e; overflow-x: auto; border-bottom: 1px solid #333; flex-shrink: 0; scrollbar-width: none; }
+        .scoreboard::-webkit-scrollbar { display: none; }
+        .player-score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 60px; position: relative; opacity: 0.5; transition: 0.3s; }
         .player-score-box.active { opacity: 1; }
         .player-score-box.master .avatar { border-color: #f1c40f; box-shadow: 0 0 10px #f1c40f; }
         .master-crown { position: absolute; top: -10px; font-size: 16px; }
-
-        .avatar {
-            width: 45px; height: 45px; border-radius: 50%; border: 2px solid #555;
-            background-size: cover; background-position: center; background-color: #333;
-            background-repeat: no-repeat; flex-shrink: 0;
-        }
-        
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #555; background-size: cover; background-position: center; background-color: #333; background-repeat: no-repeat; flex-shrink: 0; display:flex; justify-content:center; align-items:center; font-weight:bold;}
         .player-name { font-size: 10px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
         .player-points { background: #8e44ad; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 900; }
 
-        /* --- ZONES GLOBALES --- */
+        /* Conteneurs */
         .container { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        .game-board { flex-grow: 1; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-
-        /* --- SALON (LOBBY & SETUP) --- */
+        .game-board { flex-grow: 1; display: flex; flex-direction: column; align-items: center; padding: 20px; text-align: center; }
         .setup-screen { display: flex; flex-direction: column; align-items: center; padding: 30px 20px; text-align: center; }
+        
         .form-group { width: 100%; max-width: 320px; margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; font-size: 12px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; }
         .form-group input[type="text"] { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; font-family: inherit; }
         
         .file-input-wrapper { background: #222; border: 1px dashed #8e44ad; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; color: #ccc; font-size: 13px; position: relative;}
         .file-input-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        
-        /* Slider pour le recadrage/zoom */
         input[type="range"] { width: 100%; accent-color: #8e44ad; margin-top: 10px; }
 
-        .toggle-switch { display: flex; align-items: center; gap: 10px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; margin-bottom: 20px; width: 100%; max-width: 320px; box-sizing: border-box;}
-        .toggle-switch input { width: 20px; height: 20px; accent-color: #8e44ad; }
-
-        .btn-primary { background: #8e44ad; color: white; border: none; padding: 15px; width: 100%; max-width: 320px; font-size: 16px; font-weight: 900; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
+        .btn-primary { background: #8e44ad; color: white; border: none; padding: 15px; width: 100%; font-size: 16px; font-weight: 900; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
         .btn-primary:hover { background: #9b59b6; }
         .btn-primary:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; }
+        .btn-secondary { background: transparent; color: white; border: 2px solid #555; padding: 15px; width: 100%; font-size: 16px; font-weight: 900; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
 
-        /* --- SALON D'ATTENTE --- */
         .waiting-player { display: flex; flex-direction: column; align-items: center; gap: 8px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; width: 80px; animation: fadeIn 0.3s ease;}
 
-        /* --- CARTES --- */
-        .black-card {
-            background-color: #000; color: #fff; width: 100%; max-width: 320px; min-height: 160px;
-            padding: 20px; border-radius: 12px; box-sizing: border-box; font-size: 20px; font-weight: 700;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.8); border: 1px solid #333; margin-bottom: 15px;
-            display: flex; flex-direction: column; justify-content: space-between;
-        }
-
+        /* Cartes */
+        .black-card { background-color: #000; color: #fff; width: 100%; max-width: 320px; min-height: 160px; padding: 20px; border-radius: 12px; box-sizing: border-box; font-size: 20px; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.8); border: 1px solid #333; margin-bottom: 15px; display: flex; flex-direction: column; justify-content: space-between; }
         .player-hand { width: 100%; display: flex; gap: 15px; overflow-x: auto; padding: 20px; box-sizing: border-box; background: #111; border-top: 1px solid #333; flex-shrink: 0; }
-        
-        .white-card {
-            background-color: #fff; color: #000; min-width: 130px; max-width: 130px; height: 180px;
-            padding: 15px; border-radius: 8px; font-size: 13px; font-weight: 700; box-sizing: border-box;
-            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: 0.2s; flex-shrink: 0;
-            display: flex; flex-direction: column; justify-content: space-between; position: relative;
-        }
+        .white-card { background-color: #fff; color: #000; min-width: 130px; max-width: 130px; height: 180px; padding: 15px; border-radius: 8px; font-size: 13px; font-weight: 700; box-sizing: border-box; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: 0.2s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         .white-card:hover { transform: translateY(-5px); }
         .white-card.selected { border: 4px solid #8e44ad; transform: translateY(-10px); }
 
         .custom-card { border: 2px dashed #8e44ad; background-color: #fdfdfd; }
-        .custom-card textarea {
-            width: 100%; height: 100%; border: none; background: transparent; resize: none;
-            font-family: inherit; font-size: 13px; font-weight: 700; outline: none; padding: 0; margin: 0;
-        }
+        .custom-card textarea { width: 100%; height: 100%; border: none; background: transparent; resize: none; font-family: inherit; font-size: 13px; font-weight: 700; outline: none; padding: 0; margin: 0; }
 
         .submitted-cards-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 400px;}
         .card-secret { background: #222; color: #222; border: 1px solid #444; background-image: repeating-linear-gradient(45deg, #2a2a2a 25%, transparent 25%, transparent 75%, #2a2a2a 75%, #2a2a2a), repeating-linear-gradient(45deg, #2a2a2a 25%, #222 25%, #222 75%, #2a2a2a 75%, #2a2a2a); background-position: 0 0, 10px 10px; background-size: 20px 20px; }
         .card-secret::after { content: '?'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #555; font-size: 40px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .dev-controls { position: fixed; bottom: 5px; right: 5px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; z-index: 9999; font-size: 10px;}
-        .dev-controls button { background: #333; color: white; border: 1px solid #555; padding: 5px; margin: 2px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -114,47 +66,43 @@
         
         <div id="avatar-preview" class="avatar" style="width: 80px; height: 80px; margin-bottom: 5px; font-size: 32px; font-weight: bold; background-color: #333; background-size: 100%;">?</div>
         
-        <div id="zoom-container" style="display: none; width: 100%; max-width: 200px; margin-bottom: 20px; text-align: center;">
-            <label style="font-size: 10px; color: #888;">Recadrer / Zoomer</label>
-            <input type="range" id="avatar-zoom" min="100" max="300" value="100" oninput="updateZoom(this.value)">
-        </div>
-
         <div class="form-group" style="margin-top: 15px;">
             <label>Votre Pseudo</label>
-            <input type="text" id="input-pseudo" placeholder="Ex: Xx_Gamer_xX" maxlength="15">
+            <input type="text" id="input-pseudo" placeholder="Ex: Joueur_Fou" maxlength="15">
         </div>
 
         <div class="form-group">
-            <label>Photo de profil</label>
+            <label>Photo (Optionnel)</label>
             <div class="file-input-wrapper">
                 📷 Prendre une photo / Galerie
-                <input type="file" accept="image/*" id="input-file" onchange="previewAvatar(event)">
-            </div>
-            <p style="text-align: center; margin: 10px 0; font-size: 11px; color: #666;">- OU -</p>
-            <input type="text" id="input-url" placeholder="Coller une URL d'image..." oninput="previewAvatarUrl(this.value)">
-        </div>
-
-        <div class="toggle-switch">
-            <input type="checkbox" id="input-custom-card" checked>
-            <div style="text-align: left;">
-                <span style="font-size: 14px; font-weight: bold;">Option Carte Blanche</span>
-                <p style="font-size: 10px; color: #888; margin: 2px 0 0 0;">Recevez une carte vide à écrire à chaque tour.</p>
+                <input type="file" accept="image/*" onchange="previewAvatar(event)">
             </div>
         </div>
 
-        <button class="btn-primary" onclick="rejoindreSalon()">Rejoindre le salon</button>
+        <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <button class="btn-primary" onclick="creerSalon()">Créer un nouveau salon</button>
+            <p style="margin: 5px 0; color: #888; font-size: 12px; font-weight: bold;">- OU -</p>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="join-code" placeholder="CODE SALON" maxlength="4" style="flex-grow: 1; text-transform: uppercase; text-align: center; font-size: 18px; font-weight: bold; letter-spacing: 2px;">
+                <button class="btn-secondary" style="width: auto; padding: 0 20px;" onclick="rejoindreSalon()">Go</button>
+            </div>
+        </div>
+        <p id="setup-error" style="color: #ff4757; font-size: 12px; margin-top: 15px; display: none;"></p>
     </div>
 
     <div id="waiting-room-screen" class="container setup-screen" style="display: none;">
-        <h2 style="margin-top: 0;">Salon Privé</h2>
-        <p style="color: #aaa; font-size: 13px;">Code de la salle : <strong style="color: white; letter-spacing: 2px; font-size: 16px;">X49B</strong></p>
+        <h2 style="margin-top: 0;">Salon d'attente</h2>
+        <p style="color: #aaa; font-size: 13px;">Envoyez ce code à vos amis :</p>
+        <div style="background: #222; padding: 10px 30px; border-radius: 8px; border: 2px solid #8e44ad; margin-bottom: 20px;">
+            <strong id="display-room-code" style="color: white; letter-spacing: 5px; font-size: 28px;">----</strong>
+        </div>
         
-        <p id="player-count" style="color: #8e44ad; font-weight: bold; font-size: 18px; margin-top: 20px;">1 / 8 Joueurs</p>
+        <p id="player-count" style="color: #8e44ad; font-weight: bold; font-size: 16px;">1 Joueur(s)</p>
         
         <div id="waiting-players-list" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin: 20px 0; width: 100%;">
             </div>
 
-        <button id="btn-start-game" class="btn-primary" disabled onclick="demarrerLaPartie()">En attente de joueurs...</button>
+        <button id="btn-start-game" class="btn-primary" disabled onclick="demarrerLaPartieFirebase()">Seul le créateur peut lancer</button>
     </div>
 
     <div id="game-screen" class="container" style="display: none;">
@@ -162,13 +110,13 @@
             </div>
 
         <div class="game-board">
-            <div id="game-status" style="font-size: 12px; color: #f1c40f; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">C'est à vous de jouer</div>
+            <div id="game-status" style="font-size: 12px; color: #f1c40f; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">En attente de connexion...</div>
             
             <div class="black-card" id="question-card">
                 Chargement de la question...
             </div>
 
-            <button class="btn-primary" id="confirm-btn" style="display: none; border-radius: 30px; margin-top: 10px; max-width: 250px;" onclick="validerCarte()">Confirmer mon choix</button>
+            <button class="btn-primary" id="confirm-btn" style="display: none; border-radius: 30px; margin-top: 10px; max-width: 250px;" onclick="validerCarteFirebase()">Confirmer mon choix</button>
             
             <div id="judge-area" class="submitted-cards-container" style="display: none;">
                 </div>
@@ -178,316 +126,369 @@
             </div>
     </div>
 
-    <div class="dev-controls" id="dev-controls" style="display: none;">
-        <b>Outils de Dev :</b><br>
-        <button onclick="setRole('joueur')">Simuler Joueur</button>
-        <button onclick="setRole('maitre')">Simuler Juge</button>
-    </div>
-
-    <script>
-        // --- DONNÉES ---
-        let monPseudo = "Anonyme";
-        let monAvatar = "";
-        let monZoom = 100;
-        let optionCarteBlanche = false;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         
-        let joueursSalon = [];
-        let indexMaitreActuel = 0; // Garde en mémoire quel joueur est le juge du tour
+        // TA CONFIGURATION FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
+            authDomain: "novaly-a80f7.firebaseapp.com",
+            projectId: "novaly-a80f7",
+            storageBucket: "novaly-a80f7.firebasestorage.app",
+            messagingSenderId: "58102958990",
+            appId: "1:58102958990:web:6bdc2d3f049015fd0672df",
+            measurementId: "G-HE39HWQB70"
+        };
 
-        let roleActuel = 'joueur'; 
-        let carteSelectionnee = null;
-        let texteCarteBlanche = "";
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
+        // Variables de jeu globales
+        let myUid = null;
+        let isHost = false;
+        let currentRoomId = null;
+        let myHand = [];
         let listePhrases = [];
         let listeMots = [];
+        
+        // Variables locales modifiées par le joueur
+        window.monAvatar = "";
+        window.monPseudo = "Joueur";
+        window.carteSelectionnee = null;
 
-        // ================= GESTION DU RECADRAGE / ZOOM =================
-        function previewAvatar(event) {
+        // ================= PREPARATION INITIALE =================
+        // Connexion silencieuse au lanceur du jeu
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                myUid = user.uid;
+                window.monPseudo = user.displayName || "Joueur";
+                document.getElementById('input-pseudo').value = window.monPseudo;
+            } else {
+                signInAnonymously(auth).then(res => { myUid = res.user.uid; });
+            }
+        });
+
+        // Charger les fichiers TXT au lancement de la page
+        async function chargerFichiers() {
+            try {
+                const [propRes, wordRes] = await Promise.all([fetch('nolimite-prop.txt'), fetch('nolimite-word.txt')]);
+                listePhrases = (await propRes.text()).split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                listeMots = (await wordRes.text()).split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            } catch (err) {
+                listePhrases = ["Exemple de phrase avec _________."];
+                listeMots = ["Une erreur", "Un bug", "Un développeur fatigué"];
+            }
+        }
+        chargerFichiers();
+
+        // Gérer l'avatar
+        window.previewAvatar = function(event) {
             const file = event.target.files[0];
             if (file) {
                 const url = URL.createObjectURL(file);
-                appliquerAvatar(url);
+                window.monAvatar = url;
+                document.getElementById('avatar-preview').style.backgroundImage = `url(${url})`;
+                document.getElementById('avatar-preview').innerText = "";
             }
+        };
+
+        // ================= CREER OU REJOINDRE LE SALON =================
+        function preparerInfosJoueur() {
+            const pseudoInput = document.getElementById('input-pseudo').value.trim();
+            if(pseudoInput) window.monPseudo = pseudoInput;
+            return {
+                uid: myUid,
+                pseudo: window.monPseudo,
+                avatar: window.monAvatar,
+                score: 0
+            };
         }
 
-        function previewAvatarUrl(url) {
-            if(url.length > 5) appliquerAvatar(url);
+        function genererCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+            return result;
         }
 
-        function appliquerAvatar(url) {
-            monAvatar = url;
-            const preview = document.getElementById('avatar-preview');
-            preview.style.backgroundImage = `url(${url})`;
-            preview.innerText = "";
-            document.getElementById('zoom-container').style.display = 'block';
+        window.creerSalon = async function() {
+            const joueur = preparerInfosJoueur();
+            currentRoomId = genererCode();
+            isHost = true;
+
+            const roomData = {
+                code: currentRoomId,
+                status: 'waiting',
+                host: myUid,
+                players: { [myUid]: joueur },
+                playerList: [myUid], // Ordre des joueurs pour le tour de rôle
+                currentJudgeIndex: 0,
+                blackCard: "",
+                submissions: {}
+            };
+
+            await setDoc(doc(db, "nolimite_rooms", currentRoomId), roomData);
+            passerAuSalon(currentRoomId);
+            ecouterSalon(currentRoomId);
+        };
+
+        window.rejoindreSalon = async function() {
+            const codeInput = document.getElementById('join-code').value.trim().toUpperCase();
+            if(codeInput.length !== 4) return afficherErreur("Code invalide.");
+
+            const roomRef = doc(db, "nolimite_rooms", codeInput);
+            const docSnap = await getDoc(roomRef);
+
+            if (docSnap.exists()) {
+                const roomData = docSnap.data();
+                if (roomData.status !== 'waiting') return afficherErreur("Cette partie a déjà commencé.");
+
+                currentRoomId = codeInput;
+                isHost = false;
+                const joueur = preparerInfosJoueur();
+
+                // Ajouter le joueur au salon
+                roomData.players[myUid] = joueur;
+                if(!roomData.playerList.includes(myUid)) roomData.playerList.push(myUid);
+
+                await updateDoc(roomRef, {
+                    players: roomData.players,
+                    playerList: roomData.playerList
+                });
+
+                passerAuSalon(currentRoomId);
+                ecouterSalon(currentRoomId);
+            } else {
+                afficherErreur("Salon introuvable.");
+            }
+        };
+
+        function afficherErreur(msg) {
+            const errEl = document.getElementById('setup-error');
+            errEl.innerText = msg;
+            errEl.style.display = 'block';
         }
 
-        function updateZoom(val) {
-            monZoom = val;
-            document.getElementById('avatar-preview').style.backgroundSize = val + '%';
-        }
-
-        // ================= REJOINDRE LE SALON D'ATTENTE =================
-        function rejoindreSalon() {
-            const inputPseudo = document.getElementById('input-pseudo').value.trim();
-            if(inputPseudo) monPseudo = inputPseudo;
-            optionCarteBlanche = document.getElementById('input-custom-card').checked;
-
-            joueursSalon = [{
-                id: 1, 
-                pseudo: monPseudo, 
-                avatar: monAvatar, 
-                zoom: monZoom,
-                score: 0, 
-                isMaster: false, 
-                isMe: true 
-            }];
-
+        function passerAuSalon(code) {
             document.getElementById('setup-screen').style.display = 'none';
             document.getElementById('waiting-room-screen').style.display = 'flex';
-            
-            majAffichageSalon();
-            simulerArriveeJoueurs();
+            document.getElementById('display-room-code').innerText = code;
         }
 
-        function majAffichageSalon() {
-            const listEl = document.getElementById('waiting-players-list');
-            listEl.innerHTML = '';
+        // ================= SYNCHRONISATION MULTIJOUEUR =================
+        function ecouterSalon(roomId) {
+            onSnapshot(doc(db, "nolimite_rooms", roomId), (docSnap) => {
+                if(!docSnap.exists()) return alert("Le salon a été fermé.");
+                const data = docSnap.data();
+                const nbJoueurs = data.playerList.length;
 
-            joueursSalon.forEach(j => {
-                const styleAvatar = j.avatar ? `background-image: url(${j.avatar}); background-size: ${j.zoom || 100}%; font-size:0;` : '';
-                const initial = j.pseudo.charAt(0).toUpperCase();
+                // 1. GESTION DE L'ATTENTE
+                if(data.status === 'waiting') {
+                    document.getElementById('player-count').innerText = `${nbJoueurs} / 8 Joueurs`;
+                    
+                    const listEl = document.getElementById('waiting-players-list');
+                    listEl.innerHTML = '';
+                    data.playerList.forEach(uid => {
+                        const p = data.players[uid];
+                        const styleAvatar = p.avatar ? `background-image: url(${p.avatar}); font-size:0;` : '';
+                        listEl.innerHTML += `
+                            <div class="waiting-player">
+                                <div class="avatar" style="${styleAvatar}">${p.avatar ? '' : p.pseudo.charAt(0).toUpperCase()}</div>
+                                <div style="font-size: 12px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${p.pseudo}</div>
+                            </div>
+                        `;
+                    });
+
+                    const btnStart = document.getElementById('btn-start-game');
+                    if (isHost) {
+                        if (nbJoueurs >= 2) {
+                            btnStart.disabled = false;
+                            btnStart.innerText = "Lancer la partie";
+                            btnStart.style.background = "#8e44ad";
+                        } else {
+                            btnStart.disabled = true;
+                            btnStart.innerText = "Il manque des joueurs...";
+                            btnStart.style.background = "#444";
+                        }
+                    }
+                } 
                 
-                listEl.innerHTML += `
-                    <div class="waiting-player">
-                        <div class="avatar" style="${styleAvatar}">${j.avatar ? '' : initial}</div>
-                        <div style="font-size: 12px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${j.pseudo}</div>
-                    </div>
-                `;
+                // 2. GESTION DU JEU EN COURS
+                else if (data.status === 'playing') {
+                    document.getElementById('waiting-room-screen').style.display = 'none';
+                    document.getElementById('game-screen').style.display = 'flex';
+                    
+                    majScoreboard(data);
+                    
+                    // Question en cours
+                    document.getElementById('question-card').innerHTML = `<div>${data.blackCard}</div><div style="font-size: 11px; color: #8e44ad; margin-top: 20px;">Nolimite</div>`;
+
+                    const currentJudgeUid = data.playerList[data.currentJudgeIndex];
+                    const imJudge = (myUid === currentJudgeUid);
+                    const hasSubmitted = !!data.submissions[myUid];
+
+                    // Afficher la vue Juge
+                    if (imJudge) {
+                        document.getElementById('hand-area').style.display = 'none';
+                        document.getElementById('confirm-btn').style.display = 'none';
+                        document.getElementById('judge-area').style.display = 'flex';
+
+                        const nbSubmissions = Object.keys(data.submissions).length;
+                        const expectedSubmissions = nbJoueurs - 1;
+
+                        if (nbSubmissions < expectedSubmissions) {
+                            document.getElementById('game-status').innerText = `En attente des propositions (${nbSubmissions}/${expectedSubmissions})...`;
+                            document.getElementById('game-status').style.color = "#e74c3c";
+                            document.getElementById('judge-area').innerHTML = `<p style="color:#666;">Attendez que les autres joueurs envoient leurs cartes...</p>`;
+                        } else {
+                            document.getElementById('game-status').innerText = "À vous de choisir la meilleure carte !";
+                            document.getElementById('game-status').style.color = "#4cd137";
+                            
+                            // Afficher les cartes soumises
+                            const judgeArea = document.getElementById('judge-area');
+                            judgeArea.innerHTML = '';
+                            
+                            // Mélanger l'ordre des cartes pour que le juge ne sache pas qui a mis quoi
+                            const submittedEntries = Object.entries(data.submissions).sort(() => 0.5 - Math.random());
+                            
+                            submittedEntries.forEach(([uidPlayer, text], index) => {
+                                const card = document.createElement('div');
+                                card.className = 'white-card card-secret'; 
+                                card.onclick = function() {
+                                    if(this.classList.contains('card-secret')) {
+                                        this.classList.remove('card-secret');
+                                        this.innerHTML = `<div>${text}</div><div style="font-size: 10px; color: #ccc;">Nolimite</div>`;
+                                    } else {
+                                        terminerManche(uidPlayer, text, data); // Désigner le gagnant
+                                    }
+                                };
+                                judgeArea.appendChild(card);
+                            });
+                        }
+                    } 
+                    // Afficher la vue Joueur
+                    else {
+                        document.getElementById('judge-area').style.display = 'none';
+                        if (hasSubmitted) {
+                            document.getElementById('hand-area').style.display = 'none';
+                            document.getElementById('confirm-btn').style.display = 'none';
+                            document.getElementById('game-status').innerText = "Attente du Juge...";
+                            document.getElementById('game-status').style.color = "#f1c40f";
+                        } else {
+                            document.getElementById('hand-area').style.display = 'flex';
+                            document.getElementById('game-status').innerText = "Choisissez votre carte";
+                            document.getElementById('game-status').style.color = "#4cd137";
+                            remplirMainLocale();
+                        }
+                    }
+                }
             });
-
-            document.getElementById('player-count').innerText = `${joueursSalon.length} / 8 Joueurs`;
-
-            const btnStart = document.getElementById('btn-start-game');
-            if (joueursSalon.length >= 2) {
-                btnStart.disabled = false;
-                btnStart.innerText = "Lancer la partie";
-                btnStart.style.background = "#8e44ad";
-                btnStart.style.color = "white";
-                btnStart.style.cursor = "pointer";
-            }
         }
 
-        function simulerArriveeJoueurs() {
-            setTimeout(() => {
-                joueursSalon.push({ id: 2, pseudo: "Léa_Gaming", avatar: "https://i.pravatar.cc/100?img=5", zoom: 100, score: 0, isMaster: false, isMe: false });
-                majAffichageSalon();
-            }, 2000);
+        // ================= ACTIONS DU JEU =================
 
-            setTimeout(() => {
-                joueursSalon.push({ id: 3, pseudo: "NoobMaster", avatar: "https://i.pravatar.cc/100?img=11", zoom: 100, score: 0, isMaster: false, isMe: false });
-                majAffichageSalon();
-            }, 4000);
-        }
-
-        function demarrerLaPartie() {
-            document.getElementById('waiting-room-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'flex';
-            document.getElementById('dev-controls').style.display = 'block';
-
-            // Premier Maître du Jeu tiré au sort au début du jeu
-            indexMaitreActuel = Math.floor(Math.random() * joueursSalon.length);
-            joueursSalon[indexMaitreActuel].isMaster = true;
-
-            roleActuel = joueursSalon[indexMaitreActuel].isMe ? 'maitre' : 'joueur';
-
-            chargerFichiers();
-        }
-
-        // ================= CHARGEMENT ET LOGIQUE =================
-        async function chargerFichiers() {
-            try {
-                const [propRes, wordRes] = await Promise.all([
-                    fetch('nolimite-prop.txt'), fetch('nolimite-word.txt')
-                ]);
-
-                if (!propRes.ok || !wordRes.ok) throw new Error("Fichiers introuvables.");
-
-                listePhrases = (await propRes.text()).split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                listeMots = (await wordRes.text()).split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                nouvelleManche();
-            } catch (err) {
-                console.warn("Fichiers .txt absents, utilisation des données de secours.");
-                listePhrases = ["Mon dernier rencard s'est mal passé à cause de _________.", "À Noël, ma grand-mère m'a offert _________.", "Le secret d'un bon mariage, c'est _________."];
-                listeMots = ["Une attaque de pigeons.", "Des chaussettes trouées.", "Dire la vérité.", "Un vieux kebab.", "Ma collection de cailloux.", "Faire le mort.", "Un poney chauve."];
-                nouvelleManche();
-            }
-        }
-
-        function nouvelleManche() {
-            majScoreboard();
-
-            // Tirer une nouvelle question au hasard
-            const phrase = listePhrases[Math.floor(Math.random() * listePhrases.length)];
-            document.getElementById('question-card').innerHTML = `<div>${phrase}</div><div style="font-size: 11px; color: #8e44ad; margin-top: 20px;">Nolimite</div>`;
-
-            if (roleActuel === 'joueur') preparerMainJoueur();
-            else if (roleActuel === 'maitre') preparerVueMaitre();
-        }
-
-        function majScoreboard() {
-            const sb = document.getElementById('scoreboard');
-            sb.innerHTML = '';
+        // Le Host lance la partie (1ere manche)
+        window.demarrerLaPartieFirebase = async function() {
+            if(!isHost) return;
+            const newBlackCard = listePhrases[Math.floor(Math.random() * listePhrases.length)];
             
-            joueursSalon.forEach(j => {
-                const couronne = j.isMaster ? '<div class="master-crown">👑</div>' : '';
-                const styleAvatar = j.avatar ? `background-image: url(${j.avatar}); background-size: ${j.zoom || 100}%; font-size:0;` : '';
-                const initial = j.pseudo.charAt(0).toUpperCase();
-
-                sb.innerHTML += `
-                    <div class="player-score-box ${j.isMaster ? 'master active' : 'active'}">
-                        ${couronne}
-                        <div class="avatar" style="${styleAvatar}">${j.avatar ? '' : initial}</div>
-                        <div class="player-name">${j.pseudo}</div>
-                        <div class="player-points">${j.score} pts</div>
-                    </div>
-                `;
+            await updateDoc(doc(db, "nolimite_rooms", currentRoomId), {
+                status: 'playing',
+                blackCard: newBlackCard,
+                submissions: {}
             });
-        }
+        };
 
-        // --- ROLE : JOUEUR ---
-        function preparerMainJoueur() {
-            document.getElementById('game-status').innerText = "Choisissez votre carte";
-            document.getElementById('game-status').style.color = "#4cd137";
-            document.getElementById('hand-area').style.display = 'flex';
-            document.getElementById('judge-area').style.display = 'none';
-            document.getElementById('confirm-btn').style.display = 'none';
-            carteSelectionnee = null;
-
-            const main = document.getElementById('hand-area');
-            main.innerHTML = '';
-
-            // 5 CARTES AU HASARD MAXIMUM
-            // Si l'option carte blanche est active, on met 1 carte blanche + 4 mots tirés au sort
-            if (optionCarteBlanche) {
-                const blankCard = document.createElement('div');
-                blankCard.className = 'white-card custom-card';
-                blankCard.innerHTML = `<textarea placeholder="Écrivez votre réponse ici..." oninput="updateTexteCustom(this.value)"></textarea>`;
-                blankCard.onclick = () => selectionnerCarte(blankCard, "CUSTOM");
-                main.appendChild(blankCard);
+        // Gérer les cartes locales du joueur
+        function remplirMainLocale() {
+            const handArea = document.getElementById('hand-area');
+            if(myHand.length === 0) {
+                // Tirer 5 cartes au premier tour
+                myHand = [...listeMots].sort(() => 0.5 - Math.random()).slice(0, 5);
             }
 
-            const nbCartesATirer = optionCarteBlanche ? 4 : 5;
-            const motsTires = [...listeMots].sort(() => 0.5 - Math.random()).slice(0, nbCartesATirer);
-
-            motsTires.forEach(texte => {
+            handArea.innerHTML = '';
+            myHand.forEach((texte, idx) => {
                 const card = document.createElement('div');
                 card.className = 'white-card';
                 card.innerHTML = `<div>${texte}</div><div style="font-size: 10px; color: #ccc;">Nolimite</div>`;
-                card.onclick = () => selectionnerCarte(card, text = texte);
-                main.appendChild(card);
+                card.onclick = () => {
+                    document.querySelectorAll('.white-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    window.carteSelectionnee = { text: texte, index: idx };
+                    document.getElementById('confirm-btn').style.display = 'block';
+                };
+                handArea.appendChild(card);
             });
         }
 
-        function updateTexteCustom(val) { texteCarteBlanche = val; }
-
-        function selectionnerCarte(cardEl, texte) {
-            document.querySelectorAll('.white-card').forEach(c => c.classList.remove('selected'));
-            cardEl.classList.add('selected');
-            carteSelectionnee = texte;
-            document.getElementById('confirm-btn').style.display = 'block';
-        }
-
-        function validerCarte() {
-            let reponseFinale = carteSelectionnee;
-            if (carteSelectionnee === "CUSTOM") {
-                if(texteCarteBlanche.trim() === "") { alert("Votre carte blanche est vide !"); return; }
-                reponseFinale = texteCarteBlanche;
-            }
-
-            alert("Vous avez envoyé : " + reponseFinale);
+        // Le joueur valide sa carte
+        window.validerCarteFirebase = async function() {
+            if(!window.carteSelectionnee) return;
             
-            document.getElementById('hand-area').innerHTML = `<p style="color:#888; text-align:center; width:100%;">Carte envoyée. Attente du Maître du jeu...</p>`;
-            document.getElementById('confirm-btn').style.display = 'none';
-            document.getElementById('game-status').innerText = "Le Maître du Jeu lit les cartes...";
-            document.getElementById('game-status').style.color = "#f1c40f";
-        }
-
-        // --- ROLE : MAITRE DU JEU ---
-        function preparerVueMaitre() {
-            document.getElementById('game-status').innerText = "En attente des propositions...";
-            document.getElementById('game-status').style.color = "#e74c3c";
-            document.getElementById('hand-area').style.display = 'none';
-            document.getElementById('confirm-btn').style.display = 'none';
+            const selectedText = window.carteSelectionnee.text;
+            const indexToRemove = window.carteSelectionnee.index;
             
-            const judgeArea = document.getElementById('judge-area');
-            judgeArea.style.display = 'flex';
-            judgeArea.innerHTML = '';
+            // Retirer la carte jouée et piocher une nouvelle
+            myHand.splice(indexToRemove, 1);
+            myHand.push(listeMots[Math.floor(Math.random() * listeMots.length)]);
+            window.carteSelectionnee = null;
 
-            setTimeout(() => {
-                document.getElementById('game-status').innerText = "Sélectionnez la meilleure carte !";
-                document.getElementById('game-status').style.color = "#4cd137";
-                
-                // Simuler les cartes reçues par les autres joueurs (Chacun en envoie 1 au hasard depuis sa main)
-                const nbCartesRecues = joueursSalon.length - 1;
-                const propositions = [...listeMots].sort(() => 0.5 - Math.random()).slice(0, nbCartesRecues);
-                
-                propositions.forEach((texte) => {
-                    const card = document.createElement('div');
-                    card.className = 'white-card card-secret'; 
-                    
-                    card.onclick = function() {
-                        if(this.classList.contains('card-secret')) {
-                            // Retourner la carte
-                            this.classList.remove('card-secret');
-                            this.innerHTML = `<div>${texte}</div><div style="font-size: 10px; color: #ccc;">Nolimite</div>`;
-                        } else {
-                            // Désigner le gagnant de la manche
-                            document.querySelectorAll('#judge-area .white-card').forEach(c => c.classList.remove('selected'));
-                            this.classList.add('selected');
-                            
-                            setTimeout(() => {
-                                alert(`Manche terminée !\nLa carte gagnante est : "${texte}"`);
-                                passerALaMancheSuivante();
-                            }, 500);
-                        }
-                    };
-                    judgeArea.appendChild(card);
-                });
-            }, 1500);
+            // Envoyer la soumission à Firebase
+            const roomRef = doc(db, "nolimite_rooms", currentRoomId);
+            const docSnap = await getDoc(roomRef);
+            const currentSubmissions = docSnap.data().submissions;
+            currentSubmissions[myUid] = selectedText;
+
+            await updateDoc(roomRef, { submissions: currentSubmissions });
+        };
+
+        // Le juge choisit la meilleure carte et déclenche le tour suivant
+        async function terminerManche(gagnantUid, winningText, data) {
+            alert(`Manche terminée ! La carte gagnante est : "${winningText}"`);
+            
+            // 1. Donner le point au gagnant
+            data.players[gagnantUid].score += 1;
+            
+            // 2. Changer de juge
+            let nextJudgeIndex = data.currentJudgeIndex + 1;
+            if(nextJudgeIndex >= data.playerList.length) nextJudgeIndex = 0;
+
+            // 3. Tirer une nouvelle question
+            const newBlackCard = listePhrases[Math.floor(Math.random() * listePhrases.length)];
+
+            // Sauvegarder dans Firebase
+            await updateDoc(doc(db, "nolimite_rooms", currentRoomId), {
+                players: data.players,
+                currentJudgeIndex: nextJudgeIndex,
+                blackCard: newBlackCard,
+                submissions: {} // Vider les propositions
+            });
         }
 
-        // ================= PASSAGE AUTOMATIQUE DE MANCHE =================
-        function passerALaMancheSuivante() {
-            // 1. Donner 1 point au gagnant simulé (On donne au joueur 1 ou 2 au hasard pour l'exemple)
-            let indexGagnant = Math.floor(Math.random() * joueursSalon.length);
-            joueursSalon[indexGagnant].score += 1;
-            alert(`${joueursSalon[indexGagnant].pseudo} gagne 1 point !`);
+        // Interface : Tableau des scores
+        function majScoreboard(data) {
+            const sb = document.getElementById('scoreboard');
+            sb.innerHTML = '';
+            
+            data.playerList.forEach((uid, index) => {
+                const p = data.players[uid];
+                const isCurrentJudge = (index === data.currentJudgeIndex);
+                const couronne = isCurrentJudge ? '<div class="master-crown">👑</div>' : '';
+                const styleAvatar = p.avatar ? `background-image: url(${p.avatar}); font-size:0;` : '';
 
-            // 2. Changer de Maître du jeu (On passe au joueur suivant dans la liste)
-            joueursSalon[indexMaitreActuel].isMaster = false;
-            indexMaitreActuel = (indexMaitreActuel + 1) % joueursSalon.length;
-            joueursSalon[indexMaitreActuel].isMaster = true;
-
-            // 3. Mettre à jour mon rôle pour la nouvelle manche
-            roleActuel = joueursSalon[indexMaitreActuel].isMe ? 'maitre' : 'joueur';
-
-            // 4. Lancer la nouvelle manche (Tout va se re-tirer au sort)
-            nouvelleManche();
-        }
-
-        // --- OUTILS DE TEST ---
-        function setRole(nouveauRole) {
-            roleActuel = nouveauRole;
-            joueursSalon.forEach(j => j.isMaster = false);
-            if (roleActuel === 'maitre') {
-                indexMaitreActuel = 0;
-                joueursSalon[0].isMaster = true; // Moi
-            } else {
-                indexMaitreActuel = 1;
-                if(joueursSalon.length > 1) joueursSalon[1].isMaster = true; // Léa
-            }
-            nouvelleManche();
+                sb.innerHTML += `
+                    <div class="player-score-box ${isCurrentJudge ? 'master active' : 'active'}">
+                        ${couronne}
+                        <div class="avatar" style="${styleAvatar}">${p.avatar ? '' : p.pseudo.charAt(0).toUpperCase()}</div>
+                        <div class="player-name">${p.pseudo}</div>
+                        <div class="player-points">${p.score} pts</div>
+                    </div>
+                `;
+            });
         }
     </script>
 </body>
