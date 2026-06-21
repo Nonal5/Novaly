@@ -55,6 +55,66 @@
         .card-secret::after { content: '?'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #555; font-size: 40px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- POP-UP NOTIFICATION PERSONNALISÉ --- */
+        #custom-notification {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85); /* Fond noir transparent */
+            display: none; /* Caché par défaut */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .notification-content {
+            background: #121212;
+            border: 2px solid #a855f7; /* Violet Novaly */
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+            max-width: 400px;
+            width: 90%;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .notification-content h3 {
+            color: #a855f7;
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .notification-content p {
+            font-size: 18px;
+            margin: 20px 0;
+        }
+
+        .notification-content button {
+            background: #a855f7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .notification-content button:hover {
+            background: #9333ea;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -294,7 +354,7 @@ window.creerSalon = async function() {
         // ================= SYNCHRONISATION MULTIJOUEUR =================
         function ecouterSalon(roomId) {
             onSnapshot(doc(db, "nolimite_rooms", roomId), (docSnap) => {
-                if(!docSnap.exists()) return alert("Le salon a été fermé.");
+                if(!docSnap.exists()) return window.afficherNotification("Salon fermé.");
                 const data = docSnap.data();
                 const nbJoueurs = data.playerList.length;
 
@@ -461,7 +521,7 @@ window.creerSalon = async function() {
 
         // Le juge choisit la meilleure carte et déclenche le tour suivant
         async function terminerManche(gagnantUid, winningText, data) {
-            alert(`Manche terminée ! La carte gagnante est : "${winningText}"`);
+            window.afficherNotification("Manche Terminée !", "La carte gagnante est :\n\n" + texteCarte)
             
             // 1. Donner le point au gagnant
             data.players[gagnantUid].score += 1;
@@ -503,6 +563,25 @@ window.creerSalon = async function() {
                 `;
             });
         }
+        // Affiche le pop-up
+        window.afficherNotification = function(titre, texte) {
+            document.getElementById('notification-title').innerText = titre;
+            document.getElementById('notification-text').innerText = texte;
+            document.getElementById('custom-notification').style.display = 'flex';
+        };
+
+        // Ferme le pop-up
+        window.fermerNotification = function() {
+            document.getElementById('custom-notification').style.display = 'none';
+        };
     </script>
+    <!-- Pop-up personnalisé pour remplacer les alert() -->
+    <div id="custom-notification">
+        <div class="notification-content">
+            <h3 id="notification-title">Titre</h3>
+            <p id="notification-text">Texte de la notification</p>
+            <button onclick="window.fermerNotification()">OK</button>
+        </div>
+    </div>
 </body>
 </html>
