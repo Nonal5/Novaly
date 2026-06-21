@@ -214,8 +214,10 @@
             return result;
         }
 
-        window.creerSalon = async function() {
-            if (!myUid) return afficherErreur("Connexion en cours, réessayez dans un instant.");
+window.creerSalon = async function() {
+            if (!myUid) {
+                return afficherErreur("Erreur : Non connecté à Firebase. (Vérifiez l'Auth Anonyme)");
+            }
             
             const joueur = preparerInfosJoueur();
             currentRoomId = genererCode();
@@ -226,15 +228,22 @@
                 status: 'waiting',
                 host: myUid,
                 players: { [myUid]: joueur },
-                playerList: [myUid], // Ordre des joueurs pour le tour de rôle
+                playerList: [myUid],
                 currentJudgeIndex: 0,
                 blackCard: "",
                 submissions: {}
             };
 
-            await setDoc(doc(db, "nolimite_rooms", currentRoomId), roomData);
-            passerAuSalon(currentRoomId);
-            ecouterSalon(currentRoomId);
+            try {
+                // On essaie d'envoyer à Firebase
+                await setDoc(doc(db, "nolimite_rooms", currentRoomId), roomData);
+                passerAuSalon(currentRoomId);
+                ecouterSalon(currentRoomId);
+            } catch (error) {
+                // Si Firebase refuse, ça s'affiche à l'écran !
+                console.error(error);
+                afficherErreur("Blocage Firebase : " + error.message);
+            }
         };
 
         window.rejoindreSalon = async function() {
