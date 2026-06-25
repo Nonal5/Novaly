@@ -6,582 +6,933 @@
     <title>Nolimite</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; }
         body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #1a1a24; color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { text-align: center; padding: 15px; background: #111; font-weight: 900; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid #8e44ad; flex-shrink: 0; }
-        
-        /* Scores */
+
+        /* HEADER */
+        .header { text-align: center; padding: 12px 15px; background: #111; font-weight: 900; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid #8e44ad; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; }
+        .header-sub { font-size: 11px; color: #8e44ad; font-weight: 700; letter-spacing: 1px; }
+
+        /* SCOREBOARD */
         .scoreboard { display: flex; gap: 15px; padding: 10px 15px; background: #15151e; overflow-x: auto; border-bottom: 1px solid #333; flex-shrink: 0; scrollbar-width: none; }
         .scoreboard::-webkit-scrollbar { display: none; }
         .player-score-box { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 60px; position: relative; opacity: 0.5; transition: 0.3s; }
-        .player-score-box.active { opacity: 1; }
-        .player-score-box.master .avatar { border-color: #f1c40f; box-shadow: 0 0 10px #f1c40f; }
-        .master-crown { position: absolute; top: -10px; font-size: 16px; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #555; background-size: cover; background-position: center; background-color: #333; background-repeat: no-repeat; flex-shrink: 0; display:flex; justify-content:center; align-items:center; font-weight:bold;}
-        .player-name { font-size: 10px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
-        .player-points { background: #8e44ad; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 900; }
+        .player-score-box.active-player { opacity: 1; }
+        .player-score-box.is-judge .avatar { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241,196,15,0.5); }
+        .player-score-box.is-me .avatar { border-color: #8e44ad; }
+        .crown { position: absolute; top: -12px; font-size: 16px; animation: float 2s ease-in-out infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #555; background-size: cover; background-position: center; background-color: #333; background-repeat: no-repeat; flex-shrink: 0; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .player-name { font-size: 10px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 65px; text-align: center; }
+        .player-points { background: #8e44ad; color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 900; transition: 0.3s; }
+        .player-score-box.winner .player-points { background: #f1c40f; color: #000; }
+        .score-bar-bg { width: 100%; height: 3px; background: #333; border-radius: 2px; }
+        .score-bar { height: 3px; background: #8e44ad; border-radius: 2px; transition: width 0.5s ease; }
 
-        /* Conteneurs */
+        /* TIMER */
+        .timer-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px; flex-shrink: 0; }
+        .timer-arc { position: relative; width: 48px; height: 48px; }
+        .timer-arc svg { transform: rotate(-90deg); }
+        .timer-arc circle.bg { fill: none; stroke: #333; stroke-width: 4; }
+        .timer-arc circle.fg { fill: none; stroke: #8e44ad; stroke-width: 4; stroke-dasharray: 125.7; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke 0.5s; stroke-linecap: round; }
+        .timer-arc circle.fg.urgent { stroke: #e74c3c; }
+        .timer-number { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: white; }
+        .timer-label { font-size: 12px; color: #aaa; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* CONTAINERS */
         .container { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        .game-board { flex-grow: 1; display: flex; flex-direction: column; align-items: center; padding: 20px; text-align: center; }
+        .game-board { flex-grow: 1; display: flex; flex-direction: column; align-items: center; padding: 15px 20px 10px; text-align: center; }
         .setup-screen { display: flex; flex-direction: column; align-items: center; padding: 30px 20px; text-align: center; }
-        
-        .form-group { width: 100%; max-width: 320px; margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; font-size: 12px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; }
-        .form-group input[type="text"] { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; font-family: inherit; }
-        
-        .file-input-wrapper { background: #222; border: 1px dashed #8e44ad; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; color: #ccc; font-size: 13px; position: relative;}
+
+        /* SETUP FORMS */
+        .form-group { width: 100%; max-width: 320px; margin-bottom: 18px; text-align: left; }
+        .form-group label { display: block; font-size: 11px; color: #aaa; margin-bottom: 6px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
+        .form-group input[type="text"], .form-group input[type="number"] { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #000; color: white; font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus { border-color: #8e44ad; }
+        .file-input-wrapper { background: #222; border: 2px dashed #8e44ad; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; color: #ccc; font-size: 13px; position: relative; transition: background 0.2s; }
+        .file-input-wrapper:hover { background: #2a2a3a; }
         .file-input-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        input[type="range"] { width: 100%; accent-color: #8e44ad; margin-top: 10px; }
+        .score-setting { display: flex; align-items: center; gap: 10px; background: #222; border: 1px solid #444; border-radius: 8px; padding: 12px 15px; width: 100%; max-width: 320px; margin-bottom: 18px; }
+        .score-setting label { font-size: 12px; color: #aaa; white-space: nowrap; }
+        .score-setting input[type="number"] { width: 60px; padding: 6px; background: #000; border: 1px solid #555; color: white; border-radius: 4px; font-family: inherit; font-weight: 900; font-size: 16px; text-align: center; }
 
-        .btn-primary { background: #8e44ad; color: white; border: none; padding: 15px; width: 100%; font-size: 16px; font-weight: 900; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
-        .btn-primary:hover { background: #9b59b6; }
-        .btn-primary:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; }
-        .btn-secondary { background: transparent; color: white; border: 2px solid #555; padding: 15px; width: 100%; font-size: 16px; font-weight: 900; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
+        /* BUTTONS */
+        .btn-primary { background: #8e44ad; color: white; border: none; padding: 15px; width: 100%; font-size: 15px; font-weight: 900; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+        .btn-primary:hover:not(:disabled) { background: #9b59b6; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: transparent; color: white; border: 2px solid #555; padding: 14px; width: 100%; font-size: 14px; font-weight: 900; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; }
+        .btn-secondary:hover { border-color: #8e44ad; color: #8e44ad; }
+        .btn-danger { background: transparent; color: #e74c3c; border: 1px solid #e74c3c; padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn-danger:hover { background: rgba(231,76,60,0.1); }
 
-        .waiting-player { display: flex; flex-direction: column; align-items: center; gap: 8px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; width: 80px; animation: fadeIn 0.3s ease;}
+        /* WAITING ROOM */
+        .waiting-player { display: flex; flex-direction: column; align-items: center; gap: 6px; background: #111; padding: 12px; border-radius: 10px; border: 1px solid #333; width: 80px; animation: fadeIn 0.3s ease; position: relative; }
+        .waiting-player .kick-btn { display: none; position: absolute; top: -6px; right: -6px; background: #e74c3c; border: none; color: white; font-size: 10px; font-weight: 900; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; line-height: 18px; text-align: center; padding: 0; }
+        .waiting-player:hover .kick-btn { display: block; }
+        .room-code-display { background: #222; padding: 12px 30px; border-radius: 8px; border: 2px solid #8e44ad; margin-bottom: 20px; cursor: pointer; transition: background 0.2s; }
+        .room-code-display:hover { background: #2a2a3a; }
+        .room-code-display strong { color: white; letter-spacing: 5px; font-size: 28px; font-weight: 900; }
+        .copy-hint { font-size: 10px; color: #666; margin-top: 4px; }
 
-        /* Cartes */
-        .black-card { background-color: #000; color: #fff; width: 100%; max-width: 320px; min-height: 160px; padding: 20px; border-radius: 12px; box-sizing: border-box; font-size: 20px; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.8); border: 1px solid #333; margin-bottom: 15px; display: flex; flex-direction: column; justify-content: space-between; }
-        .player-hand { width: 100%; display: flex; gap: 15px; overflow-x: auto; padding: 20px; box-sizing: border-box; background: #111; border-top: 1px solid #333; flex-shrink: 0; }
-        .white-card { background-color: #fff; color: #000; min-width: 130px; max-width: 130px; height: 180px; padding: 15px; border-radius: 8px; font-size: 13px; font-weight: 700; box-sizing: border-box; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: 0.2s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        .white-card:hover { transform: translateY(-5px); }
-        .white-card.selected { border: 4px solid #8e44ad; transform: translateY(-10px); }
+        /* BLACK CARD */
+        .black-card { background-color: #000; color: #fff; width: 100%; max-width: 340px; min-height: 140px; padding: 20px; border-radius: 12px; font-size: 20px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border: 1px solid #333; margin-bottom: 10px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s; }
+        .black-card .card-footer { font-size: 11px; color: #8e44ad; font-weight: 900; letter-spacing: 1px; }
 
-        .custom-card { border: 2px dashed #8e44ad; background-color: #fdfdfd; }
-        .custom-card textarea { width: 100%; height: 100%; border: none; background: transparent; resize: none; font-family: inherit; font-size: 13px; font-weight: 700; outline: none; padding: 0; margin: 0; }
+        /* HAND & WHITE CARDS */
+        .player-hand { width: 100%; display: flex; gap: 12px; overflow-x: auto; padding: 15px; background: #111; border-top: 1px solid #333; flex-shrink: 0; scrollbar-width: thin; scrollbar-color: #8e44ad #222; }
+        .player-hand::-webkit-scrollbar { height: 4px; }
+        .player-hand::-webkit-scrollbar-thumb { background: #8e44ad; border-radius: 2px; }
+        .white-card { background-color: #fff; color: #000; min-width: 130px; max-width: 130px; height: 185px; padding: 14px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transition: all 0.2s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .white-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.6); }
+        .white-card.selected { border: 4px solid #8e44ad; transform: translateY(-12px) scale(1.04); box-shadow: 0 15px 30px rgba(142,68,173,0.4); }
+        .white-card .card-footer-w { font-size: 9px; color: #999; font-weight: 900; letter-spacing: 1px; }
+        .custom-card { border: 2px dashed #8e44ad; background-color: #fafafa; }
+        .custom-card textarea { width: 100%; flex-grow: 1; border: none; background: transparent; resize: none; font-family: inherit; font-size: 12px; font-weight: 700; outline: none; color: #000; }
 
-        .submitted-cards-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 400px;}
-        .card-secret { background: #222; color: #222; border: 1px solid #444; background-image: repeating-linear-gradient(45deg, #2a2a2a 25%, transparent 25%, transparent 75%, #2a2a2a 75%, #2a2a2a), repeating-linear-gradient(45deg, #2a2a2a 25%, #222 25%, #222 75%, #2a2a2a 75%, #2a2a2a); background-position: 0 0, 10px 10px; background-size: 20px 20px; }
-        .card-secret::after { content: '?'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #555; font-size: 40px; }
+        /* JUDGE AREA */
+        .submitted-cards-container { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 450px; }
+        .card-back { background: #222; border: 1px solid #444; background-image: repeating-linear-gradient(45deg, #2a2a2a 25%, transparent 25%, transparent 75%, #2a2a2a 75%, #2a2a2a), repeating-linear-gradient(45deg, #2a2a2a 25%, #222 25%, #222 75%, #2a2a2a 75%, #2a2a2a); background-position: 0 0, 10px 10px; background-size: 20px 20px; cursor: pointer; position: relative; transition: transform 0.2s; }
+        .card-back:hover { transform: translateY(-5px) scale(1.02); border-color: #8e44ad; }
+        .card-back::after { content: '?'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #555; font-size: 40px; font-weight: 900; }
+        .card-flipped { animation: flipIn 0.4s ease; }
+        @keyframes flipIn { 0% { transform: rotateY(90deg) scale(0.8); opacity: 0; } 100% { transform: rotateY(0deg) scale(1); opacity: 1; } }
+        .card-winner { border: 3px solid #f1c40f !important; box-shadow: 0 0 20px rgba(241,196,15,0.5) !important; }
+        .card-winner::before { content: '🏆 GAGNANT'; position: absolute; top: -24px; left: 50%; transform: translateX(-50%); background: #f1c40f; color: #000; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 4px; white-space: nowrap; letter-spacing: 1px; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* --- POP-UP NOTIFICATION PERSONNALISÉ --- */
-        #custom-notification {
-            position: fixed;
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85); /* Fond noir transparent */
-            display: none; /* Caché par défaut */
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
+        /* STATUS */
+        .game-status { font-size: 12px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; }
 
-        .notification-content {
-            background: #121212;
-            border: 2px solid #a855f7; /* Violet Novaly */
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            color: white;
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-            max-width: 400px;
-            width: 90%;
-            animation: popIn 0.3s ease-out;
-        }
+        /* REACTIONS */
+        .reaction-bar { display: flex; gap: 8px; justify-content: center; padding: 6px 0; flex-shrink: 0; }
+        .reaction-btn { background: #222; border: 1px solid #333; border-radius: 20px; padding: 5px 10px; cursor: pointer; font-size: 16px; transition: all 0.15s; color: white; }
+        .reaction-btn:hover { background: #2a2a3a; transform: scale(1.15); border-color: #555; }
+        .floating-reaction { position: fixed; font-size: 28px; pointer-events: none; animation: floatUp 2s ease forwards; z-index: 9999; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.5); } }
 
-        .notification-content h3 {
-            color: #a855f7;
-            margin-top: 0;
-            font-size: 24px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
+        /* ROUND INDICATOR */
+        .round-indicator { font-size: 11px; color: #666; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
-        .notification-content p {
-            font-size: 18px;
-            margin: 20px 0;
-        }
+        /* RECONNECT BANNER */
+        .reconnect-banner { display: none; background: #e74c3c; color: white; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; flex-shrink: 0; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-        .notification-content button {
-            background: #a855f7;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            transition: background 0.2s;
-        }
+        /* END SCREEN */
+        #end-screen { display: none; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; padding: 30px 20px; text-align: center; }
+        .podium { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 25px 0; }
+        .podium-step { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .podium-block { border-radius: 8px 8px 0 0; width: 80px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; font-size: 22px; font-weight: 900; }
+        .podium-block.gold { background: linear-gradient(180deg, #f1c40f, #d4ac0d); height: 90px; }
+        .podium-block.silver { background: linear-gradient(180deg, #95a5a6, #7f8c8d); height: 65px; }
+        .podium-block.bronze { background: linear-gradient(180deg, #d35400, #b94600); height: 45px; }
+        .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 9990; }
+        .confetti-piece { position: absolute; width: 8px; height: 8px; opacity: 0; animation: confettiFall linear forwards; }
+        @keyframes confettiFall { 0% { opacity: 1; transform: translateY(-20px) rotate(0deg); } 100% { opacity: 0; transform: translateY(100vh) rotate(720deg); } }
 
-        .notification-content button:hover {
-            background: #9333ea;
-        }
+        /* NOTIFICATION */
+        #custom-notification { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .notification-content { background: #121212; border: 2px solid #8e44ad; border-radius: 12px; padding: 28px; text-align: center; color: white; box-shadow: 0 0 30px rgba(142,68,173,0.3); max-width: 360px; width: 90%; animation: popIn 0.3s ease-out; }
+        .notification-content h3 { color: #8e44ad; margin-top: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .notification-content p { font-size: 15px; margin: 15px 0; line-height: 1.5; }
+        .notification-content button { background: #8e44ad; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 900; font-size: 14px; letter-spacing: 1px; transition: 0.2s; text-transform: uppercase; }
+        .notification-content button:hover { background: #9b59b6; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="header">Nolimite</div>
+    <div class="header">
+        NOLIMITE
+        <span class="header-sub" id="header-round"></span>
+    </div>
 
+    <!-- RECONNEXION BANNER -->
+    <div class="reconnect-banner" id="reconnect-banner">
+        ⚠️ Connexion perdue — Tentative de reconnexion...
+    </div>
+
+    <!-- =================== SETUP SCREEN =================== -->
     <div id="setup-screen" class="container setup-screen">
-        <h2 style="margin-top: 0;">Votre Profil</h2>
-        
-        <div id="avatar-preview" class="avatar" style="width: 80px; height: 80px; margin-bottom: 5px; font-size: 32px; font-weight: bold; background-color: #333; background-size: 100%;">?</div>
-        
-        <div class="form-group" style="margin-top: 15px;">
-            <label>Votre Pseudo</label>
+        <h2 style="margin-top: 0; font-size: 20px;">Votre Profil</h2>
+
+        <div id="avatar-preview" class="avatar" style="width: 80px; height: 80px; margin-bottom: 10px; font-size: 32px; background-color: #333;"></div>
+
+        <div class="form-group" style="margin-top: 10px;">
+            <label>Votre pseudo</label>
             <input type="text" id="input-pseudo" placeholder="Ex: Joueur_Fou" maxlength="15">
         </div>
 
         <div class="form-group">
-            <label>Photo (Optionnel)</label>
+            <label>Photo de profil (optionnel)</label>
             <div class="file-input-wrapper">
                 📷 Prendre une photo / Galerie
-                <input type="file" accept="image/*" onchange="window.previewAvatar(event)">
+                <input type="file" accept="image/*" id="avatar-file-input">
             </div>
         </div>
 
-        <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-            <button class="btn-primary" onclick="window.creerSalon()">Créer un nouveau salon</button>
-            <p style="margin: 5px 0; color: #888; font-size: 12px; font-weight: bold;">- OU -</p>
+        <div style="width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn-primary" id="btn-create" onclick="window.creerSalon()">Créer un nouveau salon</button>
+            <p style="margin: 4px 0; color: #666; font-size: 12px; font-weight: bold; text-align: center;">— OU —</p>
             <div style="display: flex; gap: 10px;">
-                <input type="text" id="join-code" placeholder="CODE SALON" maxlength="4" style="flex-grow: 1; text-transform: uppercase; text-align: center; font-size: 18px; font-weight: bold; letter-spacing: 2px;">
-                <button class="btn-secondary" style="width: auto; padding: 0 20px;" onclick="window.rejoindreSalon()">Go</button>
+                <input type="text" id="join-code" placeholder="CODE" maxlength="4" style="flex-grow: 1; text-transform: uppercase; text-align: center; font-size: 20px; font-weight: 900; letter-spacing: 3px; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 8px; outline: none; font-family: inherit;">
+                <button class="btn-secondary" style="width: auto; padding: 0 20px; flex-shrink: 0;" onclick="window.rejoindreSalon()">→</button>
             </div>
         </div>
-        <p id="setup-error" style="color: #ff4757; font-size: 12px; margin-top: 15px; display: none;"></p>
+        <p id="setup-error" style="color: #e74c3c; font-size: 12px; margin-top: 12px; display: none; font-weight: 700;"></p>
     </div>
 
+    <!-- =================== WAITING ROOM =================== -->
     <div id="waiting-room-screen" class="container setup-screen" style="display: none;">
-        <h2 style="margin-top: 0;">Salon d'attente</h2>
-        <p style="color: #aaa; font-size: 13px;">Envoyez ce code à vos amis :</p>
-        <div style="background: #222; padding: 10px 30px; border-radius: 8px; border: 2px solid #8e44ad; margin-bottom: 20px;">
-            <strong id="display-room-code" style="color: white; letter-spacing: 5px; font-size: 28px;">----</strong>
-        </div>
-        
-        <p id="player-count" style="color: #8e44ad; font-weight: bold; font-size: 16px;">1 Joueur(s)</p>
-        
-        <div id="waiting-players-list" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin: 20px 0; width: 100%;">
-            </div>
+        <h2 style="margin-top: 0; font-size: 20px;">Salon d'attente</h2>
+        <p style="color: #aaa; font-size: 13px; margin-bottom: 8px;">Partagez ce code avec vos amis :</p>
 
-        <button id="btn-start-game" class="btn-primary" disabled onclick="window.demarrerLaPartieFirebase()">Seul le créateur peut lancer</button>
+        <div class="room-code-display" onclick="copyRoomCode()" title="Copier le code">
+            <strong id="display-room-code">----</strong>
+            <div class="copy-hint">Appuyez pour copier</div>
+        </div>
+
+        <p id="player-count" style="color: #8e44ad; font-weight: 900; font-size: 15px; margin: 5px 0;">1 joueur(s)</p>
+
+        <!-- Config host (score max) -->
+        <div id="host-config" style="display: none; background: #111; border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 15px; width: 100%; max-width: 320px;">
+            <p style="margin: 0 0 10px; font-size: 12px; color: #aaa; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Configuration</p>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-size: 13px; color: #ccc; flex-grow: 1;">Score pour gagner :</label>
+                <input type="number" id="score-limit-input" value="9" min="3" max="20" style="width: 55px; padding: 8px; background: #000; border: 1px solid #555; color: white; border-radius: 4px; font-weight: 900; font-size: 16px; text-align: center; font-family: inherit;">
+            </div>
+        </div>
+
+        <div id="waiting-players-list" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 15px 0; width: 100%; max-width: 360px;"></div>
+
+        <div style="width: 100%; max-width: 320px;">
+            <button id="btn-start-game" class="btn-primary" disabled onclick="window.demarrerLaPartieFirebase()">En attente de joueurs...</button>
+            <p style="color: #666; font-size: 11px; margin-top: 8px; text-align: center;">Minimum 2 joueurs requis</p>
+        </div>
     </div>
 
+    <!-- =================== GAME SCREEN =================== -->
     <div id="game-screen" class="container" style="display: none;">
-        <div class="scoreboard" id="scoreboard">
+        <div class="scoreboard" id="scoreboard"></div>
+
+        <div class="timer-wrap" id="timer-wrap" style="display: none;">
+            <div class="timer-arc">
+                <svg width="48" height="48" viewBox="0 0 48 48">
+                    <circle class="bg" cx="24" cy="24" r="20"/>
+                    <circle class="fg" id="timer-circle" cx="24" cy="24" r="20"/>
+                </svg>
+                <div class="timer-number" id="timer-number">30</div>
             </div>
+            <div class="timer-label" id="timer-label">secondes</div>
+        </div>
 
         <div class="game-board">
-            <div id="game-status" style="font-size: 12px; color: #f1c40f; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">En attente de connexion...</div>
-            
+            <div class="game-status" id="game-status">Connexion...</div>
+            <div class="round-indicator" id="round-indicator"></div>
+
             <div class="black-card" id="question-card">
-                Chargement de la question...
+                <div id="question-text">Chargement...</div>
+                <div class="card-footer">NOLIMITE</div>
             </div>
 
-            <button class="btn-primary" id="confirm-btn" style="display: none; border-radius: 30px; margin-top: 10px; max-width: 250px;" onclick="window.validerCarteFirebase()">Confirmer mon choix</button>
-            
-            <div id="judge-area" class="submitted-cards-container" style="display: none;">
-                </div>
+            <button class="btn-primary" id="confirm-btn" style="display: none; border-radius: 30px; margin-top: 8px; max-width: 240px;" onclick="window.validerCarteFirebase()">
+                ✓ Confirmer mon choix
+            </button>
+
+            <div id="judge-area" class="submitted-cards-container" style="display: none;"></div>
         </div>
 
-        <div class="player-hand" id="hand-area">
-            </div>
+        <!-- REACTIONS -->
+        <div class="reaction-bar" id="reaction-bar">
+            <button class="reaction-btn" onclick="sendReaction('😂')">😂</button>
+            <button class="reaction-btn" onclick="sendReaction('🔥')">🔥</button>
+            <button class="reaction-btn" onclick="sendReaction('💀')">💀</button>
+            <button class="reaction-btn" onclick="sendReaction('👑')">👑</button>
+            <button class="reaction-btn" onclick="sendReaction('🤮')">🤮</button>
+        </div>
+
+        <div class="player-hand" id="hand-area"></div>
+    </div>
+
+    <!-- =================== END SCREEN =================== -->
+    <div id="end-screen">
+        <div style="font-size: 36px; margin-bottom: 5px;">🏆</div>
+        <h2 style="font-size: 24px; font-weight: 900; margin: 0;" id="winner-name">—</h2>
+        <p style="color: #aaa; font-size: 14px; margin-top: 5px;">a remporté la partie !</p>
+        <div class="podium" id="podium"></div>
+        <div class="confetti" id="confetti-container"></div>
+        <button class="btn-primary" style="max-width: 280px; margin-top: 10px;" onclick="window.relancerPartie()">Rejouer</button>
+    </div>
+
+    <!-- NOTIFICATION -->
+    <div id="custom-notification">
+        <div class="notification-content">
+            <h3 id="notification-title">Titre</h3>
+            <p id="notification-text">Texte</p>
+            <button onclick="window.fermerNotification()">OK</button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-        
-        // TA CONFIGURATION FIREBASE
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
             authDomain: "novaly-a80f7.firebaseapp.com",
             projectId: "novaly-a80f7",
             storageBucket: "novaly-a80f7.firebasestorage.app",
             messagingSenderId: "58102958990",
-            appId: "1:58102958990:web:6bdc2d3f049015fd0672df",
-            measurementId: "G-HE39HWQB70"
+            appId: "1:58102958990:web:6bdc2d3f049015fd0672df"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Variables de jeu globales
-        let myUid = null;
-        let isHost = false;
-        let currentRoomId = null;
-        let myHand = [];
-        let listePhrases = [];
-        let listeMots = [];
-        
-        // Variables locales modifiées par le joueur
+        // ── STATE ──────────────────────────────────────────────────────
+        let myUid = null, isHost = false, currentRoomId = null;
+        let myHand = [], listePhrases = [], listeMots = [];
+        let timerInterval = null, timerSeconds = 30;
+        let unsubscribeRoom = null;
+        let lastRoomData = null;
+        let cardFlipped = {};  // track which judge cards have been flipped
+
         window.monAvatar = "";
         window.monPseudo = "Joueur";
         window.carteSelectionnee = null;
 
-        // ================= PREPARATION INITIALE =================
-        // Connexion silencieuse au lanceur du jeu
+        // ── AUTH ───────────────────────────────────────────────────────
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 myUid = user.uid;
-                window.monPseudo = user.displayName || "Joueur";
-                document.getElementById('input-pseudo').value = window.monPseudo;
+                // Try to get display name from parent Novaly launcher
+                const parentUser = (() => { try { return window.parent?.firebase?.auth?.()?.currentUser; } catch(e) { return null; } })();
+                const displayName = user.displayName || parentUser?.displayName || "Joueur";
+                window.monPseudo = displayName;
+                const inp = document.getElementById('input-pseudo');
+                if (inp) inp.value = displayName;
+                const av = document.getElementById('avatar-preview');
+                if (av) av.innerText = displayName.charAt(0).toUpperCase();
             } else {
-                signInAnonymously(auth).then(res => { myUid = res.user.uid; });
+                signInAnonymously(auth).then(res => { myUid = res.user.uid; }).catch(e => showError("Erreur auth : " + e.message));
             }
         });
 
-        // Charger les fichiers TXT au lancement de la page
+        // ── LOAD TXT FILES ─────────────────────────────────────────────
         async function chargerFichiers() {
             try {
-                const [propRes, wordRes] = await Promise.all([fetch('nolimite-prop.txt'), fetch('nolimite-word.txt')]);
-                listePhrases = (await propRes.text()).split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                listeMots = (await wordRes.text()).split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            } catch (err) {
-                listePhrases = ["Exemple de phrase avec _________."];
-                listeMots = ["Une erreur", "Un bug", "Un développeur fatigué"];
+                const [p, w] = await Promise.all([fetch('nolimite-prop.txt'), fetch('nolimite-word.txt')]);
+                if (!p.ok || !w.ok) throw new Error("Fichiers introuvables");
+                listePhrases = (await p.text()).split('\n').map(l => l.trim()).filter(Boolean);
+                listeMots = (await w.text()).split('\n').map(l => l.trim()).filter(Boolean);
+            } catch {
+                listePhrases = [
+                    "Le secret de la productivité c'est _________.",
+                    "Mon ex m'a quitté(e) à cause de _________.",
+                    "Ce qui m'empêche de dormir la nuit : _________.",
+                    "La nouvelle fonctionnalité d'iPhone : _________.",
+                    "_________ : interdit dans 42 pays."
+                ];
+                listeMots = [
+                    "Un crocodile en costume", "L'odeur de mamie", "Un bug de Firebase",
+                    "Mon chat qui me juge", "Une baguette de pain", "Le WiFi gratuit",
+                    "L'ancienne flamme", "Un algorithme déprimé", "La dette technique",
+                    "Un manager en télétravail", "Le gluten", "Les réseaux sociaux",
+                    "Une notification à 3h du matin", "Un stagiaire non payé", "La vérité"
+                ];
             }
         }
         chargerFichiers();
 
-        // Gérer l'avatar
-        window.previewAvatar = function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                window.monAvatar = url;
-                document.getElementById('avatar-preview').style.backgroundImage = `url(${url})`;
-                document.getElementById('avatar-preview').innerText = "";
-            }
+        // ── AVATAR PREVIEW ─────────────────────────────────────────────
+        document.getElementById('avatar-file-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+            window.monAvatar = url;
+            const av = document.getElementById('avatar-preview');
+            av.style.backgroundImage = `url(${url})`;
+            av.style.backgroundSize = 'cover';
+            av.innerText = "";
+        });
+
+        // ── COPY ROOM CODE ─────────────────────────────────────────────
+        window.copyRoomCode = function() {
+            const code = document.getElementById('display-room-code').innerText;
+            navigator.clipboard?.writeText(code).then(() => {
+                const el = document.querySelector('.copy-hint');
+                if (el) { el.innerText = '✓ Copié !'; setTimeout(() => el.innerText = 'Appuyez pour copier', 1500); }
+            });
         };
 
-        // ================= CREER OU REJOINDRE LE SALON =================
-        function preparerInfosJoueur() {
-            const pseudoInput = document.getElementById('input-pseudo').value.trim();
-            if(pseudoInput) window.monPseudo = pseudoInput;
-            return {
-                uid: myUid,
-                pseudo: window.monPseudo,
-                avatar: window.monAvatar,
-                score: 0
-            };
+        // ── HELPER: current player info ────────────────────────────────
+        function playerInfo() {
+            const pseudo = document.getElementById('input-pseudo').value.trim() || window.monPseudo || "Joueur";
+            window.monPseudo = pseudo;
+            return { uid: myUid, pseudo, avatar: window.monAvatar, score: 0 };
         }
 
-        function genererCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
-            return result;
+        function genCode() {
+            return Array.from({ length: 4 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
         }
 
-window.creerSalon = async function() {
-            if (!myUid) {
-                return afficherErreur("Erreur : Non connecté à Firebase. (Vérifiez l'Auth Anonyme)");
-            }
-            
-            const joueur = preparerInfosJoueur();
-            currentRoomId = genererCode();
+        function showError(msg) {
+            const el = document.getElementById('setup-error');
+            el.innerText = msg; el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 4000);
+        }
+
+        function piocherCarte() {
+            return listeMots[Math.floor(Math.random() * listeMots.length)];
+        }
+
+        function piocherQuestion() {
+            return listePhrases[Math.floor(Math.random() * listePhrases.length)];
+        }
+
+        // ── CREATE ROOM ────────────────────────────────────────────────
+        window.creerSalon = async function() {
+            if (!myUid) return showError("Connexion en cours, réessayez...");
+            const p = playerInfo();
+            currentRoomId = genCode();
             isHost = true;
 
-            const roomData = {
-                code: currentRoomId,
-                status: 'waiting',
-                host: myUid,
-                players: { [myUid]: joueur },
-                playerList: [myUid],
-                currentJudgeIndex: 0,
-                blackCard: "",
-                submissions: {}
+            const scoreLimit = parseInt(document.getElementById('score-limit-input')?.value || '9');
+
+            const data = {
+                code: currentRoomId, status: 'waiting', host: myUid,
+                players: { [myUid]: p }, playerList: [myUid],
+                currentJudgeIndex: 0, blackCard: "", submissions: {},
+                reactions: {}, roundNumber: 0,
+                scoreLimit: scoreLimit,
+                createdAt: serverTimestamp()
             };
-
             try {
-                // On essaie d'envoyer à Firebase
-                await setDoc(doc(db, "nolimite_rooms", currentRoomId), roomData);
-                passerAuSalon(currentRoomId);
-                ecouterSalon(currentRoomId);
-            } catch (error) {
-                // Si Firebase refuse, ça s'affiche à l'écran !
-                console.error(error);
-                afficherErreur("Blocage Firebase : " + error.message);
+                await setDoc(doc(db, "nolimite_rooms", currentRoomId), data);
+                goToWaitingRoom(currentRoomId);
+                subscribeRoom(currentRoomId);
+            } catch (e) {
+                showError("Erreur Firebase : " + e.message);
             }
         };
 
+        // ── JOIN ROOM ──────────────────────────────────────────────────
         window.rejoindreSalon = async function() {
-             if (!myUid) return afficherErreur("Connexion en cours, réessayez dans un instant.");
-             
-            const codeInput = document.getElementById('join-code').value.trim().toUpperCase();
-            if(codeInput.length !== 4) return afficherErreur("Code invalide.");
+            if (!myUid) return showError("Connexion en cours, réessayez...");
+            const code = document.getElementById('join-code').value.trim().toUpperCase();
+            if (code.length !== 4) return showError("Code invalide (4 caractères).");
 
-            const roomRef = doc(db, "nolimite_rooms", codeInput);
-            const docSnap = await getDoc(roomRef);
+            const roomRef = doc(db, "nolimite_rooms", code);
+            const snap = await getDoc(roomRef);
+            if (!snap.exists()) return showError("Salon introuvable.");
+            const d = snap.data();
+            if (d.status !== 'waiting') return showError("Cette partie a déjà commencé.");
 
-            if (docSnap.exists()) {
-                const roomData = docSnap.data();
-                if (roomData.status !== 'waiting') return afficherErreur("Cette partie a déjà commencé.");
+            currentRoomId = code;
+            isHost = false;
+            const p = playerInfo();
+            const players = { ...d.players, [myUid]: p };
+            const playerList = d.playerList.includes(myUid) ? d.playerList : [...d.playerList, myUid];
 
-                currentRoomId = codeInput;
-                isHost = false;
-                const joueur = preparerInfosJoueur();
-
-                // Ajouter le joueur au salon
-                roomData.players[myUid] = joueur;
-                if(!roomData.playerList.includes(myUid)) roomData.playerList.push(myUid);
-
-                await updateDoc(roomRef, {
-                    players: roomData.players,
-                    playerList: roomData.playerList
-                });
-
-                passerAuSalon(currentRoomId);
-                ecouterSalon(currentRoomId);
-            } else {
-                afficherErreur("Salon introuvable.");
-            }
+            await updateDoc(roomRef, { players, playerList });
+            goToWaitingRoom(currentRoomId);
+            subscribeRoom(currentRoomId);
         };
 
-        function afficherErreur(msg) {
-            const errEl = document.getElementById('setup-error');
-            errEl.innerText = msg;
-            errEl.style.display = 'block';
-        }
-
-        function passerAuSalon(code) {
+        function goToWaitingRoom(code) {
             document.getElementById('setup-screen').style.display = 'none';
             document.getElementById('waiting-room-screen').style.display = 'flex';
             document.getElementById('display-room-code').innerText = code;
+            if (isHost) document.getElementById('host-config').style.display = 'block';
         }
 
-        // ================= SYNCHRONISATION MULTIJOUEUR =================
-        function ecouterSalon(roomId) {
-            onSnapshot(doc(db, "nolimite_rooms", roomId), (docSnap) => {
-                if(!docSnap.exists()) return window.afficherNotification("Salon fermé.");
-                const data = docSnap.data();
-                const nbJoueurs = data.playerList.length;
-
-                // 1. GESTION DE L'ATTENTE
-                if(data.status === 'waiting') {
-                    document.getElementById('player-count').innerText = `${nbJoueurs} / 8 Joueurs`;
-                    
-                    const listEl = document.getElementById('waiting-players-list');
-                    listEl.innerHTML = '';
-                    data.playerList.forEach(uid => {
-                        const p = data.players[uid];
-                        const styleAvatar = p.avatar ? `background-image: url(${p.avatar}); font-size:0;` : '';
-                        listEl.innerHTML += `
-                            <div class="waiting-player">
-                                <div class="avatar" style="${styleAvatar}">${p.avatar ? '' : p.pseudo.charAt(0).toUpperCase()}</div>
-                                <div style="font-size: 12px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${p.pseudo}</div>
-                            </div>
-                        `;
-                    });
-
-                    const btnStart = document.getElementById('btn-start-game');
-                    if (isHost) {
-                        if (nbJoueurs >= 2) {
-                            btnStart.disabled = false;
-                            btnStart.innerText = "Lancer la partie";
-                            btnStart.style.background = "#8e44ad";
-                        } else {
-                            btnStart.disabled = true;
-                            btnStart.innerText = "Il manque des joueurs...";
-                            btnStart.style.background = "#444";
-                        }
-                    }
-                } 
-                
-                // 2. GESTION DU JEU EN COURS
-                else if (data.status === 'playing') {
-                    document.getElementById('waiting-room-screen').style.display = 'none';
-                    document.getElementById('game-screen').style.display = 'flex';
-                    
-                    majScoreboard(data);
-                    
-                    // Question en cours
-                    document.getElementById('question-card').innerHTML = `<div>${data.blackCard}</div><div style="font-size: 11px; color: #8e44ad; margin-top: 20px;">Nolimite</div>`;
-
-                    const currentJudgeUid = data.playerList[data.currentJudgeIndex];
-                    const imJudge = (myUid === currentJudgeUid);
-                    const hasSubmitted = !!data.submissions[myUid];
-
-                    // Afficher la vue Juge
-                    if (imJudge) {
-                        document.getElementById('hand-area').style.display = 'none';
-                        document.getElementById('confirm-btn').style.display = 'none';
-                        document.getElementById('judge-area').style.display = 'flex';
-
-                        const nbSubmissions = Object.keys(data.submissions).length;
-                        const expectedSubmissions = nbJoueurs - 1;
-
-                        if (nbSubmissions < expectedSubmissions) {
-                            document.getElementById('game-status').innerText = `En attente des propositions (${nbSubmissions}/${expectedSubmissions})...`;
-                            document.getElementById('game-status').style.color = "#e74c3c";
-                            document.getElementById('judge-area').innerHTML = `<p style="color:#666;">Attendez que les autres joueurs envoient leurs cartes...</p>`;
-                        } else {
-                            document.getElementById('game-status').innerText = "À vous de choisir la meilleure carte !";
-                            document.getElementById('game-status').style.color = "#4cd137";
-                            
-                            // Afficher les cartes soumises
-                            const judgeArea = document.getElementById('judge-area');
-                            judgeArea.innerHTML = '';
-                            
-                            // Mélanger l'ordre des cartes pour que le juge ne sache pas qui a mis quoi
-                            const submittedEntries = Object.entries(data.submissions).sort(() => 0.5 - Math.random());
-                            
-                            submittedEntries.forEach(([uidPlayer, text], index) => {
-                                const card = document.createElement('div');
-                                card.className = 'white-card card-secret'; 
-                                card.onclick = function() {
-                                    if(this.classList.contains('card-secret')) {
-                                        this.classList.remove('card-secret');
-                                        this.innerHTML = `<div>${text}</div><div style="font-size: 10px; color: #ccc;">Nolimite</div>`;
-                                    } else {
-                                        terminerManche(uidPlayer, text, data); // Désigner le gagnant
-                                    }
-                                };
-                                judgeArea.appendChild(card);
-                            });
-                        }
-                    } 
-                    // Afficher la vue Joueur
-                    else {
-                        document.getElementById('judge-area').style.display = 'none';
-                        if (hasSubmitted) {
-                            document.getElementById('hand-area').style.display = 'none';
-                            document.getElementById('confirm-btn').style.display = 'none';
-                            document.getElementById('game-status').innerText = "Attente du Juge...";
-                            document.getElementById('game-status').style.color = "#f1c40f";
-                        } else {
-                            document.getElementById('hand-area').style.display = 'flex';
-                            document.getElementById('game-status').innerText = "Choisissez votre carte";
-                            document.getElementById('game-status').style.color = "#4cd137";
-                            remplirMainLocale();
-                        }
-                    }
-                }
-            });
-        }
-
-        // ================= ACTIONS DU JEU =================
-
-        // Le Host lance la partie (1ere manche)
-        window.demarrerLaPartieFirebase = async function() {
-            if(!isHost) return;
-            const newBlackCard = listePhrases[Math.floor(Math.random() * listePhrases.length)];
-            
-            await updateDoc(doc(db, "nolimite_rooms", currentRoomId), {
-                status: 'playing',
-                blackCard: newBlackCard,
-                submissions: {}
-            });
+        // ── KICK PLAYER ────────────────────────────────────────────────
+        window.kickPlayer = async function(uid) {
+            if (!isHost || uid === myUid) return;
+            const roomRef = doc(db, "nolimite_rooms", currentRoomId);
+            const snap = await getDoc(roomRef);
+            if (!snap.exists()) return;
+            const d = snap.data();
+            const players = { ...d.players };
+            delete players[uid];
+            const playerList = d.playerList.filter(id => id !== uid);
+            await updateDoc(roomRef, { players, playerList });
         };
 
-        // Gérer les cartes locales du joueur
-        function remplirMainLocale() {
-            const handArea = document.getElementById('hand-area');
-            if(myHand.length === 0) {
-                // Tirer 5 cartes au premier tour
-                myHand = [...listeMots].sort(() => 0.5 - Math.random()).slice(0, 5);
+        // ── REALTIME SUBSCRIPTION ──────────────────────────────────────
+        function subscribeRoom(roomId) {
+            if (unsubscribeRoom) unsubscribeRoom();
+            document.getElementById('reconnect-banner').style.display = 'none';
+
+            unsubscribeRoom = onSnapshot(doc(db, "nolimite_rooms", roomId),
+                (snap) => {
+                    document.getElementById('reconnect-banner').style.display = 'none';
+                    if (!snap.exists()) {
+                        window.afficherNotification("Salon fermé", "L'hôte a mis fin à la partie.");
+                        return;
+                    }
+                    lastRoomData = snap.data();
+                    handleRoomUpdate(lastRoomData);
+                },
+                (err) => {
+                    console.error("Snapshot error:", err);
+                    document.getElementById('reconnect-banner').style.display = 'block';
+                    // Auto-retry after 3s
+                    setTimeout(() => subscribeRoom(roomId), 3000);
+                }
+            );
+        }
+
+        // ── MAIN STATE HANDLER ─────────────────────────────────────────
+        function handleRoomUpdate(data) {
+            if (data.status === 'waiting') renderWaiting(data);
+            else if (data.status === 'playing') renderGame(data);
+            else if (data.status === 'ended') renderEndScreen(data);
+        }
+
+        // ── WAITING ROOM RENDER ────────────────────────────────────────
+        function renderWaiting(data) {
+            const nb = data.playerList.length;
+            document.getElementById('player-count').innerText = `${nb} / 8 joueur(s)`;
+
+            const listEl = document.getElementById('waiting-players-list');
+            listEl.innerHTML = '';
+            data.playerList.forEach(uid => {
+                const p = data.players[uid];
+                if (!p) return;
+                const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;font-size:0;` : '';
+                const kickBtn = (isHost && uid !== myUid) ? `<button class="kick-btn" onclick="kickPlayer('${uid}')" title="Expulser">✕</button>` : '';
+                listEl.innerHTML += `
+                    <div class="waiting-player">
+                        ${kickBtn}
+                        <div class="avatar" style="${avatarStyle}">${p.avatar ? '' : p.pseudo.charAt(0).toUpperCase()}</div>
+                        <div style="font-size: 11px; font-weight: bold; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-align:center;">${p.pseudo}</div>
+                        ${uid === data.host ? '<div style="font-size:9px;color:#f1c40f;font-weight:900;">HÔTE</div>' : ''}
+                    </div>`;
+            });
+
+            const btn = document.getElementById('btn-start-game');
+            if (isHost) {
+                btn.disabled = nb < 2;
+                btn.innerText = nb >= 2 ? `Lancer la partie (${nb} joueurs)` : 'Il manque des joueurs...';
+            }
+        }
+
+        // ── GAME RENDER ────────────────────────────────────────────────
+        function renderGame(data) {
+            document.getElementById('waiting-room-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+
+            renderScoreboard(data);
+
+            // Question
+            document.getElementById('question-text').innerText = data.blackCard || "Chargement...";
+            document.getElementById('header-round').innerText = `Manche ${data.roundNumber || 1}`;
+            document.getElementById('round-indicator').innerText = `Score cible : ${data.scoreLimit || 9} pts`;
+
+            const judgeUid = data.playerList[data.currentJudgeIndex];
+            const imJudge = myUid === judgeUid;
+            const judgePseudo = data.players[judgeUid]?.pseudo || "Juge";
+            const hasSubmitted = !!data.submissions[myUid];
+            const expectedSubs = data.playerList.length - 1;
+            const currentSubs = Object.keys(data.submissions).length;
+            const allSubmitted = currentSubs >= expectedSubs;
+
+            // Timer
+            if (data.timerEnd && !imJudge && !hasSubmitted) {
+                startClientTimer(data.timerEnd, 30);
+            } else if (imJudge && allSubmitted) {
+                stopTimer();
+                startClientTimer(data.judgeTimerEnd || (Date.now() + 60000), 60);
+            } else if (!hasSubmitted && !imJudge) {
+                // No timer data yet — hide
+            } else {
+                stopTimer();
             }
 
-            handArea.innerHTML = '';
+            // Show reactions
+            document.getElementById('reaction-bar').style.display = 'flex';
+
+            // Handle incoming reactions
+            if (data.reactions) {
+                Object.entries(data.reactions).forEach(([key, r]) => {
+                    if (!window.shownReactions) window.shownReactions = {};
+                    if (!window.shownReactions[key]) {
+                        window.shownReactions[key] = true;
+                        showFloatingReaction(r.emoji, r.x, r.y);
+                    }
+                });
+            }
+
+            if (imJudge) {
+                renderJudgeView(data, allSubmitted, expectedSubs, currentSubs, judgePseudo);
+            } else {
+                renderPlayerView(data, hasSubmitted, judgePseudo);
+            }
+        }
+
+        function renderJudgeView(data, allSubmitted, expectedSubs, currentSubs, judgePseudo) {
+            document.getElementById('hand-area').style.display = 'none';
+            document.getElementById('confirm-btn').style.display = 'none';
+            document.getElementById('judge-area').style.display = 'flex';
+
+            if (!allSubmitted) {
+                const gs = document.getElementById('game-status');
+                gs.innerText = `En attente des réponses (${currentSubs}/${expectedSubs})`;
+                gs.style.color = '#e74c3c';
+                stopTimer();
+                document.getElementById('timer-wrap').style.display = 'none';
+                document.getElementById('judge-area').innerHTML = `
+                    <div style="text-align:center; color:#666; padding: 20px;">
+                        <div style="font-size: 28px; margin-bottom: 10px;">⏳</div>
+                        <p style="margin:0; font-size:13px;">Les joueurs choisissent leurs cartes...</p>
+                        <p style="margin:8px 0 0; font-size:11px; color:#555;">${currentSubs}/${expectedSubs} réponse(s) reçue(s)</p>
+                    </div>`;
+            } else {
+                document.getElementById('game-status').innerText = "Choisissez la meilleure carte !";
+                document.getElementById('game-status').style.color = '#4cd137';
+
+                const judgeArea = document.getElementById('judge-area');
+                // Rebuild only if needed (avoid re-rendering on every snapshot)
+                const existingCards = judgeArea.querySelectorAll('.white-card');
+                if (existingCards.length !== Object.keys(data.submissions).length) {
+                    judgeArea.innerHTML = '';
+                    cardFlipped = {};
+                    const entries = Object.entries(data.submissions).sort(() => 0.5 - Math.random());
+                    entries.forEach(([uid, text]) => {
+                        const card = document.createElement('div');
+                        card.className = 'white-card card-back';
+                        card.dataset.uid = uid;
+                        card.dataset.text = text;
+                        card.onclick = function() {
+                            if (!cardFlipped[uid]) {
+                                // First click: flip card
+                                cardFlipped[uid] = true;
+                                card.classList.remove('card-back');
+                                card.classList.add('card-flipped');
+                                card.innerHTML = `<div style="flex-grow:1;">${text}</div><div class="card-footer-w">NOLIMITE</div>`;
+                                card.onclick = function() { terminerManche(uid, text, lastRoomData); };
+                            }
+                        };
+                        judgeArea.appendChild(card);
+                    });
+                }
+            }
+        }
+
+        function renderPlayerView(data, hasSubmitted, judgePseudo) {
+            document.getElementById('judge-area').style.display = 'none';
+
+            if (hasSubmitted) {
+                document.getElementById('hand-area').style.display = 'none';
+                document.getElementById('confirm-btn').style.display = 'none';
+                stopTimer();
+                document.getElementById('timer-wrap').style.display = 'none';
+                document.getElementById('game-status').innerText = `${judgePseudo} choisit la meilleure carte...`;
+                document.getElementById('game-status').style.color = '#f1c40f';
+            } else {
+                document.getElementById('hand-area').style.display = 'flex';
+                document.getElementById('game-status').innerText = 'Choisissez une carte';
+                document.getElementById('game-status').style.color = '#4cd137';
+                remplirMain();
+            }
+        }
+
+        // ── SCOREBOARD ─────────────────────────────────────────────────
+        function renderScoreboard(data) {
+            const sb = document.getElementById('scoreboard');
+            sb.innerHTML = '';
+            const scoreLimit = data.scoreLimit || 9;
+
+            data.playerList.forEach((uid, i) => {
+                const p = data.players[uid];
+                if (!p) return;
+                const isJudge = i === data.currentJudgeIndex;
+                const isMe = uid === myUid;
+                const pct = Math.min(100, Math.round((p.score / scoreLimit) * 100));
+                const avatarStyle = p.avatar ? `background-image:url(${p.avatar});background-size:cover;font-size:0;` : '';
+                const crownHtml = isJudge ? '<div class="crown">👑</div>' : '';
+                sb.innerHTML += `
+                    <div class="player-score-box active-player ${isJudge ? 'is-judge' : ''} ${isMe ? 'is-me' : ''}">
+                        ${crownHtml}
+                        <div class="avatar" style="${avatarStyle}">${p.avatar ? '' : p.pseudo.charAt(0).toUpperCase()}</div>
+                        <div class="player-name">${p.pseudo}${isMe ? ' (toi)' : ''}</div>
+                        <div class="player-points">${p.score}/${scoreLimit}</div>
+                        <div class="score-bar-bg" style="width:55px;"><div class="score-bar" style="width:${pct}%;"></div></div>
+                    </div>`;
+            });
+        }
+
+        // ── HAND ───────────────────────────────────────────────────────
+        function remplirMain() {
+            const hand = document.getElementById('hand-area');
+            // Keep existing cards if already rendered and selection ongoing
+            if (hand.children.length > 0) return;
+
+            if (myHand.length === 0) {
+                myHand = Array.from({ length: 5 }, piocherCarte);
+            }
+
+            hand.innerHTML = '';
             myHand.forEach((texte, idx) => {
                 const card = document.createElement('div');
                 card.className = 'white-card';
-                card.innerHTML = `<div>${texte}</div><div style="font-size: 10px; color: #ccc;">Nolimite</div>`;
-                card.onclick = () => {
-                    document.querySelectorAll('.white-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    window.carteSelectionnee = { text: texte, index: idx };
-                    document.getElementById('confirm-btn').style.display = 'block';
-                };
-                handArea.appendChild(card);
+                card.innerHTML = `<div style="flex-grow:1;">${texte}</div><div class="card-footer-w">NOLIMITE</div>`;
+                card.onclick = () => selectCard(card, texte, idx);
+                hand.appendChild(card);
             });
+
+            // Ajouter carte custom (vide)
+            const custom = document.createElement('div');
+            custom.className = 'white-card custom-card';
+            custom.innerHTML = `
+                <textarea placeholder="Écris ta propre réponse..." maxlength="80" style="flex-grow:1;border:none;background:transparent;resize:none;font-family:inherit;font-size:12px;font-weight:700;outline:none;color:#000;"></textarea>
+                <div class="card-footer-w">CUSTOM</div>`;
+            custom.onclick = (e) => {
+                e.stopPropagation();
+                const ta = custom.querySelector('textarea');
+                const val = ta.value.trim();
+                if (!val) { ta.focus(); return; }
+                selectCard(custom, val, -1);
+            };
+            hand.appendChild(custom);
         }
 
-        // Le joueur valide sa carte
+        function selectCard(card, texte, idx) {
+            document.querySelectorAll('.white-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            window.carteSelectionnee = { text: texte, index: idx };
+            document.getElementById('confirm-btn').style.display = 'block';
+        }
+
+        // ── SUBMIT CARD ────────────────────────────────────────────────
         window.validerCarteFirebase = async function() {
-            if(!window.carteSelectionnee) return;
-            
-            const selectedText = window.carteSelectionnee.text;
-            const indexToRemove = window.carteSelectionnee.index;
-            
-            // Retirer la carte jouée et piocher une nouvelle
-            myHand.splice(indexToRemove, 1);
-            myHand.push(listeMots[Math.floor(Math.random() * listeMots.length)]);
+            if (!window.carteSelectionnee) return;
+            const { text, index } = window.carteSelectionnee;
+
+            // Replace played card
+            if (index >= 0) {
+                myHand.splice(index, 1, piocherCarte());
+            }
             window.carteSelectionnee = null;
 
-            // Envoyer la soumission à Firebase
-            const roomRef = doc(db, "nolimite_rooms", currentRoomId);
-            const docSnap = await getDoc(roomRef);
-            const currentSubmissions = docSnap.data().submissions;
-            currentSubmissions[myUid] = selectedText;
+            // Clear hand UI so it rebuilds fresh next round
+            document.getElementById('hand-area').innerHTML = '';
 
-            await updateDoc(roomRef, { submissions: currentSubmissions });
+            const roomRef = doc(db, "nolimite_rooms", currentRoomId);
+            const snap = await getDoc(roomRef);
+            if (!snap.exists()) return;
+            const subs = { ...snap.data().submissions, [myUid]: text };
+            await updateDoc(roomRef, { submissions: subs });
+
+            stopTimer();
         };
 
-        // Le juge choisit la meilleure carte et déclenche le tour suivant
+        // ── END ROUND (JUDGE PICKS) ────────────────────────────────────
         async function terminerManche(gagnantUid, winningText, data) {
-            window.afficherNotification("Manche Terminée !", "La carte gagnante est :\n\n" + texteCarte)
-            
-            // 1. Donner le point au gagnant
-            data.players[gagnantUid].score += 1;
-            
-            // 2. Changer de juge
-            let nextJudgeIndex = data.currentJudgeIndex + 1;
-            if(nextJudgeIndex >= data.playerList.length) nextJudgeIndex = 0;
+            if (!isHost && data.host !== myUid) {
+                // Non-host judges can still pick — host handles the update
+                // But in our model any player can be judge, so we allow it
+            }
 
-            // 3. Tirer une nouvelle question
-            const newBlackCard = listePhrases[Math.floor(Math.random() * listePhrases.length)];
+            // Highlight winner card
+            document.querySelectorAll('#judge-area .white-card').forEach(c => {
+                if (c.dataset.uid === gagnantUid) {
+                    c.classList.add('card-winner');
+                }
+            });
 
-            // Sauvegarder dans Firebase
+            stopTimer();
+
+            const gagnantPseudo = data.players[gagnantUid]?.pseudo || "Quelqu'un";
+            window.afficherNotification("🏆 Manche terminée !", `La carte de ${gagnantPseudo} a été choisie :\n\n"${winningText}"`);
+
+            // Update scores
+            const players = JSON.parse(JSON.stringify(data.players));
+            players[gagnantUid].score = (players[gagnantUid].score || 0) + 1;
+
+            const scoreLimit = data.scoreLimit || 9;
+            const roundNumber = (data.roundNumber || 1) + 1;
+
+            // Check win condition
+            if (players[gagnantUid].score >= scoreLimit) {
+                await updateDoc(doc(db, "nolimite_rooms", currentRoomId), {
+                    players, status: 'ended', winnerId: gagnantUid
+                });
+                return;
+            }
+
+            // Next judge
+            let nextJudgeIndex = (data.currentJudgeIndex + 1) % data.playerList.length;
+            const newBlackCard = piocherQuestion();
+            const now = Date.now();
+
             await updateDoc(doc(db, "nolimite_rooms", currentRoomId), {
-                players: data.players,
+                players,
                 currentJudgeIndex: nextJudgeIndex,
                 blackCard: newBlackCard,
-                submissions: {} // Vider les propositions
+                submissions: {},
+                reactions: {},
+                roundNumber,
+                timerEnd: now + 30000,
+                judgeTimerEnd: now + 90000
             });
+
+            // Reset local state
+            cardFlipped = {};
+            window.carteSelectionnee = null;
         }
 
-        // Interface : Tableau des scores
-        function majScoreboard(data) {
-            const sb = document.getElementById('scoreboard');
-            sb.innerHTML = '';
-            
-            data.playerList.forEach((uid, index) => {
-                const p = data.players[uid];
-                const isCurrentJudge = (index === data.currentJudgeIndex);
-                const couronne = isCurrentJudge ? '<div class="master-crown">👑</div>' : '';
-                const styleAvatar = p.avatar ? `background-image: url(${p.avatar}); font-size:0;` : '';
+        // ── END SCREEN ─────────────────────────────────────────────────
+        function renderEndScreen(data) {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('end-screen').style.display = 'flex';
+            stopTimer();
 
-                sb.innerHTML += `
-                    <div class="player-score-box ${isCurrentJudge ? 'master active' : 'active'}">
-                        ${couronne}
-                        <div class="avatar" style="${styleAvatar}">${p.avatar ? '' : p.pseudo.charAt(0).toUpperCase()}</div>
-                        <div class="player-name">${p.pseudo}</div>
-                        <div class="player-points">${p.score} pts</div>
-                    </div>
+            const sorted = data.playerList
+                .map(uid => ({ uid, ...data.players[uid] }))
+                .sort((a, b) => b.score - a.score);
+
+            const winner = sorted[0];
+            document.getElementById('winner-name').innerText = winner?.pseudo || '—';
+
+            // Podium
+            const podium = document.getElementById('podium');
+            podium.innerHTML = '';
+            const medals = [
+                { class: 'gold', emoji: '🥇', rank: 1, h: 90 },
+                { class: 'silver', emoji: '🥈', rank: 2, h: 65 },
+                { class: 'bronze', emoji: '🥉', rank: 3, h: 45 }
+            ];
+            const order = [sorted[1], sorted[0], sorted[2]]; // silver, gold, bronze visual order
+            const classOrder = ['silver', 'gold', 'bronze'];
+            const emojiOrder = ['🥈', '🥇', '🥉'];
+
+            order.forEach((p, i) => {
+                if (!p) return;
+                const step = document.createElement('div');
+                step.className = 'podium-step';
+                step.innerHTML = `
+                    <div class="avatar" style="width:50px;height:50px;${p.avatar ? `background-image:url(${p.avatar});background-size:cover;font-size:0;` : ''}">${p.avatar ? '' : p.pseudo?.charAt(0).toUpperCase()}</div>
+                    <div style="font-size:11px;font-weight:900;">${p.pseudo}</div>
+                    <div style="font-size:11px;color:#aaa;">${p.score} pts</div>
+                    <div class="podium-block ${classOrder[i]}">${emojiOrder[i]}</div>`;
+                podium.appendChild(step);
+            });
+
+            // Confetti
+            launchConfetti();
+        }
+
+        function launchConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#8e44ad', '#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#e67e22'];
+            for (let i = 0; i < 60; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.cssText = `
+                    left: ${Math.random() * 100}%;
+                    top: ${-Math.random() * 20}%;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                    animation-duration: ${1.5 + Math.random() * 2}s;
+                    animation-delay: ${Math.random() * 1.5}s;
+                    transform: rotate(${Math.random() * 360}deg);
                 `;
-            });
+                container.appendChild(piece);
+            }
         }
-        // Affiche le pop-up
+
+        // ── REJOIN GAME ────────────────────────────────────────────────
+        window.relancerPartie = function() {
+            window.location.reload();
+        };
+
+        // ── TIMER ──────────────────────────────────────────────────────
+        function startClientTimer(endTimestamp, totalSeconds) {
+            stopTimer();
+            const circle = document.getElementById('timer-circle');
+            const numberEl = document.getElementById('timer-number');
+            const wrap = document.getElementById('timer-wrap');
+            const circumference = 125.7;
+
+            wrap.style.display = 'flex';
+
+            timerInterval = setInterval(() => {
+                const remaining = Math.max(0, Math.ceil((endTimestamp - Date.now()) / 1000));
+                numberEl.innerText = remaining;
+                const progress = remaining / totalSeconds;
+                circle.style.strokeDashoffset = circumference * (1 - progress);
+
+                if (remaining <= 10) {
+                    circle.classList.add('urgent');
+                    document.getElementById('timer-label').innerText = remaining === 0 ? 'Temps écoulé !' : 'urgent !';
+                } else {
+                    circle.classList.remove('urgent');
+                    document.getElementById('timer-label').innerText = 'secondes';
+                }
+                if (remaining <= 0) stopTimer();
+            }, 500);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        // ── REACTIONS ──────────────────────────────────────────────────
+        window.sendReaction = async function(emoji) {
+            if (!currentRoomId) return;
+            const key = `${myUid}_${Date.now()}`;
+            const roomRef = doc(db, "nolimite_rooms", currentRoomId);
+            const reactions = { ...((lastRoomData?.reactions) || {}), [key]: { emoji, uid: myUid, x: 30 + Math.random() * 40, y: 60 + Math.random() * 20 } };
+            // Keep only last 10 reactions
+            const keys = Object.keys(reactions);
+            if (keys.length > 10) delete reactions[keys[0]];
+            await updateDoc(roomRef, { reactions });
+        };
+
+        function showFloatingReaction(emoji, xPct, yPct) {
+            const el = document.createElement('div');
+            el.className = 'floating-reaction';
+            el.innerText = emoji;
+            el.style.left = (xPct || 50) + '%';
+            el.style.top = (yPct || 70) + '%';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 2000);
+        }
+
+        // ── NOTIFICATIONS ──────────────────────────────────────────────
         window.afficherNotification = function(titre, texte) {
             document.getElementById('notification-title').innerText = titre;
             document.getElementById('notification-text').innerText = texte;
             document.getElementById('custom-notification').style.display = 'flex';
         };
 
-        // Ferme le pop-up
         window.fermerNotification = function() {
             document.getElementById('custom-notification').style.display = 'none';
         };
+
+        // ── START GAME (HOST) ──────────────────────────────────────────
+        window.demarrerLaPartieFirebase = async function() {
+            if (!isHost) return;
+            const scoreLimit = parseInt(document.getElementById('score-limit-input').value || '9');
+            const newBlackCard = piocherQuestion();
+            const now = Date.now();
+            await updateDoc(doc(db, "nolimite_rooms", currentRoomId), {
+                status: 'playing',
+                blackCard: newBlackCard,
+                submissions: {},
+                reactions: {},
+                roundNumber: 1,
+                scoreLimit,
+                timerEnd: now + 30000,
+                judgeTimerEnd: now + 90000
+            });
+        };
     </script>
-    <!-- Pop-up personnalisé pour remplacer les alert() -->
-    <div id="custom-notification">
-        <div class="notification-content">
-            <h3 id="notification-title">Titre</h3>
-            <p id="notification-text">Texte de la notification</p>
-            <button onclick="window.fermerNotification()">OK</button>
-        </div>
-    </div>
 </body>
 </html>

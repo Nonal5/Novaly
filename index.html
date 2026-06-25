@@ -3,8 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novaly Launcher</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Novaly Launcher | Just Play.</title>
+
+    <meta name="description" content="Novaly est la plateforme de jeux vidéo indépendants de nouvelle génération. Jouez instantanément sans limites à Clutch, Nolimite et bien d'autres. Just Play.">
+    <meta name="keywords" content="novaly, novaly launcher, novelestorer, jeu video, jeux gratuits, launcher jeux video, jeux PC, jeux independants, play clutch, jouer en ligne, multijoueur">
+    <meta name="author" content="Novaly Games">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.novastorer.fr/">
+
+    <meta property="og:title" content="Novaly Launcher | Just Play.">
+    <meta property="og:description" content="Découvrez la plateforme de jeux vidéo nouvelle génération. Performances optimales, catalogue unifié et expérience pure.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.novastorer.fr/">
+    <meta property="og:image" content="https://www.novastorer.fr/assets/banner-seo.jpg"> <meta property="og:site_name" content="Novaly">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -28,114 +41,198 @@
             overflow: hidden;
         }
 
+        /* --- ANIMATIONS UX --- */
+        @keyframes slideUpFade { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes dropDownAnim {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* --- EN-TÊTE HORIZONTAL --- */
+/* --- EN-TÊTE HORIZONTAL --- */
         .main-header {
             height: 75px; background-color: var(--bg-header); display: flex; align-items: center;
             justify-content: space-between; padding: 0 40px; border-bottom: 1px solid #222; flex-shrink: 0;
             position: relative; z-index: 100;
+            gap: 40px; /* Empêche le menu et la recherche de se toucher */
         }
 
         .header-left { display: flex; align-items: center; height: 100%; }
 
         .logo-img {
-            height: 40px; margin-right: 50px; cursor: pointer; background-color: #000000; min-width: 120px;
+            height: 40px; margin-right: 40px; cursor: pointer; background-color: #000000; min-width: 120px;
             color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; letter-spacing: 1.5px;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        .logo-img:hover { transform: scale(1.05); }
 
-        .nav-links { display: flex; align-items: center; gap: 30px; height: 100%; }
+        .nav-links { display: flex; align-items: center; gap: 20px; height: 100%; }
 
         .nav-item {
             color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1px; cursor: pointer; height: 100%; display: flex; align-items: center; position: relative; transition: color 0.2s ease;
+            letter-spacing: 1px; cursor: pointer; height: 100%; display: flex; align-items: center; position: relative; transition: color 0.3s ease;
+            white-space: nowrap;
         }
 
         .nav-item:hover, .nav-item.active { color: var(--text-main); }
-        .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background-color: var(--accent-color); }
+        
+        .nav-item::after { 
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; 
+            background-color: var(--accent-color); 
+            transform: scaleX(0); transform-origin: center; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .nav-item.active::after, .nav-item:hover::after { transform: scaleX(1); }
 
         .header-right { display: flex; align-items: center; gap: 12px; height: 100%; }
 
         .search-bar {
             background-color: transparent; border: 1px solid #444; padding: 8px 16px; border-radius: 20px; color: white;
-            width: 220px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: border-color 0.2s;
+            width: 220px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .search-bar:focus { border-color: #888; }
+        .search-bar:focus { border-color: #888; width: 250px; background-color: rgba(255,255,255,0.05); }
 
-        /* --- SÉLECTEUR DE LANGUE --- */
+        /* --- SÉLECTEUR DE LANGUE (FIX DRAPEAUX POUR TOUS LES NAVIGATEURS) --- */
         .lang-wrapper { position: relative; display: flex; align-items: center; }
         .lang-selector {
             width: 36px; height: 36px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center;
             justify-content: center; cursor: pointer; transition: all 0.2s ease; color: white; background: #1a1a1a;
+            overflow: hidden;
         }
-        .lang-selector:hover { background-color: var(--hover-bg); border-color: white; }
+        .lang-selector:hover { background-color: var(--hover-bg); border-color: white; transform: rotate(5deg); }
         .lang-dropdown {
             position: absolute; top: 120%; right: 0; background: var(--bg-header); border: 1px solid #333;
             border-radius: 8px; width: 160px; max-height: 300px; overflow-y: auto; display: none; flex-direction: column;
-            z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+            z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.7);
         }
-        .lang-dropdown.show { display: flex; }
+        .lang-dropdown.show { display: flex; animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .lang-option {
             padding: 12px 15px; display: flex; align-items: center; gap: 12px; cursor: pointer;
             font-size: 13px; font-weight: 500; color: var(--text-muted); transition: 0.2s; border-bottom: 1px solid #222;
         }
         .lang-option:last-child { border-bottom: none; }
-        .lang-option:hover { background: var(--hover-bg); color: white; }
-        .flag-icon { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: block; }
+        .lang-option:hover { background: var(--hover-bg); color: white; padding-left: 20px; }
+        
+        .flag-icon { 
+            width: 24px !important; height: 24px !important; 
+            border-radius: 50% !important; 
+            object-fit: cover !important; 
+            object-position: center !important; 
+            display: block !important; 
+            background-color: #222;
+            flex-shrink: 0;
+        }
 
         /* --- PROFIL HEADER --- */
         .user-section { display: flex; height: 100%; align-items: center; }
-        .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; padding-left: 10px; padding-right: 5px; }
-        .profile-trigger:hover { background: #222; border-radius: 8px; }
-        .nav-title { background: #ffffff; color: #000000; font-size: 9px; font-weight: 900; padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; padding-left: 10px; padding-right: 5px; border-radius: 8px; transition: background 0.2s;}
+        .profile-trigger:hover { background: #222; }
+        .nav-title { background: #ffffff; color: #000000; font-size: 9px; font-weight: 900; padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid transparent; }
+        .nav-title.guest { background: #000000; color: #ffffff; border: 1px solid #444; }
         .avatar { width: 28px; height: 28px; background-color: #ffffff; background-size: cover; background-position: center; background-repeat: no-repeat; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 12px; flex-shrink: 0; }
         .user-info { display: flex; flex-direction: column; text-align: left; line-height: 1.2; }
         .nav-username { font-weight: 700; font-size: 12px; text-transform: uppercase; color: white; }
-        .online-dot { color: #4cd137; font-size: 9px; text-transform: none; letter-spacing: 0; }
+        .online-dot { color: #4cd137; font-size: 9px; text-transform: none; letter-spacing: 0; display: flex; align-items: center; gap: 4px; }
+        .online-dot.offline { color: #888; }
 
         /* --- BOUTON AMIS --- */
         .friends-btn {
             display: flex; align-items: center; gap: 8px; background: #1a1a1a; border: 1px solid #333; 
-            padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: 0.2s; color: white; font-weight: bold; font-size: 12px;
+            padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); color: white; font-weight: bold; font-size: 12px;
         }
-        .friends-btn:hover { background: #2a2a2a; border-color: #555; }
+        .friends-btn:hover { background: #2a2a2a; border-color: #777; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        /* --- MENUS DÉROULANTS (PROFIL & AMIS) --- */
+        /* --- MENUS DÉROULANTS --- */
         .user-dropdown {
             position: absolute; top: 110%; right: 0; background: #18181c; border: 1px solid #333;
-            border-radius: 8px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden;
+            border-radius: 8px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden;
         }
-        .user-dropdown.show { display: flex; }
+        .user-dropdown.show { display: flex; animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .dropdown-item { padding: 12px 15px; font-size: 13px; color: #ccc; cursor: pointer; transition: 0.2s; text-align: left; display: flex; align-items: center;}
-        .dropdown-item img { width: 14px; filter: invert(1); opacity: 0.8; margin-right: 8px; vertical-align: middle; }
+        .dropdown-item img { width: 14px; filter: invert(1); opacity: 0.8; margin-right: 8px; vertical-align: middle; transition: transform 0.2s;}
         .dropdown-item:hover { background: #2a2a2a; color: white; }
+        .dropdown-item:hover img { transform: scale(1.2); opacity: 1; }
         .dropdown-divider { height: 1px; background: #333; margin: 5px 0; }
         .dropdown-item.logout { color: #ff4757; }
         .dropdown-item.logout img { filter: invert(34%) sepia(98%) saturate(3501%) hue-rotate(333deg) brightness(101%) contrast(106%); }
-        .dropdown-item.logout:hover { background: #ff475722; }
+        .dropdown-item.logout:hover { background: #ff475722; padding-left: 20px; }
 
         /* --- CONTENU & VUES --- */
-        .content { flex-grow: 1; padding: 40px 80px; overflow-y: auto; display: flex; flex-direction: column; }
+        .content { flex-grow: 1; padding: 40px 80px; overflow-y: auto; display: flex; flex-direction: column; scroll-behavior: smooth; }
         .page-title { margin: 0 0 30px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; display: none; }
         .view-section { display: none; flex-grow: 1; }
-        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .view-section.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* --- ANIMATION MOTION NOVALY CORRIGÉE --- */
+        .motion-logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+        .novaly-motion-logo {
+            font-size: 72px;
+            font-weight: 900;
+            letter-spacing: 15px;
+            text-transform: uppercase;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.2); /* Aspect par défaut quand la souris n'est pas là */
+            display: inline-block;
+            user-select: none;
+            cursor: default;
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            transition: color 0.3s ease;
+        }
+        .novaly-motion-logo.active-light {
+            background: radial-gradient(circle 120px at var(--mouse-x) var(--mouse-y), rgba(255,255,255,1) 0%, rgba(255,255,255,0.2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
 
         /* --- BANNIÈRE & GRILLES --- */
         .hero-banner {
             background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
             height: 450px; border-radius: 12px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; padding: 40px; margin-bottom: 40px;
+            box-shadow: inset 0 -50px 100px rgba(0,0,0,0.5);
         }
-        .hero-banner h1 { font-size: 56px; margin: 0 0 10px; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .hero-banner p { font-size: 18px; color: #ddd; margin: 0 0 25px; max-width: 600px; }
-        .btn-hero { background: transparent; color: white; border: 2px solid white; padding: 12px 35px; font-size: 15px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
-        .btn-hero:hover { background: white; color: black; }
-        .btn-hero:disabled { background: transparent !important; border-color: #333 !important; color: #555 !important; cursor: not-allowed; }
+        
+        .hero-banner h1 { font-size: 56px; margin: 0 0 10px; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+        .hero-banner p { font-size: 18px; color: #ddd; margin: 0 0 25px; max-width: 600px; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+        .btn-hero { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; background: transparent; color: white; border: 2px solid white; padding: 12px 35px; font-size: 15px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .btn-hero:hover { background: white; color: black; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.2); }
+        .btn-hero:disabled { background: transparent !important; border-color: #333 !important; color: #555 !important; cursor: not-allowed; box-shadow: none; transform: none;}
+
+        /* --- TAGS JEUX --- */
+        .game-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+        .tag { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
+        .tag-action { background: rgba(231, 76, 60, 0.15); color: #ff6b81; border: 1px solid #ff4757; }
+        .tag-multi { background: rgba(52, 152, 219, 0.15); color: #70a1ff; border: 1px solid #3742fa; }
+        .tag-party { background: rgba(155, 89, 182, 0.15); color: #a29bfe; border: 1px solid #5352ed; }
+        .tag-soon { background: rgba(241, 196, 15, 0.15); color: #eccc68; border: 1px solid #ffa502; }
+        .tag-reflexion { background: rgba(46, 204, 113, 0.15); color: #7bed9f; border: 1px solid #2ed573; }
+
+        /* --- SKELETON LOADING --- */
+        .skeleton { position: relative; overflow: hidden; border-color: #222 !important; pointer-events: none; }
+        .skeleton .game-cover, .skeleton .game-title, .skeleton .game-price, .skeleton .game-tags { visibility: hidden; }
+        .skeleton::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, #222 25%, #2a2a2a 50%, #222 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; margin-bottom: 60px; }
-        .game-card { cursor: pointer; transition: transform 0.2s ease; }
-        .game-card:hover { transform: scale(1.03); }
-        .game-cover { height: 300px; border-radius: 8px; margin-bottom: 12px; background-color: #222; position: relative; overflow: hidden;}
-        .game-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .game-price { background: #2a2a2a; color: #eee; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .game-card { cursor: pointer; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 8px; padding-bottom: 10px; }
+        .game-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
+        .game-card:hover .tag { filter: brightness(1.2); }
+        .game-cover { height: 280px; border-radius: 8px; margin-bottom: 12px; background-color: #222; position: relative; overflow: hidden; transition: 0.3s;}
+        .game-card:hover .game-cover::after { content:''; position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); opacity: 0.5; }
+        .game-title { font-weight: 800; font-size: 15px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
+        .game-price { background: #2a2a2a; color: #eee; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block; transition: 0.2s; }
+        .game-card:hover .game-price { background: #333; color: white; }
 
         /* --- PROFIL & PARAMÈTRES --- */
         .profile-layout { display: flex; gap: 40px; max-width: 1000px; margin-bottom: 60px; }
@@ -145,67 +242,69 @@
         .profile-tab.active { border-left: 4px solid var(--accent-color); border-radius: 0 6px 6px 0; }
         .profile-content { flex-grow: 1; }
         .profile-tab-content { display: none; background: var(--card-bg); padding: 35px; border-radius: 8px; border: 1px solid #333; }
-        .profile-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .profile-tab-content.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; box-sizing: border-box; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif;}
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: white; }
-        .btn { background: white; color: black; border: none; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: 0.2s; }
-        .btn:hover { opacity: 0.9; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; transition: 0.2s; }
+        .form-group input:focus + label, .form-group textarea:focus + label { color: white; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; box-sizing: border-box; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; transition: 0.2s;}
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: white; box-shadow: 0 0 0 3px rgba(255,255,255,0.1); }
+        
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: white; color: black; border: none; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
+        .btn:active { transform: translateY(0); }
         
         .generic-view-content { background: var(--card-bg); padding: 40px; border-radius: 8px; text-align: center; color: var(--text-muted); margin-bottom: 60px; }
-        .news-card { background: #222; border: 1px solid #333; border-radius: 8px; padding: 20px; text-align: left; transition: 0.2s; cursor: pointer; }
-        .news-card:hover { border-color: #555; background: #2a2a2a; }
-        .news-card h4 { margin: 0 0 10px 0; color: white; font-size: 16px; }
-        .news-card p { margin: 0; font-size: 13px; color: var(--text-muted); }
+        .news-card { background: #222; border: 1px solid #333; border-radius: 8px; padding: 20px; text-align: left; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; }
+        .news-card:hover { border-color: #666; background: #2a2a2a; transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .news-card h4 { margin: 0 0 10px 0; color: white; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+        .news-card p { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+        /* --- BOUTONS PLEIN ECRAN --- */
+        .game-controls { position: absolute; top: 15px; left: 15px; z-index: 60; display: flex; gap: 10px; }
+        .game-control-btn { 
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); color: white; border: 1px solid rgba(255,255,255,0.2); 
+            padding: 8px 15px; border-radius: 6px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .game-control-btn:hover { background: rgba(0, 0, 0, 0.9); border-color: white; transform: scale(1.05); }
+        .game-control-btn.btn-quit:hover { background: rgba(231, 76, 60, 0.9); border-color: #ff4757; }
 
         /* --- FOOTER --- */
         .site-footer { background-color: var(--bg-main); border-top: 1px solid #222; padding: 50px 0 20px 0; margin-top: auto; font-size: 13px; color: var(--text-muted); }
         .site-footer h4 { color: var(--text-main); font-size: 14px; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 0.5px; }
         .footer-downloads { margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 40px; }
         .app-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
-        .app-btn { background: transparent; border: 1px solid #444; color: white; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+        .app-btn { background: transparent; border: 1px solid #444; color: white; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .app-btn svg { width: 18px; height: 18px; fill: currentColor; }
-        .app-btn:hover { background-color: var(--hover-bg); border-color: white; transform: translateY(-2px); }
+        .app-btn:hover { background-color: var(--hover-bg); border-color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .footer-container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; margin-bottom: 50px; }
         .footer-links { display: flex; gap: 80px; }
         .footer-column { display: flex; flex-direction: column; gap: 15px; }
         .footer-link { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-size: 13px; cursor: pointer; }
-        .footer-link:hover, .footer-link.active { color: var(--text-main); }
+        .footer-link:hover, .footer-link.active { color: var(--text-main); transform: translateX(2px); }
         .footer-bottom { border-top: 1px solid #222; padding-top: 25px; font-size: 12px; display: flex; justify-content: space-between; }
 
-        /* ========================================================= */
-        /* ================== RESPONSIVE MOBILE ==================== */
-        /* ========================================================= */
-        .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; }
-
         @media (max-width: 1024px) {
-            /* En-tête / Menu Hamburger */
             .main-header { padding: 15px 20px; flex-wrap: wrap; height: auto; min-height: 70px; align-items: flex-start; }
             .header-left { flex-wrap: wrap; width: 100%; height: auto; justify-content: space-between; }
             .logo-img { margin-right: 0; margin-top: 5px; }
-            .menu-toggle { display: block; margin-top: 8px;}
-            
-            /* Cacher les menus de navigation sur mobile par défaut */
+/* Cache le menu mobile sur ordinateur */
+            .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; margin-right: 15px; }            
             .nav-links { display: none; width: 100%; flex-direction: column; align-items: flex-start; padding: 20px 0 0 0; gap: 15px; }
             .header-right { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 15px 0; gap: 15px; height: auto; border-top: 1px solid #333; margin-top: 15px; }
             
-            /* Actions du Header sur mobile */
-            .main-header.open .nav-links, .main-header.open .header-right { display: flex; }
+            .main-header.open .nav-links, .main-header.open .header-right { display: flex; animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
             .nav-item { height: auto; padding: 10px 0; width: 100%; }
             .nav-item.active::after { bottom: -5px; }
             .search-bar { width: 100%; }
             .lang-dropdown { top: 100%; left: 0; right: auto; width: 100%; }
             
-            /* Ajustement Amis & Profil Mobile */
             #friends-menu-container { width: 100%; justify-content: center; margin: 10px 0; }
             .friends-btn { width: 100%; justify-content: center; }
             .user-section { width: 100%; justify-content: center; }
             .profile-trigger { width: 100%; justify-content: center; background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333;}
             .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444;}
             
-            /* Contenu principal Mobile */
             .content { padding: 20px; }
             .hero-banner { height: auto; padding: 30px 20px; text-align: center; align-items: center; }
             .hero-banner h1 { font-size: 36px; text-transform: uppercase; margin-bottom: 10px;}
@@ -213,7 +312,6 @@
             .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
             .game-cover { height: 220px; }
             
-            /* Paramètres du Profil Mobile */
             .profile-layout { flex-direction: column; gap: 20px; }
             .profile-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid #333; white-space: nowrap;}
             .profile-sidebar::-webkit-scrollbar { height: 4px; }
@@ -222,11 +320,9 @@
             .profile-tab.active { border-left: none; border-bottom: 3px solid var(--accent-color); border-radius: 0; }
             .profile-tab-content { padding: 20px; }
             
-            /* Grilles intérieures profil */
             .profile-tab-content > div[style*="display: grid"] { grid-template-columns: 1fr !important; }
             .profile-tab-content > div[style*="display: flex; gap: 20px"] { flex-direction: column; align-items: flex-start; }
 
-            /* Footer Mobile */
             .footer-container { flex-direction: column; gap: 30px; }
             .footer-links { flex-direction: column; gap: 30px; }
             .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
@@ -301,14 +397,17 @@
             </div>
             
             <div class="user-section">
-                <div id="logged-out-view" style="height: 100%;">
-                    <div class="nav-item" style="padding-left: 5px; padding-right: 5px;">
-                        <a href="login.html" 
-                           onmouseover="this.style.backgroundColor='#e0e0e0'; this.style.transform='scale(1.03)';" 
-                           onmouseout="this.style.backgroundColor='#ffffff'; this.style.transform='scale(1)';" 
-                           style="background-color: #ffffff; color: #000000; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 11px; transition: all 0.2s ease; display: block; text-transform: uppercase; text-align: center;">
-                             Se connecter / S'inscrire
-                        </a>
+                <div id="logged-out-view" style="height: 100%; display: flex; align-items: center;">
+                    <div class="profile-trigger nav-item" onclick="window.location.href='login.html'">
+                        <span class="nav-title guest">GUEST</span>
+                        <div class="avatar" style="background-color: #222; color: #888;">?</div>
+                        <div class="user-info">
+                            <span class="nav-username" style="color: #ccc;">Invité</span>
+                            <span class="online-dot offline">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                                Non connecté
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -318,7 +417,10 @@
                         <div class="avatar" id="nav-avatar">?</div>
                         <div class="user-info">
                             <span class="nav-username" id="nav-username">Utilisateur</span>
-                            <span class="online-dot">En ligne ●</span>
+                            <span class="online-dot">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                                En ligne
+                            </span>
                         </div>
                         <span style="font-size: 9px; color: var(--text-muted); margin-left: 3px;">▼</span>
                     </div>
@@ -348,28 +450,44 @@
             <p style="color: #aaa; font-size: 13px; margin-bottom: 25px;">Choisissez votre mode de jeu :</p>
             
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <button class="btn" style="background: #0984e3; color: white; padding: 15px; font-size: 14px;" onclick="startPublicMatch()">🌍 Lancer publiquement</button>
-                <button class="btn" style="background: transparent; color: white; border: 1px solid #555; padding: 15px; font-size: 14px;" onclick="togglePrivateMatchInput()">🔒 Partie privée</button>
+                <button class="btn" style="background: #0984e3; color: white; padding: 15px; font-size: 14px;" onclick="startPublicMatch()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    Lancer publiquement
+                </button>
+                <button class="btn" style="background: transparent; color: white; border: 1px solid #555; padding: 15px; font-size: 14px;" onclick="togglePrivateMatchInput()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Partie privée
+                </button>
             </div>
 
-            <div id="private-match-section" style="display: none; margin-top: 20px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; animation: fadeIn 0.3s ease;">
+            <div id="private-match-section" style="display: none; margin-top: 20px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
                 <label style="display: block; font-size: 12px; color: #888; margin-bottom: 8px; text-align: left;">Rejoindre avec un code :</label>
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="private-room-code" placeholder="EX: 4A8B" maxlength="6" style="flex-grow: 1; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 4px; text-transform: uppercase; text-align: center; font-weight: bold; letter-spacing: 2px; font-size: 16px; outline: none;">
                     <button class="btn" style="background: #4cd137; color: black; border: none; padding: 0 20px; font-weight: 800;" onclick="joinPrivateMatch()">GO</button>
                 </div>
                 <div style="margin-top: 15px; border-top: 1px solid #222; padding-top: 15px;">
-                    <button class="btn" style="background: transparent; color: #ccc; border: 1px dashed #555; width: 100%; font-size: 12px;" onclick="createPrivateMatch()">+ Créer une nouvelle salle privée</button>
+                    <button class="btn" style="background: transparent; color: #ccc; border: 1px dashed #555; width: 100%; font-size: 12px;" onclick="createPrivateMatch()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Créer une nouvelle salle privée
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+    
     <main class="content">
         <h1 class="page-title" id="dynamic-page-title">Titre</h1>
 
         <div id="view-store" class="view-section active">
+            
+            <div class="motion-logo-container" id="motion-container">
+                <div class="novaly-motion-logo" id="motion-logo">NOVALY</div>
+                <p style="color: var(--text-muted); font-size: 11px; margin-top: -5px; letter-spacing: 3px; text-transform: uppercase; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;">Plateforme Nouvelle Génération</p>
+            </div>
+
             <div class="hero-banner" id="store-banner">
-                <div style="background: #ffffff; color: #000; padding: 5px 15px; border-radius: 4px; font-weight: 800; font-size: 12px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px;">Coming Soon</div>
+                <div style="background: #ffffff; color: #000; padding: 5px 15px; border-radius: 4px; font-weight: 800; font-size: 12px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;">Coming Soon</div>
                 <h1>CLUTCH</h1>
                 <p>Préparez-vous pour l'expérience ultime. Le futur du gaming arrive sur Novaly.</p>
                 <button class="btn-hero" disabled>Indisponible</button>
@@ -377,10 +495,13 @@
 
             <h2 style="font-size: 18px; margin-bottom: 20px;">Prochainement</h2>
             <div class="grid" id="store-grid">
-                <div class="game-card">
+                <div class="game-card skeleton">
                     <div class="game-cover" style="background: linear-gradient(135deg, #333, #000); display: flex; align-items: center; justify-content: center;">
                         <span style="font-weight: 900; font-size: 20px; letter-spacing: 2px; opacity: 0.5;">CLUTCH</span>
-                        <div style="position: absolute; top: 10px; right: 10px; background: white; color: black; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 900;">SOON</div>
+                    </div>
+                    <div class="game-tags">
+                        <span class="tag tag-action">Action</span>
+                        <span class="tag tag-soon">Bientôt</span>
                     </div>
                     <div class="game-title">CLUTCH : Standard Edition</div>
                     <div class="game-price">À venir</div>
@@ -388,22 +509,27 @@
             </div>
         </div>
 
-<!-- =================== NOUVELLE VUE : JEUX ONLINE =================== -->
         <div id="view-online" class="view-section">
             <h2 style="font-size: 18px; margin-bottom: 20px;">Nos Jeux en Ligne</h2>
             <div class="grid">
-                <!-- JEU 1 : The Imposteur -->
-                <div class="game-card" onclick="lancerJeu('imposteur')">
+                <div class="game-card skeleton" onclick="lancerJeu('imposteur')">
                     <div class="game-cover" style="background: linear-gradient(135deg, #2c3e50, #000); display: flex; align-items: center; justify-content: center;">
                         <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">
+                    </div>
+                    <div class="game-tags">
+                        <span class="tag tag-multi">Multijoueur</span>
+                        <span class="tag tag-reflexion">Réflexion</span>
                     </div>
                     <div class="game-title">The Imposteur</div>
                     <div class="game-price">Jouer à l'alpha</div>
                 </div>
-                <!-- JEU 2 : Nolimite -->
-                <div class="game-card" onclick="lancerJeu('nolimite')">
+                <div class="game-card skeleton" onclick="lancerJeu('nolimite')">
                     <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;">
                         </div>
+                    <div class="game-tags">
+                        <span class="tag tag-party">Party Game</span>
+                        <span class="tag tag-multi">Multijoueur</span>
+                    </div>
                     <div class="game-title">Nolimite</div>
                     <div class="game-price">Jouer à l'alpha</div>
                 </div>
@@ -423,15 +549,24 @@
                 <p data-i18n="communityDesc" style="margin-bottom: 30px;">Rejoignez la discussion, partagez vos créations et trouvez des coéquipiers.</p>
                 <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
                     <div class="news-card">
-                        <h4 data-i18n="commNews1Title">📢 Mise à jour v1.2 : Patch Notes</h4>
+                        <h4 data-i18n="commNews1Title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                            Mise à jour v1.2 : Patch Notes
+                        </h4>
                         <p data-i18n="commNews1Desc">Découvrez toutes les nouveautés, corrections de bugs et équilibrages apportés par la dernière mise à jour.</p>
                     </div>
                     <div class="news-card">
-                        <h4 data-i18n="commNews2Title">🏆 Tournoi Galactic Warfare</h4>
+                        <h4 data-i18n="commNews2Title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                            Tournoi Galactic Warfare
+                        </h4>
                         <p data-i18n="commNews2Desc">Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.</p>
                     </div>
                     <div class="news-card">
-                        <h4 data-i18n="commNews3Title">🎨 Créations de la semaine</h4>
+                        <h4 data-i18n="commNews3Title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="5.5" r="1.5"/><circle cx="18.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                            Créations de la semaine
+                        </h4>
                         <p data-i18n="commNews3Desc">Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.</p>
                     </div>
                 </div>
@@ -604,7 +739,10 @@
                         <div id="stripe-modal" style="display: none; background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #4cd137; margin-top: 15px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                                 <strong style="color: white;">Ajouter une carte</strong>
-                                <span style="font-size: 10px; color: #aaa;">🔒 SSL Sécurisé</span>
+                                <span style="font-size: 10px; color: #aaa;">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                    SSL Sécurisé
+                                </span>
                             </div>
                             <input type="text" id="fake-card-num" placeholder="Numéro (16 chiffres)" maxlength="16" style="width: 100%; box-sizing: border-box; padding: 12px; background: #111; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 4px; font-family: monospace;">
                             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -692,14 +830,62 @@
                 <div>© 2026 Novaly Games, LLC. <span data-i18n="footerRights">Tous droits réservés.</span></div>
             </div>
         </footer>
-        <!-- ================= ZONE DE JEU (IFRAME) ================= -->
+
         <div id="game-container" style="display: none; position: absolute; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); z-index: 50; background: #000;">
-            <button onclick="quitterJeu()" style="position: absolute; top: 10px; left: 10px; z-index: 60; background: rgba(255, 71, 87, 0.8); color: white; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">Quitter le jeu</button>
+            <div class="game-controls">
+                <button onclick="quitterJeu()" class="game-control-btn btn-quit">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Quitter le jeu
+                </button>
+                <button onclick="toggleFullscreen()" class="game-control-btn btn-fullscreen">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                    Plein Écran
+                </button>
+            </div>
             <iframe id="game-frame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </main>
 
     <script>
+        // 1. GESTION DU PLEIN ÉCRAN
+        window.toggleFullscreen = function() {
+            const container = document.getElementById('game-container');
+            if (!document.fullscreenElement) {
+                if(container.requestFullscreen) {
+                    container.requestFullscreen().catch(err => console.log(err));
+                }
+            } else {
+                if(document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        };
+
+        // 2. RETRAIT DE L'EFFET SKELETON APRÈS 1.5 SECONDES
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.skeleton').forEach(el => el.classList.remove('skeleton'));
+            }, 1500);
+        });
+
+// 3. ANIMATION MOTION "NOVALY" (SPOTLIGHT) FIXÉ
+        const motionContainer = document.getElementById('motion-container');
+        const motionLogo = document.getElementById('motion-logo');
+        if (motionContainer && motionLogo) {
+            motionContainer.addEventListener('mousemove', (e) => {
+                motionLogo.classList.add('active-light'); // Allume la lumière
+                const rect = motionLogo.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                motionLogo.style.setProperty('--mouse-x', `${x}px`);
+                motionLogo.style.setProperty('--mouse-y', `${y}px`);
+            });
+            
+            motionContainer.addEventListener('mouseleave', () => {
+                motionLogo.classList.remove('active-light'); // Éteint la lumière
+            });
+        }
+
         const translations = {
             fr: {
                 navStore: "Magasin", navOnline: "Jeux Rapide", navLibrary: "Bibliothèque", navCommunity: "Communauté", navAbout: "À propos", navCart: "Panier", navContact: "Contactez-nous",
