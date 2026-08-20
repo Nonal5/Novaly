@@ -136,6 +136,18 @@
             <button class="btn" onclick="register()">Créer mon compte</button>
             <p class="toggle-text">Déjà un compte ? <span onclick="toggleForm()">Se connecter</span></p>
         </div>
+        <div id="google-pseudo-section" class="section-fade" style="display: none;">
+    <div class="subtitle">Dernière étape !</div>
+    <div id="google-error" class="error-message"></div>
+    <p style="font-size: 13px; color: #ccc; margin-bottom: 20px;">Choisissez un pseudo unique pour le réseau Novaly.</p>
+    
+    <div class="form-group">
+        <label>Votre Pseudo</label>
+        <input type="text" id="google-username" placeholder="Ex: JoueurPro">
+    </div>
+    
+    <button class="btn" onclick="finalizeGoogleLogin()">Valider et entrer</button>
+</div>
 
         <a href="index.html" class="back-link">← Retour au magasin</a>
     </div>
@@ -244,26 +256,68 @@
             }
         };
 
-        window.loginWithGoogle = async function() {
-            hideErrors();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const pseudo = result.user.displayName || "Joueur";
+window.tempGoogleUser = null; // Stocke l'utilisateur temporairement
 
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', pseudo);
-                localStorage.setItem('email', result.user.email);
-                window.location.href = 'index.html';
-                            
-            } catch (error) {
-                if (error.code === 'auth/account-exists-with-different-credential') {
-                    showError('login-error', "Un compte utilise déjà cet e-mail. Connectez-vous avec votre mot de passe !");
-                } else {
-                    showError('login-error', "La connexion Google a été annulée ou a échoué.");
-                    console.error("Détail de l'erreur :", error);
-                }
-            }
-        };
+window.loginWithGoogle = async function() {
+    hideErrors();
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const userDocRef = doc(db, "users", result.user.uid);
+        
+        // On vérifie si ce compte Google a déjà un profil Novaly
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+            // Le compte existe déjà, on le connecte direct
+            localStorage.setItem('isLoggedIn', 'true');
+            window.location.href = 'index.html';
+        } else {
+            // NOUVEAU COMPTE : On cache le reste et on demande le pseudo
+            window.tempGoogleUser = result.user;
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('google-pseudo-section').style.display = 'block';
+        }
+    } catch (error) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+            showError('login-error', "Erreur avec Google.");
+        }
+    }
+};
+
+window.finalizeGoogleLogin = async function() {
+    hideErrors();
+    const pseudo = document.getElementById('google-username').value.trim();
+    const btn = document.querySelector('#google-pseudo-section .btn');
+    
+    if (!pseudo) return showError('google-error', "Veuillez entrer un pseudo.");
+    
+    btn.innerText = "Vérification...";
+    try {
+        // On vérifie si le pseudo est déjà pris
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("pseudoLower", "==", pseudo.toLowerCase()));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            btn.innerText = "Valider et entrer";
+            return showError('google-error', "Ce pseudo est déjà pris !");
+        }
+
+        // Pseudo libre : on met à jour le profil et on crée le document
+        await updateProfile(window.tempGoogleUser, { displayName: pseudo });
+        await setDoc(doc(db, "users", window.tempGoogleUser.uid), {
+            pseudo: pseudo,
+            pseudoLower: pseudo.toLowerCase()
+        });
+
+        localStorage.setItem('isLoggedIn', 'true');
+        window.location.href = 'index.html';
+        
+    } catch (error) {
+        showError('google-error', "Une erreur est survenue.");
+        btn.innerText = "Valider et entrer";
+    }
+};
 
         window.toggleForm = function() {
             hideErrors();

@@ -523,8 +523,7 @@
                     </div>
                     <div class="game-title">The Imposteur</div>
                     <div class="game-price">Jouer à l'alpha</div>
-                    <button class="btn btn-add-game" onclick="event.stopPropagation(); ajouterALaBibliotheque('imposteur')" style="width:100%; margin-top:10px; font-size:11px; padding:6px;">Ajouter à la bibliothèque</button>
-                </div>
+                    <button id="btn-add-imposteur" class="btn btn-add-game" onclick="event.stopPropagation(); ajouterALaBibliotheque('imposteur', this)" style="width:100%; margin-top:10px; font-size:11px; padding:6px;">Ajouter à la bibliothèque</button>                </div>
                 <div class="game-card skeleton" onclick="lancerJeu('nolimite')">
                     <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;">
                         </div>
@@ -534,8 +533,7 @@
                     </div>
                     <div class="game-title">Nolimite</div>
                     <div class="game-price">Jouer à l'alpha</div>
-                    <button class="btn btn-add-game" onclick="event.stopPropagation(); ajouterALaBibliotheque('nolimite')" style="width:100%; margin-top:10px; font-size:11px; padding:6px;">Ajouter à la bibliothèque</button>
-                </div>
+                    <button id="btn-add-nolimite" class="btn btn-add-game" onclick="event.stopPropagation(); ajouterALaBibliotheque('nolimite', this)" style="width:100%; margin-top:10px; font-size:11px; padding:6px;">Ajouter à la bibliothèque</button>                </div>
             </div>
         </div>
 
@@ -860,12 +858,18 @@
         <button onclick="envoyerMessage()" style="background: #0984e3; color: white; border: none; padding: 0 15px; margin-left: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">></button>
     </div>
 </div>
-<!-- POP-UP D'ALERTE PERSONNALISÉ NOVALY -->
-<div id="novaly-alert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-    <div style="background: #1a1a1a; border: 1px solid #8e44ad; border-radius: 12px; padding: 30px; text-align: center; max-width: 350px; box-shadow: 0 10px 30px rgba(142,68,173,0.3);">
-        <h3 style="margin-top: 0; color: #fff; text-transform: uppercase; letter-spacing: 1px;">Information</h3>
-        <p id="novaly-alert-text" style="color: #ccc; font-size: 14px; margin-bottom: 25px; line-height: 1.5;"></p>
-        <button class="btn" style="background: #8e44ad; color: white; border: none; width: 100%;" onclick="document.getElementById('novaly-alert').style.display='none'">OK</button>
+<!-- POP-UP D'ALERTE PERSONNALISÉ MODERNE -->
+<div id="novaly-alert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+    <div style="background: rgba(25, 25, 30, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; text-align: center; max-width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+        
+        <div style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        </div>
+        
+        <h3 style="margin: 0 0 10px; color: #fff; font-size: 16px; font-weight: 600;">Information</h3>
+        <p id="novaly-alert-text" style="color: #aaa; font-size: 13px; margin-bottom: 25px; line-height: 1.5;"></p>
+        
+        <button style="background: white; color: black; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#ddd'" onmouseout="this.style.background='white'" onclick="document.getElementById('novaly-alert').style.display='none'">Compris</button>
     </div>
 </div>
     </main>
@@ -1263,6 +1267,15 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         window.mesJeux = data.jeuxPossedes || [];
+                        window.mesJeux.forEach(gameId => {
+                        let btn = document.getElementById('btn-add-' + gameId);
+                        if(btn) {
+                            btn.innerText = "Dans la bibliothèque";
+                            btn.disabled = true;
+                            btn.style.background = "#2a2a2a";
+                            btn.style.color = "#888";
+                        }
+                        });
                         if(window.actualiserBibliotheque) window.actualiserBibliotheque();
                         if (data.avatarUrl) {
                             document.getElementById('nav-avatar').innerText = "";
@@ -1784,19 +1797,26 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
         window.mesJeux = []; // Liste des jeux possédés
 
 // Fonction pour ajouter un jeu
-window.ajouterALaBibliotheque = async function(gameId) {
+window.ajouterALaBibliotheque = async function(gameId, btnElement) {
     if (!auth.currentUser) {
         afficherAlerte("Vous devez être connecté pour ajouter un jeu !");
         return;
     }
     if (window.mesJeux.includes(gameId)) {
-        afficherAlertealert("Vous possédez déjà ce jeu !");
+        afficherAlerte("Vous possédez déjà ce jeu !");
         return;
     }
     
     window.mesJeux.push(gameId);
     await setDoc(doc(db, "users", auth.currentUser.uid), { jeuxPossedes: window.mesJeux }, { merge: true });
-    afficherAlerte("Jeu ajouté à votre bibliothèque !");
+    
+    // On change l'aspect du bouton immédiatement
+    if(btnElement) {
+        btnElement.innerText = "Dans la bibliothèque";
+        btnElement.disabled = true;
+        btnElement.style.background = "#2a2a2a";
+        btnElement.style.color = "#888";
+    }
     actualiserBibliotheque();
 };
 
@@ -1814,11 +1834,11 @@ window.actualiserBibliotheque = function() {
 
     let html = `<h2 style="font-size: 18px; margin-bottom: 20px;">Vos Jeux</h2><div class="grid">`;
     
-    // Génère les cartes en fonction des jeux possédés
+    // Copie conforme de l'HTML du magasin pour garder les mêmes images !
     if (window.mesJeux.includes('imposteur')) {
         html += `<div class="game-card" onclick="lancerJeu('imposteur')">
                     <div class="game-cover" style="background: linear-gradient(135deg, #2c3e50, #000); display: flex; align-items: center; justify-content: center;">
-                        <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1);">
+                        <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">
                     </div>
                     <div class="game-title">The Imposteur</div>
                     <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
@@ -1826,9 +1846,7 @@ window.actualiserBibliotheque = function() {
     }
     if (window.mesJeux.includes('nolimite')) {
         html += `<div class="game-card" onclick="lancerJeu('nolimite')">
-                    <div class="game-cover" style="background: #8e44ad; display: flex; align-items: center; justify-content: center;">
-                        <span style="font-weight:900; font-size:24px;">NOLIMITE</span>
-                    </div>
+                    <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;"></div>
                     <div class="game-title">Nolimite</div>
                     <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
                  </div>`;
