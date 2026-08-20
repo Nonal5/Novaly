@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #F5C842;
+    --gold-dark: #C8A020;
+    --gold-light: #FFE580;
+    --crimson: #C0392B;
+    --crimson-dark: #922B21;
+    --dark: #0A0A0F;
+    --dark2: #12121A;
+    --dark3: #1A1A28;
+    --dark4: #222235;
+    --dark5: #2A2A40;
+    --mid: #333355;
+    --light: #E8E0FF;
+    --muted: #8888AA;
+    --accent-blue: #4A6FFF;
+    --accent-purple: #9B59B6;
+    --accent-teal: #1ABC9C;
+    --accent-orange: #E67E22;
+    --green: #27AE60;
+    --red: #E74C3C;
+    --border: rgba(245,200,66,0.2);
+    --border-bright: rgba(245,200,66,0.6);
+    --text: #E8E0FF;
+  }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    width: 100%;
+    min-height: 600px;
+    overflow-x: hidden;
+    user-select: none;
+  }
+
+  /* ======= SCREENS ======= */
+  .screen { display: none; width: 100%; min-height: 600px; position: relative; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ======= STARS BG ======= */
+  .stars {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
+  }
+  .star {
+    position: absolute; border-radius: 50%; background: #fff;
+    animation: twinkle 3s infinite alternate;
+  }
+  @keyframes twinkle { from { opacity: 0.1; } to { opacity: 0.8; } }
+
+  /* ======= MENU SCREEN ======= */
+  #menuScreen {
+    background: radial-gradient(ellipse at 50% 30%, #1a1035 0%, var(--dark) 70%);
+    align-items: center; justify-content: center; text-align: center;
+    flex-direction: column; gap: 0;
+  }
+
+  .logo-wrap { position: relative; z-index: 2; margin-bottom: 8px; }
+
+  .logo-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; letter-spacing: 6px; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 20px; z-index: 2; position: relative;
+  }
+
+  .logo-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 72px; font-weight: 900; line-height: 1;
+    color: var(--gold);
+    text-shadow: 0 0 60px rgba(245,200,66,0.4), 0 2px 0 var(--gold-dark);
+    letter-spacing: 8px; z-index: 2; position: relative;
+    animation: logoPulse 4s ease-in-out infinite;
+  }
+  @keyframes logoPulse {
+    0%,100% { text-shadow: 0 0 40px rgba(245,200,66,0.3), 0 2px 0 var(--gold-dark); }
+    50% { text-shadow: 0 0 80px rgba(245,200,66,0.6), 0 2px 0 var(--gold-dark), 0 0 120px rgba(245,200,66,0.2); }
+  }
+
+  .logo-tagline {
+    font-size: 15px; letter-spacing: 3px; color: var(--muted); margin-top: 6px;
+    z-index: 2; position: relative; text-transform: uppercase;
+  }
+
+  .menu-cards-preview {
+    display: flex; gap: 12px; justify-content: center; margin: 28px 0;
+    z-index: 2; position: relative;
+  }
+
+  .preview-card {
+    width: 44px; height: 62px; border-radius: 6px;
+    border: 1.5px solid var(--border-bright);
+    background: var(--dark3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; cursor: default;
+    animation: float 3s ease-in-out infinite;
+    position: relative;
+  }
+  .preview-card:nth-child(1) { animation-delay: 0s; transform: rotate(-8deg); }
+  .preview-card:nth-child(2) { animation-delay: 0.5s; transform: rotate(-3deg); }
+  .preview-card:nth-child(3) { animation-delay: 1s; transform: rotate(0deg); top: -8px; border-color: var(--gold); background: var(--dark4); }
+  .preview-card:nth-child(4) { animation-delay: 1.5s; transform: rotate(4deg); }
+  .preview-card:nth-child(5) { animation-delay: 2s; transform: rotate(9deg); }
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(var(--rot,0deg)); }
+    50% { transform: translateY(-6px) rotate(var(--rot,0deg)); }
+  }
+
+  .menu-btns {
+    display: flex; flex-direction: column; gap: 12px; width: 280px;
+    z-index: 2; position: relative;
+  }
+
+  .btn-main {
+    padding: 14px 32px; border-radius: 8px; font-family: 'Rajdhani', sans-serif;
+    font-size: 17px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; border: none; transition: all 0.15s ease; position: relative;
+    overflow: hidden;
+  }
+  .btn-main.primary {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--dark); box-shadow: 0 4px 20px rgba(245,200,66,0.3);
+  }
+  .btn-main.primary:hover {
+    transform: translateY(-2px); box-shadow: 0 6px 28px rgba(245,200,66,0.5);
+  }
+  .btn-main.secondary {
+    background: var(--dark4); color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-main.secondary:hover {
+    background: var(--dark5); border-color: var(--border-bright);
+    transform: translateY(-1px);
+  }
+  .btn-main.ghost {
+    background: transparent; color: var(--muted);
+    border: 1px solid rgba(136,136,170,0.2);
+  }
+  .btn-main.ghost:hover { color: var(--text); border-color: var(--muted); }
+
+  .divider-line {
+    width: 200px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
+    margin: 8px auto; z-index: 2; position: relative;
+  }
+
+  .menu-version {
+    font-size: 11px; color: rgba(136,136,170,0.4); letter-spacing: 2px;
+    z-index: 2; position: relative; margin-top: 16px;
+  }
+
+  /* ======= TOP NAV ======= */
+  .topnav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; background: var(--dark2);
+    border-bottom: 1px solid var(--border); z-index: 10;
+    flex-shrink: 0;
+  }
+  .topnav-logo {
+    font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 900;
+    color: var(--gold); letter-spacing: 3px;
+  }
+  .topnav-right { display: flex; align-items: center; gap: 16px; }
+  .topnav-coins {
+    display: flex; align-items: center; gap: 6px; padding: 6px 14px;
+    background: var(--dark4); border-radius: 20px; border: 1px solid var(--border);
+    font-size: 15px; font-weight: 700;
+  }
+  .coin-icon { font-size: 16px; }
+  .xp-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .xp-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+  .xp-bar { width: 80px; height: 6px; background: var(--dark4); border-radius: 3px; overflow: hidden; }
+  .xp-fill { height: 100%; background: linear-gradient(90deg, var(--accent-purple), var(--gold)); border-radius: 3px; width: 65%; }
+  .rank-badge {
+    padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; background: linear-gradient(135deg, var(--crimson-dark), var(--crimson));
+    color: #fff;
+  }
+  .avatar-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+    border: 2px solid var(--gold); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: #fff;
+  }
+
+  /* ======= BOTTOM NAV ======= */
+  .bottomnav {
+    display: flex; border-top: 1px solid var(--border);
+    background: var(--dark2); z-index: 10; flex-shrink: 0;
+  }
+  .bnav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 10px 4px; gap: 4px; cursor: pointer; transition: all 0.15s;
+    font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;
+    border-top: 2px solid transparent;
+  }
+  .bnav-item:hover { color: var(--text); background: var(--dark3); }
+  .bnav-item.active { color: var(--gold); border-top-color: var(--gold); background: rgba(245,200,66,0.05); }
+  .bnav-icon { font-size: 20px; }
+
+  /* ======= LOBBY SCREEN ======= */
+  #lobbyScreen { background: var(--dark); }
+  .lobby-content {
+    flex: 1; padding: 20px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  .section-title {
+    font-size: 11px; letter-spacing: 3px; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+
+  /* Game mode cards */
+  .game-modes-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+  .game-mode-card {
+    background: var(--dark3); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 12px; cursor: pointer; transition: all 0.2s; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .game-mode-card::before {
+    content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.2s;
+    background: radial-gradient(ellipse at 50% 0%, var(--mode-color, rgba(245,200,66,0.1)) 0%, transparent 70%);
+  }
+  .game-mode-card:hover::before, .game-mode-card.selected::before { opacity: 1; }
+  .game-mode-card:hover, .game-mode-card.selected {
+    border-color: var(--mode-color, var(--gold)); transform: translateY(-2px);
+  }
+  .game-mode-card.selected { box-shadow: 0 0 20px rgba(245,200,66,0.2); }
+  .mode-icon { font-size: 28px; margin-bottom: 8px; }
+  .mode-name { font-size: 14px; font-weight: 700; letter-spacing: 1px; color: var(--text); }
+  .mode-players { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .mode-rank-badge {
+    position: absolute; top: 8px; right: 8px; font-size: 9px; padding: 2px 6px;
+    border-radius: 6px; font-weight: 700; letter-spacing: 1px;
+  }
+
+  /* Match settings */
+  .settings-card {
+    background: var(--dark3); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-label { font-size: 14px; color: var(--muted); letter-spacing: 1px; }
+  .setting-value { font-size: 14px; font-weight: 700; color: var(--text); }
+  .toggle-group { display: flex; gap: 6px; }
+  .toggle-btn {
+    padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; cursor: pointer; border: 1px solid var(--border);
+    background: var(--dark4); color: var(--muted); transition: all 0.15s;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  .toggle-btn.active {
+    background: var(--gold); color: var(--dark);
+    border-color: var(--gold); box-shadow: 0 0 12px rgba(245,200,66,0.3);
+  }
+  .toggle-btn:hover:not(.active) { border-color: var(--muted); color: var(--text); }
+
+  /* Player slot */
+  .players-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+  .player-slot {
+    background: var(--dark4); border: 1px dashed rgba(136,136,170,0.3);
+    border-radius: 10px; padding: 12px 8px; text-align: center; min-height: 80px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .player-slot.filled { border-style: solid; border-color: var(--border); background: var(--dark3); }
+  .player-slot.you { border-color: var(--gold); background: rgba(245,200,66,0.05); }
+  .player-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px;
+  }
+  .player-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .player-rank { font-size: 10px; color: var(--muted); }
+  .slot-empty { font-size: 22px; color: rgba(136,136,170,0.2); }
+  .slot-label { font-size: 10px; color: rgba(136,136,170,0.4); letter-spacing: 1px; }
+
+  /* Find match btn */
+  .find-match-section { padding: 4px 0 8px; }
+  .btn-find-match {
+    width: 100%; padding: 16px; border-radius: 10px; font-family: 'Orbitron', monospace;
+    font-size: 16px; font-weight: 700; letter-spacing: 3px; cursor: pointer; border: none;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light));
+    color: var(--dark); transition: all 0.2s;
+    box-shadow: 0 4px 24px rgba(245,200,66,0.3);
+    position: relative; overflow: hidden;
+  }
+  .btn-find-match:hover {
+    transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,200,66,0.5);
+  }
+  .btn-find-match::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+    animation: shimmer 2.5s infinite;
+  }
+  @keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+  /* ======= SHOP SCREEN ======= */
+  #shopScreen { background: var(--dark); }
+  .shop-content { flex: 1; padding: 20px; overflow-y: auto; }
+
+  .shop-tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    background: var(--dark3); border-radius: 10px; padding: 4px;
+  }
+  .shop-tab {
+    flex: 1; padding: 8px; text-align: center; border-radius: 7px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
+    color: var(--muted); transition: all 0.15s; text-transform: uppercase;
+  }
+  .shop-tab.active { background: var(--dark5); color: var(--gold); }
+  .shop-tab:hover:not(.active) { color: var(--text); }
+
+  .shop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+  .shop-item {
+    background: var(--dark3); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; cursor: pointer;
+    transition: all 0.2s; position: relative;
+  }
+  .shop-item:hover { transform: translateY(-3px); border-color: var(--border-bright); }
+  .shop-item.rare { border-color: rgba(155,89,182,0.5); }
+  .shop-item.epic { border-color: rgba(245,200,66,0.5); }
+  .shop-item.legendary {
+    border-color: rgba(245,120,30,0.7);
+    box-shadow: 0 0 20px rgba(245,120,30,0.1);
+  }
+
+  .shop-item-preview {
+    height: 110px; display: flex; align-items: center; justify-content: center;
+    font-size: 52px; position: relative;
+    background: linear-gradient(180deg, var(--dark4) 0%, var(--dark2) 100%);
+  }
+  .rarity-tag {
+    position: absolute; top: 8px; left: 8px; padding: 3px 8px;
+    border-radius: 6px; font-size: 9px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .rarity-common { background: rgba(136,136,170,0.2); color: var(--muted); }
+  .rarity-rare { background: rgba(74,111,255,0.2); color: var(--accent-blue); }
+  .rarity-epic { background: rgba(155,89,182,0.2); color: var(--accent-purple); }
+  .rarity-legendary { background: rgba(230,120,34,0.2); color: var(--accent-orange); }
+  .owned-tag {
+    position: absolute; top: 8px; right: 8px; padding: 3px 8px;
+    border-radius: 6px; font-size: 9px; font-weight: 700; letter-spacing: 1px;
+    background: rgba(39,174,96,0.2); color: var(--green);
+  }
+
+  .shop-item-info { padding: 12px; }
+  .shop-item-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .shop-item-desc { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .shop-item-price {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .price-tag {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 16px; font-weight: 700; color: var(--gold);
+  }
+  .btn-buy {
+    padding: 5px 14px; border-radius: 7px; font-family: 'Rajdhani', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px; cursor: pointer; border: none;
+    background: var(--gold); color: var(--dark); transition: all 0.15s;
+  }
+  .btn-buy:hover { background: var(--gold-light); transform: scale(1.05); }
+  .btn-buy:disabled { background: var(--dark5); color: var(--muted); cursor: default; transform: none; }
+
+  /* ======= RANKED SCREEN ======= */
+  #rankedScreen { background: var(--dark); }
+  .ranked-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .rank-display {
+    background: linear-gradient(135deg, var(--dark3), var(--dark4));
+    border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .rank-display::before {
+    content: ''; position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(192,57,43,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .current-rank-icon { font-size: 56px; margin-bottom: 8px; display: block; }
+  .current-rank-name {
+    font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900;
+    color: var(--crimson); letter-spacing: 4px; margin-bottom: 4px;
+  }
+  .rank-points { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .rank-progress {
+    background: var(--dark5); border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 6px;
+  }
+  .rank-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--crimson-dark), var(--crimson));
+    border-radius: 8px; width: 73%;
+    animation: fillProgress 1.5s ease-out;
+  }
+  @keyframes fillProgress { from { width: 0; } }
+  .rank-progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+
+  .rank-tiers-row {
+    display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
+  }
+  .tier-pill {
+    display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+    border-radius: 20px; border: 1px solid var(--border);
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    background: var(--dark3); color: var(--muted);
+  }
+  .tier-pill.current { border-color: var(--crimson); color: var(--crimson); background: rgba(192,57,43,0.1); }
+  .tier-pill.completed { color: var(--green); border-color: rgba(39,174,96,0.4); background: rgba(39,174,96,0.05); }
+  .tier-icon { font-size: 14px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat-card {
+    background: var(--dark3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 10px; text-align: center;
+  }
+  .stat-number { font-size: 24px; font-weight: 700; color: var(--text); }
+  .stat-number.green { color: var(--green); }
+  .stat-number.red { color: var(--red); }
+  .stat-number.gold { color: var(--gold); }
+  .stat-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+
+  .leaderboard { background: var(--dark3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .leaderboard-header {
+    padding: 12px 16px; background: var(--dark4);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--muted);
+    text-transform: uppercase;
+  }
+  .leaderboard-row {
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s;
+  }
+  .leaderboard-row:last-child { border-bottom: none; }
+  .leaderboard-row:hover { background: var(--dark4); }
+  .leaderboard-row.me { background: rgba(245,200,66,0.05); }
+  .lb-rank {
+    width: 24px; text-align: center; font-size: 14px; font-weight: 700;
+    color: var(--muted);
+  }
+  .lb-rank.gold { color: var(--gold); }
+  .lb-rank.silver { color: #C0C0C0; }
+  .lb-rank.bronze { color: #CD7F32; }
+  .lb-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+  }
+  .lb-info { flex: 1; }
+  .lb-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .lb-mode { font-size: 10px; color: var(--muted); }
+  .lb-points { font-size: 15px; font-weight: 700; color: var(--gold); }
+
+  /* ======= PROFILE SCREEN ======= */
+  #profileScreen { background: var(--dark); }
+  .profile-content { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+  .profile-hero {
+    background: linear-gradient(135deg, var(--dark3), var(--dark4));
+    border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .profile-avatar-big {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+    border: 3px solid var(--gold); display: flex; align-items: center;
+    justify-content: center; font-size: 28px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .profile-info { flex: 1; }
+  .profile-name { font-family: 'Orbitron', monospace; font-size: 20px; font-weight: 700; color: var(--text); }
+  .profile-handle { font-size: 13px; color: var(--muted); margin: 2px 0 10px; }
+  .profile-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .profile-badge {
+    padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .badge-rank { background: rgba(192,57,43,0.2); color: var(--crimson); }
+  .badge-win { background: rgba(39,174,96,0.2); color: var(--green); }
+  .badge-season { background: rgba(245,200,66,0.15); color: var(--gold); }
+
+  .games-history { background: var(--dark3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .history-row {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .history-row:last-child { border-bottom: none; }
+  .history-mode-icon { font-size: 22px; width: 28px; text-align: center; }
+  .history-info { flex: 1; }
+  .history-mode { font-size: 13px; font-weight: 700; color: var(--text); }
+  .history-details { font-size: 11px; color: var(--muted); }
+  .history-result {
+    font-size: 13px; font-weight: 700; padding: 4px 10px;
+    border-radius: 8px;
+  }
+  .result-win { background: rgba(39,174,96,0.15); color: var(--green); }
+  .result-loss { background: rgba(231,76,60,0.15); color: var(--red); }
+  .history-rp { font-size: 12px; font-weight: 700; color: var(--gold); min-width: 50px; text-align: right; }
+
+  /* ======= MATCHING OVERLAY ======= */
+  #matchingOverlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(10,10,15,0.95); backdrop-filter: blur(8px);
+    flex-direction: column; align-items: center; justify-content: center;
+    gap: 24px;
+  }
+  #matchingOverlay.active { display: flex; }
+  .matching-spinner {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 3px solid rgba(245,200,66,0.1);
+    border-top-color: var(--gold);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .matching-text {
+    font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700;
+    color: var(--gold); letter-spacing: 4px;
+  }
+  .matching-sub { font-size: 13px; color: var(--muted); letter-spacing: 2px; }
+  .matching-dots { display: flex; gap: 8px; }
+  .mdot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+    animation: bounce 1.4s ease-in-out infinite;
+  }
+  .mdot:nth-child(2) { animation-delay: 0.2s; }
+  .mdot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+  .btn-cancel-match {
+    padding: 10px 28px; border-radius: 8px; font-family: 'Rajdhani', sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 2px; cursor: pointer;
+    border: 1px solid rgba(231,76,60,0.4); background: rgba(231,76,60,0.1);
+    color: var(--red); transition: all 0.15s; text-transform: uppercase;
+  }
+  .btn-cancel-match:hover { background: rgba(231,76,60,0.2); border-color: var(--red); }
+
+  /* ======= NOTIFICATION TOAST ======= */
+  #toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--dark3); border: 1px solid var(--border-bright);
+    border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 700;
+    color: var(--text); z-index: 200; opacity: 0; transition: all 0.3s;
+    pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ===================== MATCHING OVERLAY ===================== -->
+<div id="matchingOverlay">
+  <div class="matching-spinner"></div>
+  <div class="matching-text">FINDING MATCH</div>
+  <div class="matching-sub" id="matchingModeName">POKER — RANKED</div>
+  <div class="matching-dots">
+    <div class="mdot"></div><div class="mdot"></div><div class="mdot"></div>
+  </div>
+  <button class="btn-cancel-match" onclick="closeMatching()">Cancel</button>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast"></div>
+
+<!-- ===================== MENU SCREEN ===================== -->
+<div class="screen active" id="menuScreen">
+  <div class="stars" id="menuStars"></div>
+
+  <div class="logo-wrap">
+    <div class="logo-sub">CARD BATTLE PLATFORM</div>
+    <div class="logo-title">CLUTCH</div>
+    <div class="logo-tagline">Every hand is ranked. Every bluff counts.</div>
+  </div>
+
+  <div class="menu-cards-preview">
+    <div class="preview-card">🂡</div>
+    <div class="preview-card">🃟</div>
+    <div class="preview-card">🃁</div>
+    <div class="preview-card">🂱</div>
+    <div class="preview-card">🃑</div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <div class="menu-btns">
+    <button class="btn-main primary" onclick="goScreen('lobbyScreen')">▶ Play Now</button>
+    <button class="btn-main secondary" onclick="goScreen('rankedScreen')">🏆 Ranked Ladder</button>
+    <button class="btn-main secondary" onclick="goScreen('shopScreen')">🛒 Shop</button>
+    <button class="btn-main ghost" onclick="goScreen('profileScreen')">👤 My Profile</button>
+  </div>
+
+  <div class="divider-line"></div>
+  <div class="menu-version">CLUTCH v1.0 · SEASON 1 · RANKED MODE</div>
+</div>
+
+<!-- ===================== LOBBY SCREEN ===================== -->
+<div class="screen" id="lobbyScreen">
+  <div class="topnav">
+    <div class="topnav-logo">CLUTCH</div>
+    <div class="topnav-right">
+      <div class="topnav-coins"><span class="coin-icon">🪙</span><span id="coinsDisplay">2,850</span></div>
+      <div class="xp-bar-wrap">
+        <span class="xp-label">LVL 24</span>
+        <div class="xp-bar"><div class="xp-fill"></div></div>
+      </div>
+      <div class="rank-badge">GOLD II</div>
+      <div class="avatar-btn">V</div>
+    </div>
+  </div>
+
+  <div class="lobby-content">
+    <div>
+      <div class="section-title">Choose Your Game Mode</div>
+      <div class="game-modes-grid">
+        <div class="game-mode-card selected" style="--mode-color: rgba(245,200,66,0.6)" onclick="selectMode(this,'Poker')" data-mode="Poker">
+          <span class="mode-rank-badge rarity-epic">⭐ CLASSIC</span>
+          <div class="mode-icon">🂱</div>
+          <div class="mode-name">POKER</div>
+          <div class="mode-players">2–6 players</div>
+        </div>
+        <div class="game-mode-card" style="--mode-color: rgba(155,89,182,0.5)" onclick="selectMode(this,'Loup-Garou')" data-mode="Loup-Garou">
+          <span class="mode-rank-badge rarity-rare">🌕 NIGHT</span>
+          <div class="mode-icon">🐺</div>
+          <div class="mode-name">LOUP-GAROU</div>
+          <div class="mode-players">6–18 players</div>
+        </div>
+        <div class="game-mode-card" style="--mode-color: rgba(26,188,156,0.5)" onclick="selectMode(this,'Undercover')" data-mode="Undercover">
+          <span class="mode-rank-badge rarity-rare">🕵️ DEDUCTION</span>
+          <div class="mode-icon">🕵️</div>
+          <div class="mode-name">UNDERCOVER</div>
+          <div class="mode-players">3–10 players</div>
+        </div>
+        <div class="game-mode-card" style="--mode-color: rgba(231,76,60,0.5)" onclick="selectMode(this,'UNO')" data-mode="UNO">
+          <span class="mode-rank-badge rarity-common">🎮 FAST</span>
+          <div class="mode-icon">🃟</div>
+          <div class="mode-name">UNO</div>
+          <div class="mode-players">2–4 players</div>
+        </div>
+        <div class="game-mode-card" style="--mode-color: rgba(230,126,34,0.5)" onclick="selectMode(this,'Bluff')" data-mode="Bluff">
+          <span class="mode-rank-badge rarity-rare">🎭 BLUFF</span>
+          <div class="mode-icon">🤥</div>
+          <div class="mode-name">BLUFF</div>
+          <div class="mode-players">3–8 players</div>
+        </div>
+        <div class="game-mode-card" style="--mode-color: rgba(52,152,219,0.5)" onclick="selectMode(this,'Menteur')" data-mode="Menteur">
+          <span class="mode-rank-badge rarity-legendary">💀 BRUTAL</span>
+          <div class="mode-icon">🎲</div>
+          <div class="mode-name">MENTEUR</div>
+          <div class="mode-players">2–8 players</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="section-title">Match Settings</div>
+      <div class="setting-row">
+        <span class="setting-label">Mode</span>
+        <div class="toggle-group">
+          <button class="toggle-btn active">RANKED</button>
+          <button class="toggle-btn" onclick="toggleBtns(this)">CASUAL</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Region</span>
+        <div class="toggle-group">
+          <button class="toggle-btn active">EU-WEST</button>
+          <button class="toggle-btn" onclick="toggleBtns(this)">US</button>
+          <button class="toggle-btn" onclick="toggleBtns(this)">ASIA</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Voice Chat</span>
+        <div class="toggle-group">
+          <button class="toggle-btn" onclick="toggleBtns(this)">ON</button>
+          <button class="toggle-btn active">OFF</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span class="setting-label">Party</span>
+        <span class="setting-value">Solo Queue</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Lobby (1/4)</div>
+      <div class="players-row">
+        <div class="player-slot you filled">
+          <div class="player-avatar" style="background: linear-gradient(135deg, #9B59B6, #4A6FFF);">V</div>
+          <div class="player-name">Valhalla_X</div>
+          <div class="player-rank">🥇 Gold II</div>
+        </div>
+        <div class="player-slot filled">
+          <div class="player-avatar" style="background: linear-gradient(135deg, #C0392B, #E74C3C);">K</div>
+          <div class="player-name">KingBluff</div>
+          <div class="player-rank">🏆 Plat IV</div>
+        </div>
+        <div class="player-slot">
+          <div class="slot-empty">+</div>
+          <div class="slot-label">Waiting...</div>
+        </div>
+        <div class="player-slot">
+          <div class="slot-empty">+</div>
+          <div class="slot-label">Waiting...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="find-match-section">
+      <button class="btn-find-match" onclick="startMatching()" id="findMatchBtn">
+        ⚡ FIND MATCH
+      </button>
+    </div>
+  </div>
+
+  <div class="bottomnav">
+    <div class="bnav-item active" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon">🎮</span>Play</div>
+    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon">🏆</span>Ranked</div>
+    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon">🛒</span>Shop</div>
+    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon">👤</span>Profile</div>
+    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon">🏠</span>Menu</div>
+  </div>
+</div>
+
+<!-- ===================== SHOP SCREEN ===================== -->
+<div class="screen" id="shopScreen">
+  <div class="topnav">
+    <div class="topnav-logo">SHOP</div>
+    <div class="topnav-right">
+      <div class="topnav-coins"><span class="coin-icon">🪙</span><span id="coinsShop">2,850</span></div>
+    </div>
+  </div>
+
+  <div class="shop-content">
+    <div class="shop-tabs" id="shopTabs">
+      <div class="shop-tab active" onclick="shopTab(this,'skins')">Card Skins</div>
+      <div class="shop-tab" onclick="shopTab(this,'avatars')">Avatars</div>
+      <div class="shop-tab" onclick="shopTab(this,'emotes')">Emotes</div>
+      <div class="shop-tab" onclick="shopTab(this,'packs')">Bundles</div>
+    </div>
+
+    <div class="shop-grid" id="shopGrid"></div>
+  </div>
+
+  <div class="bottomnav">
+    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon">🎮</span>Play</div>
+    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon">🏆</span>Ranked</div>
+    <div class="bnav-item active" onclick="navTo('shopScreen',this)"><span class="bnav-icon">🛒</span>Shop</div>
+    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon">👤</span>Profile</div>
+    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon">🏠</span>Menu</div>
+  </div>
+</div>
+
+<!-- ===================== RANKED SCREEN ===================== -->
+<div class="screen" id="rankedScreen">
+  <div class="topnav">
+    <div class="topnav-logo">RANKED</div>
+    <div class="topnav-right">
+      <div class="rank-badge">GOLD II</div>
+      <div class="topnav-coins"><span class="coin-icon">⭐</span><span>1,240 RP</span></div>
+    </div>
+  </div>
+
+  <div class="ranked-content">
+    <div class="rank-display">
+      <span class="current-rank-icon">🥇</span>
+      <div class="current-rank-name">GOLD II</div>
+      <div class="rank-points">1,240 / 1,500 Ranked Points</div>
+      <div class="rank-progress"><div class="rank-progress-fill"></div></div>
+      <div class="rank-progress-label">
+        <span>Gold II</span><span>260 RP to Gold I</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Season 1 — Rank Ladder</div>
+      <div class="rank-tiers-row">
+        <div class="tier-pill completed"><span class="tier-icon">🥉</span>Bronze</div>
+        <div class="tier-pill completed"><span class="tier-icon">🪨</span>Silver</div>
+        <div class="tier-pill current"><span class="tier-icon">🥇</span>Gold</div>
+        <div class="tier-pill"><span class="tier-icon">💎</span>Plat</div>
+        <div class="tier-pill"><span class="tier-icon">💠</span>Diamond</div>
+        <div class="tier-pill"><span class="tier-icon">👑</span>Master</div>
+        <div class="tier-pill"><span class="tier-icon">🔥</span>Clutch</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">My Stats — Season 1</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-number gold">67%</div><div class="stat-label">Win Rate</div></div>
+        <div class="stat-card"><div class="stat-number green">+240</div><div class="stat-label">RP This Week</div></div>
+        <div class="stat-card"><div class="stat-number">142</div><div class="stat-label">Games Played</div></div>
+        <div class="stat-card"><div class="stat-number green">95</div><div class="stat-label">Wins</div></div>
+        <div class="stat-card"><div class="stat-number red">47</div><div class="stat-label">Losses</div></div>
+        <div class="stat-card"><div class="stat-number gold">14</div><div class="stat-label">Win Streak</div></div>
+      </div>
+    </div>
+
+    <div class="leaderboard">
+      <div class="leaderboard-header">🌍 Global Leaderboard — Top Players</div>
+      <div class="leaderboard-row">
+        <div class="lb-rank gold">🥇</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#C0392B,#E74C3C)">Z</div>
+        <div class="lb-info"><div class="lb-name">ZeroBluff</div><div class="lb-mode">Poker · 🔥 Clutch I</div></div>
+        <div class="lb-points">4,280 RP</div>
+      </div>
+      <div class="leaderboard-row">
+        <div class="lb-rank silver">🥈</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#27AE60,#1E8449)">N</div>
+        <div class="lb-info"><div class="lb-name">NightWolf</div><div class="lb-mode">Loup-Garou · 🔥 Clutch II</div></div>
+        <div class="lb-points">3,950 RP</div>
+      </div>
+      <div class="leaderboard-row">
+        <div class="lb-rank bronze">🥉</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#F39C12,#E67E22)">S</div>
+        <div class="lb-info"><div class="lb-name">ShadowAce</div><div class="lb-mode">Undercover · 👑 Master</div></div>
+        <div class="lb-points">3,710 RP</div>
+      </div>
+      <div class="leaderboard-row">
+        <div class="lb-rank">4</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#3498DB,#2E86C1)">P</div>
+        <div class="lb-info"><div class="lb-name">PsychBlader</div><div class="lb-mode">Bluff · 👑 Master</div></div>
+        <div class="lb-points">3,580 RP</div>
+      </div>
+      <div class="leaderboard-row me">
+        <div class="lb-rank" style="color:var(--gold)">247</div>
+        <div class="lb-avatar" style="background:linear-gradient(135deg,#9B59B6,#4A6FFF)">V</div>
+        <div class="lb-info"><div class="lb-name">Valhalla_X <span style="font-size:10px;color:var(--gold)">(You)</span></div><div class="lb-mode">Poker · 🥇 Gold II</div></div>
+        <div class="lb-points">1,240 RP</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottomnav">
+    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon">🎮</span>Play</div>
+    <div class="bnav-item active" onclick="navTo('rankedScreen',this)"><span class="bnav-icon">🏆</span>Ranked</div>
+    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon">🛒</span>Shop</div>
+    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon">👤</span>Profile</div>
+    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon">🏠</span>Menu</div>
+  </div>
+</div>
+
+<!-- ===================== PROFILE SCREEN ===================== -->
+<div class="screen" id="profileScreen">
+  <div class="topnav">
+    <div class="topnav-logo">PROFILE</div>
+    <div class="topnav-right">
+      <div class="topnav-coins"><span class="coin-icon">🪙</span><span>2,850</span></div>
+    </div>
+  </div>
+
+  <div class="profile-content">
+    <div class="profile-hero">
+      <div class="profile-avatar-big">V</div>
+      <div class="profile-info">
+        <div class="profile-name">VALHALLA_X</div>
+        <div class="profile-handle">#2847 · Joined Season 1</div>
+        <div class="profile-badges">
+          <span class="profile-badge badge-rank">🥇 Gold II</span>
+          <span class="profile-badge badge-win">💪 67% WR</span>
+          <span class="profile-badge badge-season">🌟 S1 Player</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Best Game Modes</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-number gold">🂱</div><div class="stat-label">Poker · Main</div></div>
+        <div class="stat-card"><div class="stat-number">🐺</div><div class="stat-label">Loup-Garou</div></div>
+        <div class="stat-card"><div class="stat-number">🕵️</div><div class="stat-label">Undercover</div></div>
+      </div>
+    </div>
+
+    <div class="games-history">
+      <div class="leaderboard-header">🕒 Recent Games</div>
+      <div class="history-row">
+        <div class="history-mode-icon">🂱</div>
+        <div class="history-info">
+          <div class="history-mode">Poker — Ranked</div>
+          <div class="history-details">5 players · 24 min · 3 eliminations</div>
+        </div>
+        <div class="history-result result-win">WIN</div>
+        <div class="history-rp">+28 RP</div>
+      </div>
+      <div class="history-row">
+        <div class="history-mode-icon">🐺</div>
+        <div class="history-info">
+          <div class="history-mode">Loup-Garou — Ranked</div>
+          <div class="history-details">12 players · 41 min · Survived</div>
+        </div>
+        <div class="history-result result-win">WIN</div>
+        <div class="history-rp">+35 RP</div>
+      </div>
+      <div class="history-row">
+        <div class="history-mode-icon">🕵️</div>
+        <div class="history-info">
+          <div class="history-mode">Undercover — Ranked</div>
+          <div class="history-details">6 players · 18 min · Caught early</div>
+        </div>
+        <div class="history-result result-loss">LOSS</div>
+        <div class="history-rp" style="color:var(--red)">−12 RP</div>
+      </div>
+      <div class="history-row">
+        <div class="history-mode-icon">🃟</div>
+        <div class="history-info">
+          <div class="history-mode">UNO — Ranked</div>
+          <div class="history-details">3 players · 9 min · +4 card streak</div>
+        </div>
+        <div class="history-result result-win">WIN</div>
+        <div class="history-rp">+18 RP</div>
+      </div>
+      <div class="history-row">
+        <div class="history-mode-icon">🤥</div>
+        <div class="history-info">
+          <div class="history-mode">Bluff — Ranked</div>
+          <div class="history-details">4 players · 15 min · Last standing</div>
+        </div>
+        <div class="history-result result-win">WIN</div>
+        <div class="history-rp">+22 RP</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottomnav">
+    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon">🎮</span>Play</div>
+    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon">🏆</span>Ranked</div>
+    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon">🛒</span>Shop</div>
+    <div class="bnav-item active" onclick="navTo('profileScreen',this)"><span class="bnav-icon">👤</span>Profile</div>
+    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon">🏠</span>Menu</div>
+  </div>
+</div>
+
+<script>
+  // ======= STATE =======
+  let coins = 2850;
+  let currentMode = 'Poker';
+  let matchingTimer = null;
+  let shopCategory = 'skins';
+
+  const shopItems = {
+    skins: [
+      { name: 'Shadow Deck', desc: 'Dark obsidian card backs', icon: '🖤', rarity: 'common', price: 400, owned: true },
+      { name: 'Royal Gold', desc: 'Gilded premium finish', icon: '✨', rarity: 'epic', price: 1200, owned: false },
+      { name: 'Dragon Scale', desc: 'Legendary red dragon theme', icon: '🐉', rarity: 'legendary', price: 2500, owned: false },
+      { name: 'Cyber Neon', desc: 'Futuristic holographic look', icon: '💜', rarity: 'rare', price: 800, owned: false },
+    ],
+    avatars: [
+      { name: 'The Phantom', desc: 'Mysterious masked player', icon: '🎭', rarity: 'rare', price: 600, owned: false },
+      { name: 'Wolf Lord', desc: 'Loup-Garou champion skin', icon: '🐺', rarity: 'legendary', price: 2000, owned: false },
+      { name: 'Poker King', desc: 'Classic card shark look', icon: '👑', rarity: 'epic', price: 1400, owned: false },
+      { name: 'Shadow Agent', desc: 'Undercover specialist', icon: '🕵️', rarity: 'rare', price: 700, owned: false },
+    ],
+    emotes: [
+      { name: 'Big Brain', desc: 'Show off your galaxy brain play', icon: '🧠', rarity: 'common', price: 200, owned: false },
+      { name: 'L + Ratio', desc: 'For when you eliminate someone', icon: '💀', rarity: 'rare', price: 450, owned: false },
+      { name: 'GG EZ', desc: 'For true clutch wins only', icon: '😎', rarity: 'epic', price: 900, owned: true },
+      { name: 'Tilt Meter', desc: 'Watch them tilt', icon: '😤', rarity: 'common', price: 250, owned: false },
+    ],
+    packs: [
+      { name: 'Starter Bundle', desc: '5 skins + avatar + 500 coins', icon: '📦', rarity: 'rare', price: 1500, owned: false },
+      { name: 'Wolf Pack', desc: 'All Loup-Garou content + bonus', icon: '🌕', rarity: 'legendary', price: 4000, owned: false },
+      { name: 'Clutch Season 1', desc: 'Exclusive S1 commemoration pack', icon: '🏆', rarity: 'legendary', price: 6000, owned: false },
+      { name: 'Emote Bundle', desc: 'All 8 emotes discounted 30%', icon: '😂', rarity: 'epic', price: 1800, owned: false },
+    ]
+  };
+
+  // ======= SCREENS =======
+  function goScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'shopScreen') renderShop();
+  }
+
+  function navTo(screenId, el) {
+    goScreen(screenId);
+    const nav = el.closest('.bottomnav');
+    if(nav) {
+      nav.querySelectorAll('.bnav-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+    }
+  }
+
+  // ======= STARS =======
+  function makeStars() {
+    const c = document.getElementById('menuStars');
+    if(!c) return;
+    for(let i=0; i<60; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      const sz = Math.random()*2+0.5;
+      s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s`;
+      c.appendChild(s);
+    }
+  }
+
+  // ======= GAME MODE SELECT =======
+  function selectMode(el, name) {
+    document.querySelectorAll('.game-mode-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    currentMode = name;
+    showToast('Mode: ' + name);
+  }
+
+  // ======= TOGGLE BTNS =======
+  function toggleBtns(el) {
+    const grp = el.closest('.toggle-group');
+    grp.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ======= MATCHING =======
+  function startMatching() {
+    document.getElementById('matchingModeName').textContent = currentMode.toUpperCase() + ' — RANKED';
+    document.getElementById('matchingOverlay').classList.add('active');
+    matchingTimer = setTimeout(closeMatching, 8000);
+  }
+
+  function closeMatching() {
+    document.getElementById('matchingOverlay').classList.remove('active');
+    if(matchingTimer) { clearTimeout(matchingTimer); matchingTimer = null; }
+  }
+
+  // ======= SHOP =======
+  function shopTab(el, cat) {
+    document.querySelectorAll('#shopTabs .shop-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    shopCategory = cat;
+    renderShop();
+  }
+
+  function renderShop() {
+    const grid = document.getElementById('shopGrid');
+    const items = shopItems[shopCategory] || [];
+    grid.innerHTML = items.map((item,i) => `
+      <div class="shop-item ${item.rarity}">
+        <div class="shop-item-preview">
+          <span class="rarity-tag rarity-${item.rarity}">${item.rarity.toUpperCase()}</span>
+          ${item.owned ? '<span class="owned-tag">OWNED</span>' : ''}
+          <span style="filter: none">${item.icon}</span>
+        </div>
+        <div class="shop-item-info">
+          <div class="shop-item-name">${item.name}</div>
+          <div class="shop-item-desc">${item.desc}</div>
+          <div class="shop-item-price">
+            <div class="price-tag">🪙 ${item.price.toLocaleString()}</div>
+            <button class="btn-buy" ${item.owned ? 'disabled' : ''} onclick="buyItem(${i},'${shopCategory}')">
+              ${item.owned ? 'OWNED' : 'BUY'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function buyItem(idx, cat) {
+    const item = shopItems[cat][idx];
+    if(item.owned) return;
+    if(coins < item.price) {
+      showToast('⚠️ Not enough coins!', '#E74C3C');
+      return;
+    }
+    coins -= item.price;
+    item.owned = true;
+    document.getElementById('coinsShop').textContent = coins.toLocaleString();
+    document.getElementById('coinsDisplay').textContent = coins.toLocaleString();
+    showToast('✅ ' + item.name + ' unlocked!');
+    renderShop();
+  }
+
+  // ======= TOAST =======
+  function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.borderColor = color || 'rgba(245,200,66,0.6)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ======= INIT =======
+  makeStars();
+  renderShop();
+</script>
+</body>
+</html>
