@@ -1796,7 +1796,7 @@ window.ajouterALaBibliotheque = async function(gameId) {
     
     window.mesJeux.push(gameId);
     await setDoc(doc(db, "users", auth.currentUser.uid), { jeuxPossedes: window.mesJeux }, { merge: true });
-    afficherAlertealert("Jeu ajouté à votre bibliothèque !");
+    afficherAlerte("Jeu ajouté à votre bibliothèque !");
     actualiserBibliotheque();
 };
 
