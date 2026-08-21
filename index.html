@@ -1875,10 +1875,6 @@ window.actualiserBibliotheque = function() {
     biblioView.innerHTML = html;
 };
 
-window.activeChatId = null;
-window.currentFriendId = null; // Mémorise l'ID de l'ami
-let chatUnsubscribe = null;
-
 // Fonction utilitaire pour formater la date du chat
 function formatChatDate(timestamp) {
     if (!timestamp) return "";
