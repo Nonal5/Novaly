@@ -354,8 +354,8 @@
                 <div class="friends-btn" onclick="toggleFriendsMenu(event)">
                     <svg viewBox="0 0 640 512" style="width: 14px; height: 14px; fill: currentColor;"><path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
                     AMIS
+                    <span id="unread-badge" style="display: none; background: #ff4757; color: white; border-radius: 10px; padding: 2px 6px; font-size: 10px; margin-left: 5px;">0</span>
                 </div>
-                
                 <div id="friends-dropdown" class="user-dropdown" style="width: 280px; right: 0;">
                     <div style="padding: 15px; border-bottom: 1px solid #333; background: #151515;">
                         <div style="display: flex; gap: 8px;">
@@ -1375,6 +1375,7 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     let offlineHtml = "";
                     let onlineCount = 0;
                     let offlineCount = 0;
+                    let totalUnread = 0; // NOUVEAU : On compte les messages non lus
 
                     for (const docFriend of snapshot.docs) {
                         const friendLink = docFriend.data();
@@ -1384,11 +1385,16 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                         const friendData = friendSnap.data();
                         const isOnline = friendData ? friendData.isOnline : false;
 
-                        // Modifie l'itemHtml pour inclure le onclick et le curseur pointer :
+                        // NOUVEAU : On affiche un badge si un message n'est pas lu
+                        const hasUnread = friendLink.hasUnread === true;
+                        if (hasUnread) totalUnread++;
+                        const badgeUnread = hasUnread ? `<span style="background: #ff4757; color: white; font-size: 9px; padding: 2px 5px; border-radius: 10px; font-weight: bold; margin-left: auto; box-shadow: 0 0 5px rgba(255,71,87,0.5);">NOUVEAU</span>` : '';
+
                         const itemHtml = `
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 4px; opacity: ${isOnline ? '1' : '0.5'}; cursor: pointer; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'" onclick="ouvrirChat('${friendId}', '${friendLink.pseudo}')">
                             <div style="width: 7px; height: 7px; background: ${isOnline ? '#4cd137' : '#555'}; border-radius: 50%; ${isOnline ? 'box-shadow: 0 0 5px #4cd137;' : ''}"></div>
                             <span style="font-size: 13px; color: ${isOnline ? '#eee' : '#777'}; font-weight: 500;">${friendLink.pseudo}</span>
+                            ${badgeUnread}
                         </div>`;
 
                         if (isOnline) {
@@ -1399,6 +1405,21 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                             offlineCount++;
                         }
                     }
+
+                    if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
+                    if(offlineList) offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
+
+                    // NOUVEAU : Mise à jour de la bulle globale "AMIS"
+                    const badgeGlobal = document.getElementById('unread-badge');
+                    if(badgeGlobal) {
+                        if(totalUnread > 0) {
+                            badgeGlobal.style.display = 'inline-block';
+                            badgeGlobal.innerText = totalUnread;
+                        } else {
+                            badgeGlobal.style.display = 'none';
+                        }
+                    }
+                });
 
                     if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
                     if(offlineList) offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
@@ -1858,15 +1879,19 @@ window.actualiserBibliotheque = function() {
 window.activeChatId = null;
 let chatUnsubscribe = null;
 
+window.activeChatId = null;
+window.currentFriendId = null; // Mémorise l'ID de l'ami
+let chatUnsubscribe = null;
+
 window.ouvrirChat = function(friendId, friendPseudo) {
     document.getElementById('chat-box').style.display = 'flex';
     document.getElementById('chat-title').innerText = "Discussion avec " + friendPseudo;
     
-    // On génère un ID unique pour cette conversation (en triant les UIDs par ordre alphabétique)
+    window.currentFriendId = friendId;
     const chatId = [auth.currentUser.uid, friendId].sort().join('_');
     window.activeChatId = chatId;
 
-    if (chatUnsubscribe) chatUnsubscribe(); // On coupe l'écoute de l'ancien chat si on change d'ami
+    if (chatUnsubscribe) chatUnsubscribe(); 
     
     const msgsRef = collection(db, "chats", chatId, "messages");
     const q = query(msgsRef, orderBy("timestamp", "asc"));
@@ -1878,27 +1903,36 @@ window.ouvrirChat = function(friendId, friendPseudo) {
             const msg = docSnap.data();
             const isMe = msg.senderId === auth.currentUser.uid;
             box.innerHTML += `
-                <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; background: ${isMe ? '#0984e3' : '#333'}; padding: 8px 12px; border-radius: 12px; max-width: 80%; color: white;">
+                <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; background: ${isMe ? '#0984e3' : '#333'}; padding: 8px 12px; border-radius: 12px; max-width: 80%; color: white; word-wrap: break-word;">
                     ${msg.text}
                 </div>`;
         });
-        box.scrollTop = box.scrollHeight; // Auto-scroll vers le bas
+        box.scrollTop = box.scrollHeight; 
+        
+        // NOUVEAU : Dès qu'on ouvre le chat (ou qu'un message arrive en direct), on efface la notification "Nouveau"
+        setDoc(doc(db, "users", auth.currentUser.uid, "friends", friendId), { 
+            hasUnread: false 
+        }, { merge: true });
     });
 };
 
 window.envoyerMessage = async function() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
-    if (!text || !window.activeChatId) return;
+    if (!text || !window.activeChatId || !window.currentFriendId) return;
 
-    input.value = ""; // On vide l'input
+    input.value = ""; 
     
     await addDoc(collection(db, "chats", window.activeChatId, "messages"), {
         text: text,
         senderId: auth.currentUser.uid,
-        // CORRECTION 1 : On utilise l'heure locale pour un affichage immédiat
-        timestamp: Date.now() 
+        timestamp: Date.now()
     });
+
+    // NOUVEAU : On prévient l'ami qu'il a reçu un message
+    await setDoc(doc(db, "users", window.currentFriendId, "friends", auth.currentUser.uid), { 
+        hasUnread: true 
+    }, { merge: true });
 };
 
 // Ajoute l'envoi avec la touche Entrée
