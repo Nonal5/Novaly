@@ -138,6 +138,15 @@
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* Adaptation Mobile */
+        @media (max-width: 768px) {
+            .black-card { min-height: 110px; font-size: 16px; padding: 15px; }
+            .white-card { min-width: 100px; max-width: 100px; height: 140px; padding: 10px; font-size: 11px; }
+            .scoreboard { gap: 10px; padding: 10px; }
+            .avatar { width: 35px; height: 35px; font-size: 14px; }
+            .btn-primary { padding: 12px; font-size: 13px; }
+            .setup-screen { padding: 20px 15px; }
+        }
     </style>
 </head>
 <body>

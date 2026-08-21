@@ -294,6 +294,24 @@
         .footer-link:hover, .footer-link.active { color: var(--text-main); transform: translateX(2px); }
         .footer-bottom { border-top: 1px solid #222; padding-top: 25px; font-size: 12px; display: flex; justify-content: space-between; }
 
+        .btn-telecharger-principal {
+                background-color: #ffffff; /* Fond tout blanc */
+                color: #000000 ; /* Texte en noir */
+                padding: 5px 12px; /* Espace autour du texte pour faire un rectangle */
+                font-size: 13px;
+                border-radius: 12px; /* Bords arrondis (tu peux augmenter à 15px si tu veux plus rond) */
+                font-weight: bold;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                margin-left: 5px; /* Espace avec les autres liens du menu */
+                display: inline-block;
+            }
+
+            /* Petit effet sympa quand on passe la souris dessus */
+            .btn-telecharger-principal:hover {
+                background-color: #e0e0e0; /* Devient très légèrement gris au survol */
+                transform: translateY(-2px); /* Se soulève un tout petit peu */
+            }
 /* ========================================================= */
         /* ================== RESPONSIVE MOBILE ==================== */
         /* ========================================================= */
@@ -329,6 +347,30 @@
             .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444;}
             
             .content { padding: 20px; }
+            /* ... (tout ton code mobile existant pour le menu) ... */
+            .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444;}
+            
+            .content { padding: 20px; }
+
+            /* --- NOUVEAUX AJOUTS POUR LE RESTE DU SITE SUR MOBILE --- */
+            .hero-banner { height: 300px; padding: 20px; }
+            .hero-banner h1 { font-size: 32px; }
+            .hero-banner p { font-size: 14px; }
+            
+            /* Grille de jeux plus petite pour mobile */
+            .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+            .game-cover { height: 180px; }
+            
+            /* Le menu Profil passe à la verticale */
+            .profile-layout { flex-direction: column; gap: 20px; }
+            .profile-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid #333; }
+            .profile-tab { white-space: nowrap; font-size: 12px; padding: 10px; }
+            .profile-tab.active { border-left: none; border-bottom: 3px solid var(--accent-color); border-radius: 6px 6px 0 0; }
+            
+            /* Pied de page et Pop-up */
+            .footer-links { flex-direction: column; gap: 30px; }
+            #game-lobby-modal > div { width: 90%; padding: 20px; }
+        } /* <-- Cette accolade ferme le @media (max-width: 1024px) */
     </style>
 </head>
 <body>
@@ -341,15 +383,15 @@
                 <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
                 <div class="nav-item" id="nav-online" data-i18n="navOnline" onclick="navigateTo('#jeuxonline', 'online')">Jeux rapide</div>
                 <div class="nav-item" id="nav-library" data-i18n="navLibrary" onclick="navigateTo('#bibliotheque', 'library')">Bibliothèque</div>
-                <div class="nav-item" id="nav-community" data-i18n="navCommunity" onclick="navigateTo('#communaute', 'community')">Communauté</div>
-                <div class="nav-item" id="nav-cart" data-i18n="navCart" onclick="navigateTo('#panier', 'cart')">Panier</div>
                 <div class="nav-item" id="nav-about" data-i18n="navAbout" onclick="navigateTo('#apropos', 'about')">À propos</div>
+                
+                <!-- Le nouveau bouton Télécharger ! -->
             </nav>
         </div>
 
         <div class="header-right">   
             <input type="text" id="main-search-bar" class="search-bar" data-i18n-ph="searchPh" placeholder="Rechercher un jeu...">
-            
+            <a href="telecharger.html" target="_blank" class="btn-telecharger-principal">Télécharger Novaly</a>
             <div id="friends-menu-container" style="position: relative; display: none; align-items: center;">
                 <div class="friends-btn" onclick="toggleFriendsMenu(event)">
                     <svg viewBox="0 0 640 512" style="width: 14px; height: 14px; fill: currentColor;"><path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
