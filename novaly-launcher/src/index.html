@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novaly Launcher | Just Play.</title>
+
+    <meta name="description" content="Novaly est la plateforme de jeux vidéo indépendants de nouvelle génération. Jouez instantanément sans limites à Clutch, Nolimite et bien d'autres. Just Play.">
+    <meta name="keywords" content="novaly, novaly launcher, novelestorer, jeu video, jeux gratuits, launcher jeux video, jeux PC, jeux independants, play clutch, jouer en ligne, multijoueur">
+    <meta name="author" content="Novaly Games">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.novastorer.fr/">
+
+    <meta property="og:title" content="Novaly Launcher | Just Play.">
+    <meta property="og:description" content="Découvrez la plateforme de jeux vidéo nouvelle génération. Performances optimales, catalogue unifié et expérience pure.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.novastorer.fr/">
+    <meta property="og:image" content="https://www.novastorer.fr/assets/banner-seo.jpg"> <meta property="og:site_name" content="Novaly">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-main: #121212;
+            --bg-header: #0a0a0a;
+            --text-main: #ffffff;
+            --text-muted: #9e9e9e;
+            --hover-bg: #2a2a2a;
+            --accent-color: #ffffff;
+            --card-bg: #1a1a1a;
+        }
+        /* --- BARRE DE TITRE SUR-MESURE --- */
+        .custom-titlebar {
+            height: 32px;
+            background: #050505;
+            display: flex;
+            flex-shrink: 0;
+            z-index: 9999;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .titlebar-drag-area {
+            flex-grow: 1;
+            height: 100%;
+            /* C'EST CETTE ZONE QUI PERMET DE DÉPLACER LA FENÊTRE */
+        }
+        .titlebar-controls {
+            display: flex;
+        }
+        .titlebar-button {
+            width: 46px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .titlebar-button:hover { background: #2a2a2a; color: white; }
+        .titlebar-close:hover { background: #e81123; color: white; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* --- ANIMATIONS UX --- */
+        @keyframes slideUpFade { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes dropDownAnim {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+/* --- EN-TÊTE HORIZONTAL --- */
+        .main-header {
+            height: 75px; background-color: var(--bg-header); display: flex; align-items: center;
+            padding: 0 40px; border-bottom: 1px solid #222; flex-shrink: 0;
+            position: relative; z-index: 100; gap: 20px;
+        }
+
+        .header-left { display: flex; align-items: center; height: 100%; }
+
+        .logo-img {
+            height: 40px; margin-right: 40px; cursor: pointer; background-color: #000000; min-width: 120px;
+            color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; letter-spacing: 1.5px;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .logo-img:hover { transform: scale(1.05); }
+
+        .nav-links { display: flex; align-items: center; gap: 20px; height: 100%; }
+
+        .nav-item {
+            color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; cursor: pointer; height: 100%; display: flex; align-items: center; position: relative; transition: color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover, .nav-item.active { color: var(--text-main); }
+        
+        /* Animation fluide du soulignement */
+        .nav-item::after { 
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; 
+            background-color: var(--accent-color); 
+            transform: scaleX(0); transform-origin: center; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .nav-item.active::after, .nav-item:hover::after { transform: scaleX(1); }
+
+        .header-right { display: flex; align-items: center; gap: 12px; height: 100%; margin-left: auto; }
+
+        .search-bar {
+            background-color: transparent; border: 1px solid #444; padding: 8px 16px; border-radius: 20px; color: white;
+            width: 220px; outline: none; font-family: 'Inter', sans-serif; font-size: 13px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .search-bar:focus { border-color: #888; width: 250px; background-color: rgba(255,255,255,0.05); }
+
+        /* --- SÉLECTEUR DE LANGUE (FIX DRAPEAUX POUR TOUS LES NAVIGATEURS) --- */
+        .lang-wrapper { position: relative; display: flex; align-items: center; }
+        .lang-selector {
+            width: 36px; height: 36px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; transition: all 0.2s ease; color: white; background: #1a1a1a;
+            overflow: hidden;
+        }
+        .lang-selector:hover { background-color: var(--hover-bg); border-color: white; transform: rotate(5deg); }
+        .lang-dropdown {
+            position: absolute; top: 120%; right: 0; background: var(--bg-header); border: 1px solid #333;
+            border-radius: 8px; width: 160px; max-height: 300px; overflow-y: auto; display: none; flex-direction: column;
+            z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+        }
+        .lang-dropdown.show { display: flex; animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .lang-option {
+            padding: 12px 15px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+            font-size: 13px; font-weight: 500; color: var(--text-muted); transition: 0.2s; border-bottom: 1px solid #222;
+        }
+        .lang-option:last-child { border-bottom: none; }
+        .lang-option:hover { background: var(--hover-bg); color: white; padding-left: 20px; }
+        
+        .flag-icon { 
+            width: 24px !important; height: 24px !important; 
+            border-radius: 50% !important; 
+            object-fit: cover !important; 
+            object-position: center !important; 
+            display: block !important; 
+            background-color: #222;
+            flex-shrink: 0;
+        }
+
+        /* --- PROFIL HEADER --- */
+        .user-section { display: flex; height: 100%; align-items: center; }
+        .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; padding-left: 10px; padding-right: 5px; border-radius: 8px; transition: background 0.2s;}
+        .profile-trigger:hover { background: #222; }
+        .nav-title { background: #ffffff; color: #000000; font-size: 9px; font-weight: 900; padding: 3px 6px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid transparent; }
+        .nav-title.guest { background: #000000; color: #ffffff; border: 1px solid #444; }
+        .avatar { width: 28px; height: 28px; background-color: #ffffff; background-size: cover; background-position: center; background-repeat: no-repeat; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 12px; flex-shrink: 0; }
+        .user-info { display: flex; flex-direction: column; text-align: left; line-height: 1.2; }
+        .nav-username { font-weight: 700; font-size: 12px; text-transform: uppercase; color: white; }
+        .online-dot { color: #4cd137; font-size: 9px; text-transform: none; letter-spacing: 0; display: flex; align-items: center; gap: 4px; }
+        .online-dot.offline { color: #888; }
+
+        /* --- BOUTON AMIS --- */
+        .friends-btn {
+            display: flex; align-items: center; gap: 8px; background: #1a1a1a; border: 1px solid #333; 
+            padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); color: white; font-weight: bold; font-size: 12px;
+        }
+        .friends-btn:hover { background: #2a2a2a; border-color: #777; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        /* --- MENUS DÉROULANTS --- */
+        .user-dropdown {
+            position: absolute; top: 110%; right: 0; background: #18181c; border: 1px solid #333;
+            border-radius: 8px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden;
+        }
+        .user-dropdown.show { display: flex; animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .dropdown-item { padding: 12px 15px; font-size: 13px; color: #ccc; cursor: pointer; transition: 0.2s; text-align: left; display: flex; align-items: center;}
+        .dropdown-item img { width: 14px; filter: invert(1); opacity: 0.8; margin-right: 8px; vertical-align: middle; transition: transform 0.2s;}
+        .dropdown-item:hover { background: #2a2a2a; color: white; }
+        .dropdown-item:hover img { transform: scale(1.2); opacity: 1; }
+        .dropdown-divider { height: 1px; background: #333; margin: 5px 0; }
+        .dropdown-item.logout { color: #ff4757; }
+        .dropdown-item.logout img { filter: invert(34%) sepia(98%) saturate(3501%) hue-rotate(333deg) brightness(101%) contrast(106%); }
+        .dropdown-item.logout:hover { background: #ff475722; padding-left: 20px; }
+
+        /* --- CONTENU & VUES --- */
+        .content { flex-grow: 1; padding: 40px 80px; overflow-y: auto; display: flex; flex-direction: column; scroll-behavior: smooth; }
+        .page-title { margin: 0 0 30px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; display: none; }
+        .view-section { display: none; flex-grow: 1; }
+        .view-section.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* --- ANIMATION MOTION NOVALY CORRIGÉE --- */
+        .motion-logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+        .novaly-motion-logo {
+            font-size: 72px;
+            font-weight: 900;
+            letter-spacing: 15px;
+            text-transform: uppercase;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.2); /* Aspect par défaut quand la souris n'est pas là */
+            display: inline-block;
+            user-select: none;
+            position: relative; /* Pour le pseudo-élément */
+            cursor: default;
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            transition: color 0.3s ease;
+        }
+        .novaly-motion-logo.active-light {
+            background: radial-gradient(circle 120px at var(--mouse-x) var(--mouse-y), rgba(255,255,255,1) 0%, rgba(255,255,255,0.2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+ @media (max-width: 768px) {
+            .novaly-motion-logo {
+                background: radial-gradient(circle 120px at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.2) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                color: transparent;
+                animation: mobileLogoAnim 3s infinite alternate;
+            }
+            @keyframes mobileLogoAnim { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+        }
+
+        /* --- BANNIÈRE & GRILLES --- */
+        .hero-banner {
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
+            height: 450px; border-radius: 12px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; padding: 40px; margin-bottom: 40px;
+            box-shadow: inset 0 -50px 100px rgba(0,0,0,0.5);
+        }
+        
+        .hero-banner h1 { font-size: 56px; margin: 0 0 10px; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+        .hero-banner p { font-size: 18px; color: #ddd; margin: 0 0 25px; max-width: 600px; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+        .btn-hero { animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; background: transparent; color: white; border: 2px solid white; padding: 12px 35px; font-size: 15px; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .btn-hero:hover { background: white; color: black; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.2); }
+        .btn-hero:disabled { background: transparent !important; border-color: #333 !important; color: #555 !important; cursor: not-allowed; box-shadow: none; transform: none;}
+
+        /* --- TAGS JEUX --- */
+        .game-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+        .tag { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
+        .tag-action { background: rgba(231, 76, 60, 0.15); color: #ff6b81; border: 1px solid #ff4757; }
+        .tag-multi { background: rgba(52, 152, 219, 0.15); color: #70a1ff; border: 1px solid #3742fa; }
+        .tag-party { background: rgba(155, 89, 182, 0.15); color: #a29bfe; border: 1px solid #5352ed; }
+        .tag-soon { background: rgba(241, 196, 15, 0.15); color: #eccc68; border: 1px solid #ffa502; }
+        .tag-reflexion { background: rgba(46, 204, 113, 0.15); color: #7bed9f; border: 1px solid #2ed573; }
+
+        /* --- SKELETON LOADING --- */
+        .skeleton { position: relative; overflow: hidden; border-color: #222 !important; pointer-events: none; }
+        .skeleton .game-cover, .skeleton .game-title, .skeleton .game-price, .skeleton .game-tags { visibility: hidden; }
+        .skeleton::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, #222 25%, #2a2a2a 50%, #222 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        .game-card { cursor: pointer; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 8px; padding-bottom: 10px; }
+        .game-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
+        .game-card:hover .tag { filter: brightness(1.2); }
+        .game-cover { height: 280px; border-radius: 8px; margin-bottom: 12px; background-color: #222; position: relative; overflow: hidden; transition: 0.3s;}
+        .game-card:hover .game-cover::after { content:''; position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); opacity: 0.5; }
+        .game-title { font-weight: 800; font-size: 15px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
+        .game-price { background: #2a2a2a; color: #eee; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block; transition: 0.2s; }
+        .game-card:hover .game-price { background: #333; color: white; }
+
+        /* --- PROFIL & PARAMÈTRES --- */
+        .profile-layout { display: flex; gap: 40px; max-width: 1000px; margin-bottom: 60px; }
+        .profile-sidebar { width: 250px; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
+        .profile-tab { padding: 12px 15px; color: var(--text-muted); cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 14px; transition: all 0.2s ease; }
+        .profile-tab:hover, .profile-tab.active { background-color: var(--hover-bg); color: var(--text-main); }
+        .profile-tab.active { border-left: 4px solid var(--accent-color); border-radius: 0 6px 6px 0; }
+        .profile-content { flex-grow: 1; }
+        .profile-tab-content { display: none; background: var(--card-bg); padding: 35px; border-radius: 8px; border: 1px solid #333; }
+        .profile-tab-content.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; transition: 0.2s; }
+        .form-group input:focus + label, .form-group textarea:focus + label { color: white; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; box-sizing: border-box; padding: 12px; background: #121212; border: 1px solid #444; color: white; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; transition: 0.2s;}
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: white; box-shadow: 0 0 0 3px rgba(255,255,255,0.1); }
+        
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: white; color: black; border: none; padding: 10px 20px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
+        .btn:active { transform: translateY(0); }
+        
+        .generic-view-content { background: var(--card-bg); padding: 40px; border-radius: 8px; text-align: center; color: var(--text-muted); margin-bottom: 60px; }
+        .news-card { background: #222; border: 1px solid #333; border-radius: 8px; padding: 20px; text-align: left; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; }
+        .news-card:hover { border-color: #666; background: #2a2a2a; transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .news-card h4 { margin: 0 0 10px 0; color: white; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+        .news-card p { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+        /* --- BOUTONS PLEIN ECRAN --- */
+        .game-controls { position: absolute; top: 15px; left: 15px; z-index: 60; display: flex; gap: 10px; }
+        .game-control-btn { 
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); color: white; border: 1px solid rgba(255,255,255,0.2); 
+            padding: 8px 15px; border-radius: 6px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .game-control-btn:hover { background: rgba(0, 0, 0, 0.9); border-color: white; transform: scale(1.05); }
+        .game-control-btn.btn-quit:hover { background: rgba(231, 76, 60, 0.9); border-color: #ff4757; }
+
+        /* --- FOOTER --- */
+        .site-footer { background-color: var(--bg-main); border-top: 1px solid #222; padding: 50px 0 20px 0; margin-top: auto; font-size: 13px; color: var(--text-muted); }
+        .site-footer h4 { color: var(--text-main); font-size: 14px; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .footer-downloads { margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 40px; }
+        .app-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
+        .app-btn { background: transparent; border: 1px solid #444; color: white; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .app-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .app-btn:hover { background-color: var(--hover-bg); border-color: white; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .footer-container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; margin-bottom: 50px; }
+        .footer-links { display: flex; gap: 80px; }
+        .footer-column { display: flex; flex-direction: column; gap: 15px; }
+        .footer-link { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-size: 13px; cursor: pointer; }
+        .footer-link:hover, .footer-link.active { color: var(--text-main); transform: translateX(2px); }
+        .footer-bottom { border-top: 1px solid #222; padding-top: 25px; font-size: 12px; display: flex; justify-content: space-between; }
+
+/* ========================================================= */
+        /* ================== RESPONSIVE MOBILE ==================== */
+        /* ========================================================= */
+        .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; margin-right: 10px; }
+
+        @media (max-width: 1024px) {
+            .main-header { padding: 15px 20px; flex-wrap: wrap; height: auto; min-height: 70px; gap: 15px; }
+            .header-left { width: 100%; justify-content: space-between; align-items: center; }
+            .logo-img { margin-right: 0; margin-top: 0; }
+            .menu-toggle { display: block; margin-top: 0; }
+            
+            /* On cache tout par défaut sous le menu burger */
+            .nav-links { display: none; width: 100%; flex-direction: column; align-items: flex-start; padding: 15px 0 0 0; gap: 15px; }
+            .header-right { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 15px 0; gap: 15px; border-top: 1px solid #333; margin-top: 10px; margin-left: 0; }
+            .lang-wrapper { display: none; width: 100%; justify-content: center; padding: 10px 0; }
+            .user-section { display: none; width: 100%; justify-content: center; padding: 10px 0; }
+            
+            /* Quand le menu est ouvert, tout s'affiche proprement en colonne */
+            .main-header.open .nav-links, 
+            .main-header.open .header-right,
+            .main-header.open .lang-wrapper,
+            .main-header.open .user-section { 
+                display: flex; animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+            }
+            
+            .nav-item { height: auto; padding: 10px 0; width: 100%; }
+            .search-bar { width: 100%; }
+            .lang-dropdown { top: 100%; left: 0; right: auto; width: 100%; }
+            
+            #friends-menu-container { width: 100%; justify-content: center; }
+            .friends-btn { width: 100%; justify-content: center; }
+            .profile-trigger { width: 100%; justify-content: center; background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333;}
+            .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444;}
+            
+            .content { padding: 20px; }
+    </style>
+</head>
+<body>
+
+<!-- BARRE DE TITRE -->
+    <div class="custom-titlebar">
+        <div class="titlebar-drag-area" data-tauri-drag-region></div>
+        <div class="titlebar-controls">
+            <div class="titlebar-button" id="titlebar-minimize">—</div>
+            <div class="titlebar-button" id="titlebar-maximize">🗖</div>
+            <div class="titlebar-button titlebar-close" id="titlebar-close">✕</div>
+        </div>
+    </div>
+<header class="main-header" data-tauri-drag-region>
+        <div class="header-left">
+            <div class="logo-img" onclick="navigateTo('#magasin', 'store')">NOVALY</div>
+            <div class="menu-toggle" onclick="toggleMobileMenu()">☰</div>
+            <nav class="nav-links">
+                <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
+                <div class="nav-item" id="nav-online" data-i18n="navOnline" onclick="navigateTo('#jeuxonline', 'online')">Jeux rapide</div>
+                <div class="nav-item" id="nav-library" data-i18n="navLibrary" onclick="navigateTo('#bibliotheque', 'library')">Bibliothèque</div>
+                <div class="nav-item" id="nav-community" data-i18n="navCommunity" onclick="navigateTo('#communaute', 'community')">Communauté</div>
+                <div class="nav-item" id="nav-cart" data-i18n="navCart" onclick="navigateTo('#panier', 'cart')">Panier</div>
+                <div class="nav-item" id="nav-about" data-i18n="navAbout" onclick="navigateTo('#apropos', 'about')">À propos</div>
+            </nav>
+        </div>
+
+        <div class="header-right">   
+            <input type="text" id="main-search-bar" class="search-bar" data-i18n-ph="searchPh" placeholder="Rechercher un jeu...">
+            
+            <div id="friends-menu-container" style="position: relative; display: none; align-items: center;">
+                <div class="friends-btn" onclick="toggleFriendsMenu(event)">
+                    <svg viewBox="0 0 640 512" style="width: 14px; height: 14px; fill: currentColor;"><path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
+                    AMIS
+                    <span id="unread-badge" style="display: none; background: #ff4757; color: white; border-radius: 10px; padding: 2px 6px; font-size: 10px; margin-left: 5px;">0</span>
+                </div>
+                <div id="friends-dropdown" class="user-dropdown" style="width: 280px; right: 0;">
+                    <div style="padding: 15px; border-bottom: 1px solid #333; background: #151515;">
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="friend-search-input" placeholder="Ajouter un pseudo..." style="flex-grow: 1; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: white; border-radius: 4px; outline: none; font-size: 12px; font-family: 'Inter', sans-serif;">
+                            <button class="btn" onclick="sendFriendRequest()" style="background: #0984e3; color: white; border: none; padding: 0 15px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px;">+</button>
+                        </div>
+                        <p id="friend-msg" style="font-size: 11px; margin-top: 8px; margin-bottom: 0; display: none;"></p>
+                    </div>
+
+                    <div id="pending-requests-container" style="padding: 12px 15px; border-bottom: 1px solid #333; display: none; background: rgba(241, 196, 15, 0.05);">
+                        <div style="font-size: 10px; font-weight: 800; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Demandes d'ami</div>
+                        <div id="friend-requests-list"></div>
+                    </div>
+
+                    <div style="padding: 15px;">
+                        <div style="font-size: 10px; font-weight: 800; color: #4cd137; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">En ligne</div>
+                        <div id="friends-online-list" style="margin-bottom: 15px; max-height: 150px; overflow-y: auto;">
+                            <p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>
+                        </div>
+
+                        <div style="font-size: 10px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Hors ligne</div>
+                        <div id="friends-offline-list" style="max-height: 150px; overflow-y: auto;">
+                            <p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>         
+            
+            <div class="lang-wrapper">
+                <div class="lang-selector" id="lang-btn" onclick="toggleLangMenu()">
+                    <img src="https://flagcdn.com/w40/fr.png" alt="fr" class="flag-icon">
+                </div>
+                <div class="lang-dropdown" id="lang-menu">
+                    <div class="lang-option" onclick="changeLanguage('fr', 'https://flagcdn.com/w40/fr.png')"><img src="https://flagcdn.com/w40/fr.png" alt="fr" class="flag-icon"> Français</div>
+                    <div class="lang-option" onclick="changeLanguage('en', 'https://flagcdn.com/w40/gb.png')"><img src="https://flagcdn.com/w40/gb.png" alt="en" class="flag-icon"> English</div>
+                    <div class="lang-option" onclick="changeLanguage('es', 'https://flagcdn.com/w40/es.png')"><img src="https://flagcdn.com/w40/es.png" alt="es" class="flag-icon"> Español</div>
+                    <div class="lang-option" onclick="changeLanguage('de', 'https://flagcdn.com/w40/de.png')"><img src="https://flagcdn.com/w40/de.png" alt="de" class="flag-icon"> Deutsch</div>
+                    <div class="lang-option" onclick="changeLanguage('it', 'https://flagcdn.com/w40/it.png')"><img src="https://flagcdn.com/w40/it.png" alt="it" class="flag-icon"> Italiano</div>
+                </div>
+            </div>
+            
+            <div class="user-section">
+                <div id="logged-out-view" style="height: 100%; display: flex; align-items: center;">
+                    <div class="profile-trigger nav-item" onclick="window.location.href='login.html'">
+                        <span class="nav-title guest">GUEST</span>
+                        <div class="avatar" style="background-color: #222; color: #888;">?</div>
+                        <div class="user-info">
+                            <span class="nav-username" style="color: #ccc;">Invité</span>
+                            <span class="online-dot offline">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>
+                                Non connecté
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="logged-in-view" style="display: none; height: 100%; position: relative;">
+                    <div class="profile-trigger nav-item" onclick="toggleUserMenu(event)">
+                        <span class="nav-title" id="nav-title">NOVICE</span>
+                        <div class="avatar" id="nav-avatar">?</div>
+                        <div class="user-info">
+                            <span class="nav-username" id="nav-username">Utilisateur</span>
+                            <span class="online-dot">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                                En ligne
+                            </span>
+                        </div>
+                        <span style="font-size: 9px; color: var(--text-muted); margin-left: 3px;">▼</span>
+                    </div>
+
+                    <div id="user-dropdown" class="user-dropdown" style="width: 240px;">
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/trophy.svg"> Mes succès</div>
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/sparkles.svg"> Récompenses Novaly</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('payment', document.getElementById('tab-btn-payment')); navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/wallet.svg"> Solde du compte</div>
+                        <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/ticket.svg"> Bons</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('general', document.getElementById('tab-btn-general')); navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/user.svg"> Compte</div>
+                        <div class="dropdown-item" onclick="switchProfileTab('code', document.getElementById('tab-btn-code')); navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/gift.svg"> Utiliser un code</div>
+                        <div class="dropdown-item" onclick="navigateTo('#bibliotheque', 'library')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/bookmark.svg"> Liste de souhaits</div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/help-circle.svg"> Assistance <span style="float: right; margin-left: auto;">↗</span></div>
+                        <div class="dropdown-item logout" onclick="logout()"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/log-out.svg"> Se déconnecter</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="game-lobby-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 12px; width: 400px; padding: 30px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+            <span onclick="closeGameModal()" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#888'">&times;</span>
+            
+            <h2 id="lobby-game-title" style="margin-top: 0; font-weight: 800; font-size: 24px;">Titre du jeu</h2>
+            <p style="color: #aaa; font-size: 13px; margin-bottom: 25px;">Choisissez votre mode de jeu :</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button class="btn" style="background: #0984e3; color: white; padding: 15px; font-size: 14px;" onclick="startPublicMatch()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    Lancer publiquement
+                </button>
+                <button class="btn" style="background: transparent; color: white; border: 1px solid #555; padding: 15px; font-size: 14px;" onclick="togglePrivateMatchInput()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Partie privée
+                </button>
+            </div>
+
+            <div id="private-match-section" style="display: none; margin-top: 20px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <label style="display: block; font-size: 12px; color: #888; margin-bottom: 8px; text-align: left;">Rejoindre avec un code :</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="private-room-code" placeholder="EX: 4A8B" maxlength="6" style="flex-grow: 1; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 4px; text-transform: uppercase; text-align: center; font-weight: bold; letter-spacing: 2px; font-size: 16px; outline: none;">
+                    <button class="btn" style="background: #4cd137; color: black; border: none; padding: 0 20px; font-weight: 800;" onclick="joinPrivateMatch()">GO</button>
+                </div>
+                <div style="margin-top: 15px; border-top: 1px solid #222; padding-top: 15px;">
+                    <button class="btn" style="background: transparent; color: #ccc; border: 1px dashed #555; width: 100%; font-size: 12px;" onclick="createPrivateMatch()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Créer une nouvelle salle privée
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <main class="content">
+        <h1 class="page-title" id="dynamic-page-title">Titre</h1>
+
+        <div id="view-store" class="view-section active">
+            
+            <div class="motion-logo-container" id="motion-container">
+                <div class="novaly-motion-logo" id="motion-logo">NOVALY</div>
+                <p style="color: var(--text-muted); font-size: 11px; margin-top: -5px; letter-spacing: 3px; text-transform: uppercase; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;">Just Play Again</p>
+            </div>
+
+            <div class="hero-banner" id="store-banner">
+                <div style="background: #ffffff; color: #000; padding: 5px 15px; border-radius: 4px; font-weight: 800; font-size: 12px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;">Coming Soon</div>
+                <h1>CLUTCH</h1>
+                <p>Préparez-vous pour l'expérience ultime. Le futur du gaming arrive sur Novaly.</p>
+                <button class="btn-hero" disabled>Indisponible</button>
+            </div>
+
+            <h2 style="font-size: 18px; margin-bottom: 20px;">Prochainement</h2>
+            <div class="grid" id="store-grid">
+                <div class="game-card skeleton">
+                    <div class="game-cover" style="background: linear-gradient(135deg, #333, #000); display: flex; align-items: center; justify-content: center;">
+                        <span style="font-weight: 900; font-size: 20px; letter-spacing: 2px; opacity: 0.5;">CLUTCH</span>
+                    </div>
+                    <div class="game-tags">
+                        <span class="tag tag-action">Action</span>
+                        <span class="tag tag-soon">Bientôt</span>
+                    </div>
+                    <div class="game-title">CLUTCH : Standard Edition</div>
+                    <div class="game-price">À venir</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-online" class="view-section">
+            <h2 style="font-size: 18px; margin-bottom: 20px;">Nos Jeux en Ligne</h2>
+            <div class="grid">
+                <div class="game-card skeleton" onclick="lancerJeu('imposteur')">
+                    <div class="game-cover" style="background: linear-gradient(135deg, #2c3e50, #000); display: flex; align-items: center; justify-content: center;">
+                        <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">
+                    </div>
+                    <div class="game-tags">
+                        <span class="tag tag-multi">Multijoueur</span>
+                        <span class="tag tag-reflexion">Réflexion</span>
+                    </div>
+                    <div class="game-title">The Imposteur</div>
+                    <div class="game-price">Jouer à l'alpha</div>
+                    <button id="btn-add-imposteur" class="btn btn-add-game" onclick="event.stopPropagation(); ajouterALaBibliotheque('imposteur', this)" style="width:100%; margin-top:10px; font-size:11px; padding:6px;">Ajouter à la bibliothèque</button>                </div>
+                <div class="game-card skeleton" onclick="lancerJeu('nolimite')">
+                    <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;">
+                        </div>
+                    <div class="game-tags">
+                        <span class="tag tag-party">Party Game</span>
+                        <span class="tag tag-multi">Multijoueur</span>
+                    </div>
+                    <div class="game-title">Nolimite</div>
+                    <div class="game-price">Jouer à l'alpha</div>
+                    <button id="btn-add-nolimite" class="btn btn-add-game" onclick="event.stopPropagation(); ajouterALaBibliotheque('nolimite', this)" style="width:100%; margin-top:10px; font-size:11px; padding:6px;">Ajouter à la bibliothèque</button>                </div>
+            </div>
+        </div>
+
+        <div id="view-library" class="view-section">
+            <div class="generic-view-content">
+                <h2>Votre bibliothèque est vide</h2>
+                <p>Les jeux que vous achèterez apparaîtront ici.</p>
+            </div>
+        </div>
+
+        <div id="view-community" class="view-section">
+            <div class="generic-view-content" style="background: transparent; text-align: left; padding: 0;">
+                <h2 data-i18n="communityTitle" style="color: white; margin-bottom: 10px;">Communauté Novaly</h2>
+                <p data-i18n="communityDesc" style="margin-bottom: 30px;">Rejoignez la discussion, partagez vos créations et trouvez des coéquipiers.</p>
+                <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    <div class="news-card">
+                        <h4 data-i18n="commNews1Title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                            Mise à jour v1.2 : Patch Notes
+                        </h4>
+                        <p data-i18n="commNews1Desc">Découvrez toutes les nouveautés, corrections de bugs et équilibrages apportés par la dernière mise à jour.</p>
+                    </div>
+                    <div class="news-card">
+                        <h4 data-i18n="commNews2Title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                            Tournoi Galactic Warfare
+                        </h4>
+                        <p data-i18n="commNews2Desc">Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.</p>
+                    </div>
+                    <div class="news-card">
+                        <h4 data-i18n="commNews3Title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="5.5" r="1.5"/><circle cx="18.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                            Créations de la semaine
+                        </h4>
+                        <p data-i18n="commNews3Desc">Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-about" class="view-section">
+            <div class="generic-view-content" style="max-width: 600px; margin: 0 auto; text-align: left;">
+                <h2 data-i18n="aboutTitle" style="color: white; margin-bottom: 20px;">À propos de Novaly</h2>
+                <p data-i18n="aboutDesc1" style="line-height: 1.6;">Novaly est votre plateforme de jeu de nouvelle génération, conçue pour offrir des performances optimales, une bibliothèque unifiée et une expérience utilisateur fluide sans distraction.</p>
+                <div style="background: #121212; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #333;">
+                    <p style="margin: 0; font-size: 14px; color: var(--text-main); font-weight: 600;" data-i18n="aboutVersion">Version du Launcher : 1.0.4 (Build 2026)</p>
+                    <p style="margin: 5px 0 0 0; font-size: 13px;" data-i18n="aboutStatus">Tous les systèmes sont opérationnels.</p>
+                </div>
+                <button class="btn" data-i18n="aboutBtn">Vérifier les mises à jour</button>
+            </div>
+        </div>
+
+        <div id="view-cart" class="view-section">
+            <div class="generic-view-content">
+                <h2 data-i18n="cartEmpty">Votre panier est vide</h2>
+                <p data-i18n="cartDesc">Découvrez nos nouveautés dans le magasin.</p>
+                <button class="btn" style="margin-top: 20px;" onclick="navigateTo('#magasin', 'store')" data-i18n="goStore">Aller au magasin</button>
+            </div>
+        </div>
+
+        <div id="view-contact" class="view-section">
+            <div class="generic-view-content" style="max-width: 500px; margin: 0 auto; text-align: left;">
+                <h2 data-i18n="contactTitle">Nous contacter</h2>
+                <div class="form-group">
+                    <label data-i18n="contactSubject">Sujet</label>
+                    <input type="text" style="width: 100%;">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="contactMessage">Message</label>
+                    <textarea style="width: 100%; height: 100px;"></textarea>
+                </div>
+                <button class="btn" data-i18n="contactBtn">Envoyer le message</button>
+            </div>
+        </div>
+
+        <div id="view-profile" class="view-section">
+            <div class="profile-layout" style="max-width: 1200px;">
+                
+                <div class="profile-sidebar" id="profileSidebar">
+                    <div class="profile-tab active" id="tab-btn-general" onclick="switchProfileTab('general', this)">Paramètres du compte</div>
+                    <div class="profile-tab" id="tab-btn-security" onclick="switchProfileTab('security', this)">Mot de passe et sécurité</div>
+                    <div class="profile-tab" id="tab-btn-payment" onclick="switchProfileTab('payment', this)">Paiement et solde</div>
+                    <div class="profile-tab" id="tab-btn-links" onclick="switchProfileTab('links', this)">Comptes associés</div>
+                    <div class="profile-tab" id="tab-btn-code" onclick="switchProfileTab('code', this)">Utiliser un code</div>
+                    <div class="profile-tab" id="tab-btn-parental" onclick="switchProfileTab('parental', this)">Contrôle parental</div>
+                </div>
+
+                <div class="profile-content">
+                    
+                    <div id="tab-general" class="profile-tab-content active">
+                        <h3>Informations de compte</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Gérez les détails de votre compte et votre apparence publique.</p>
+                        
+                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 25px; background: #222; padding: 20px; border-radius: 8px; border: 1px solid #333;">
+                            <div id="profile-avatar-preview" style="width: 80px; height: 80px; background-color: #111; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; background-size: cover; background-position: center; background-repeat: no-repeat; border: 2px solid #444; flex-shrink: 0;">?</div>                            
+                            <div>
+                                <label for="avatar-upload" class="btn" style="background: #fff; color: #000; padding: 8px 15px; font-size: 13px;">Téléverser une image</label>
+                                <input type="file" id="avatar-upload" accept="image/png, image/jpeg" style="display: none;" onchange="previewAvatar(event)">
+                                <p style="font-size: 11px; color: #888; margin-top: 8px; margin-bottom: 0;">Format JPG ou PNG. Max 1 Mo.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nom d'affichage (Pseudo)</label>
+                            <input type="text" id="profile-username" value="Utilisateur">
+                        </div>
+                        <div class="form-group">
+                            <label>Titre (Cosmétique)</label>
+                            <select id="profile-title">
+                                <option value="NOVICE" style="background: #222; color: white;">NOVICE (Défaut)</option>
+                                <option value="PIONNIER" style="background: #222; color: #f1c40f;">PIONNIER (Fondateur)</option>
+                                <option value="BETA TESTEUR" style="background: #222; color: #3498db;">BÊTA TESTEUR</option>
+                                <option value="VIP" style="background: #222; color: #e74c3c;">VIP</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Adresse e-mail</label>
+                            <input type="email" id="profile-email" value="" disabled style="background: #111; color: #555;">
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
+
+                        <h3>Détails personnels</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Ces informations sont privées et ne seront pas affichées.</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group"><label>Prénom</label><input type="text" id="profile-firstname"></div>
+                            <div class="form-group"><label>Nom de famille</label><input type="text" id="profile-lastname"></div>
+                            <div class="form-group"><label>Adresse 1</label><input type="text" id="profile-address1"></div>
+                            <div class="form-group"><label>Adresse 2</label><input type="text" id="profile-address2"></div>
+                            <div class="form-group"><label>Ville</label><input type="text" id="profile-city"></div>
+                            <div class="form-group"><label>Région / État</label><input type="text" id="profile-region"></div>
+                            <div class="form-group"><label>Code Postal</label><input type="text" id="profile-zip"></div>
+                            <div class="form-group"><label>Pays</label><input type="text" id="profile-country"></div>
+                        </div>
+
+                        <div style="margin-top: 40px; margin-bottom: 30px;">
+                            <button class="btn" onclick="saveProfile()">Enregistrer les modifications</button>
+                            <p id="save-msg" style="color: #4cd137; font-size: 13px; display: none; margin-top: 10px;">Profil mis à jour !</p>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
+                        <div style="background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; padding: 25px; border-radius: 8px;">
+                            <h3 style="color: #ff4757; margin-top: 0;">Zone de danger</h3>
+                            <p style="color: #ccc; font-size: 12px; margin-bottom: 15px;">La suppression de votre compte est définitive.</p>
+                            <button class="btn" style="background: #ff4757; color: white; border: none;" onclick="document.getElementById('delete-confirm-box').style.display='block'">Supprimer mon compte</button>
+                            
+                            <div id="delete-confirm-box" style="display: none; margin-top: 20px; background: #111; padding: 20px; border-radius: 6px; border: 1px solid #ff4757;">
+                                <p style="font-size: 13px; color: white; margin-top: 0; margin-bottom: 15px; font-weight: bold;">Confirmez votre identité :</p>
+                                <input type="email" id="delete-email" placeholder="Adresse e-mail" style="width: 100%; margin-bottom: 10px; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                <input type="password" id="delete-password" placeholder="Mot de passe" style="width: 100%; margin-bottom: 15px; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button class="btn" style="background: transparent; color: white; border: 1px solid #555; flex-grow: 1;" onclick="document.getElementById('delete-confirm-box').style.display='none'">Annuler</button>
+                                    <button class="btn" style="background: #ff4757; color: white; border: none; flex-grow: 2;" onclick="confirmDeleteAccount()">Confirmer la suppression</button>
+                                </div>
+                                <p id="delete-msg" style="color: #ff4757; font-size: 12px; margin-top: 10px; display: none;"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-security" class="profile-tab-content">
+                        <h3>Authentification à deux facteurs (A2F)</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés.</p>
+                        
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
+                            <div>
+                                <strong>Application d'authentification</strong>
+                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Utilisez Google Authenticator ou Authy.</p>
+                            </div>
+                            <button class="btn" id="btn-a2f-app" onclick="toggleA2F('app')" style="background: #4cd137; border: none; width: 100px;">Activer</button>
+                        </div>
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                            <div>
+                                <strong>Authentification par E-mail</strong>
+                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Recevez un code à votre e-mail.</p>
+                            </div>
+                            <button class="btn" id="btn-a2f-email" onclick="toggleA2F('email')" style="background: #4cd137; border: none; width: 100px;">Activer</button>
+                        </div>
+                        <p id="a2f-msg" style="color: #4cd137; font-size: 12px; margin-top: 15px; display: none;"></p>
+                    </div>
+
+                    <div id="tab-payment" class="profile-tab-content">
+                        <h3>Portefeuille Novaly</h3>
+                        <div style="background: linear-gradient(135deg, #2a2a35, #1a1a24); border: 1px solid #444; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 30px;">
+                            <p style="color: #aaa; margin: 0 0 10px 0; text-transform: uppercase; font-size: 12px;">Solde actuel</p>
+                            <h2 style="font-size: 48px; margin: 0; font-weight: 900;" id="wallet-balance">0,00 €</h2>
+                            <button class="btn" style="margin-top: 20px;" onclick="afficherAlerte('Module Stripe en cours de développement !')">Ajouter des fonds</button>
+                        </div>
+
+                        <h3>Moyens de paiement</h3>
+                        <div id="saved-cards-list" style="display: none; margin-bottom: 15px;">
+                            <div style="background: #111; border: 1px solid #333; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap:10px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="background: #fff; color: #000; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">VISA</div>
+                                    <span style="color: white; font-family: monospace; font-size: 14px;">•••• •••• •••• <span id="card-last4"></span></span>
+                                </div>
+                                <button class="btn" onclick="removeCard()" style="background: transparent; border: 1px solid #ff4757; color: #ff4757; padding: 5px 10px; font-size: 11px;">Supprimer</button>
+                            </div>
+                        </div>
+
+                        <div id="add-card-btn" style="border: 1px dashed #555; border-radius: 8px; padding: 20px; text-align: center; color: #888; cursor: pointer;" onclick="document.getElementById('stripe-modal').style.display='block'">
+                            + Ajouter une carte de crédit
+                        </div>
+
+                        <div id="stripe-modal" style="display: none; background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #4cd137; margin-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <strong style="color: white;">Ajouter une carte</strong>
+                                <span style="font-size: 10px; color: #aaa;">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                    SSL Sécurisé
+                                </span>
+                            </div>
+                            <input type="text" id="fake-card-num" placeholder="Numéro (16 chiffres)" maxlength="16" style="width: 100%; box-sizing: border-box; padding: 12px; background: #111; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 4px; font-family: monospace;">
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <input type="text" placeholder="MM/AA" maxlength="5" style="width: 50%; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; font-family: monospace;">
+                                <input type="text" placeholder="CVC" maxlength="3" style="width: 50%; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; font-family: monospace;">
+                            </div>
+                            <button class="btn" style="width: 100%; background: #4cd137;" onclick="saveFakeCard()">Sauvegarder la carte</button>
+                        </div>
+                    </div>
+
+                    <div id="tab-links" class="profile-tab-content">
+                        <h3>Comptes Associés</h3>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #5865F2; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg" style="width: 18px; filter: invert(1);">
+                                    </div>
+                                    <strong>Discord</strong>
+                                </div>
+                                <button id="link-discord-btn" class="btn" style="padding: 6px 15px; font-size: 12px;" onclick="linkAccount('discord')">Associer</button>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="width: 30px; height: 30px; background: #171a21; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/steam.svg" style="width: 18px; filter: invert(1);">
+                                    </div>
+                                    <strong>Steam</strong>
+                                </div>
+                                <button id="link-steam-btn" class="btn" style="padding: 6px 15px; font-size: 12px;" onclick="linkAccount('steam')">Associer</button>
+                            </div>
+                        </div>
+                        <p id="link-msg" style="color: #4cd137; font-size: 12px; margin-top: 15px; display: none;"></p>
+                    </div>
+
+                    <div id="tab-code" class="profile-tab-content">
+                        <h3>Utiliser un code</h3>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Saisissez un code pour débloquer des cosmétiques ou des crédits Novaly.</p>
+                        <div class="form-group">
+                            <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
+                        </div>
+                        <button class="btn" style="width: 100%;">Échanger le code</button>
+                    </div>
+
+                    <div id="tab-parental" class="profile-tab-content">
+                        <h3>Contrôle Parental</h3>
+                        <div style="background: #222; padding: 30px; border-radius: 8px; border: 1px solid #444; text-align: center;">
+                            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/shield-alert.svg" style="width: 40px; height: 40px; filter: invert(1); opacity: 0.8; margin-bottom: 15px;">
+                            <h4>Le Contrôle Parental est désactivé</h4>
+                            <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Activez-le pour restreindre les achats, limiter le chat vocal et filtrer les jeux par classification d'âge.</p>
+                            <button class="btn" style="background: #0984e3; color: white; border: none; width: 100%;">Configurer le contrôle parental</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="site-footer">
+            <div class="footer-downloads">
+                <h4 data-i18n="footerAppsTitle">Téléchargez Novaly</h4>
+                <div class="app-buttons">
+                    <button class="app-btn"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> App Store</button>
+                    <button class="app-btn"><svg viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg> Google Play</button>
+                    <button class="app-btn"><svg viewBox="0 0 448 512"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg> Windows</button>
+                    <button class="app-btn"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> Mac</button>
+                    <button class="app-btn"><svg viewBox="0 0 448 512"><path d="M220.8 123.3c1.1 0 2.6-.4 2.6-.4 44.4-7.6 62.4-56.5 62.4-56.5 12.8-33.1-23-45.7-23-45.7-25-10.4-58.4-1.5-74 15.9-18.7 20.8-12.7 61.2-12.7 61.2 1.4 16.9 24.2 25.4 44.7 25.5zm199.1 154c-13.6-24.5-22.3-15-22.3-15-46.2 36.9-106.3 34.4-106.3 34.4-44.8.4-78.5-19.1-78.5-19.1-12.8-7.8-21.7-18.4-21.7-18.4-25.5-35.3-51.5-24.1-51.5-24.1-26.6 6.3-33.6 28.4-33.6 28.4-6.4 20.2-2.1 36.3-2.1 36.3 22.3 46 62.1 38.3 62.1 38.3 32.1-4 68-18.8 68-18.8 45.3-22.1 91.5-11.8 91.5-11.8 35.8 7.3 53.6 33.3 53.6 33.3 18.2 25.8 12 40.8 12 40.8-6.1 19.3-30.8 25.4-30.8 25.4-29.4 6-64.8-17.7-64.8-17.7-25-14.8-51.2-9-51.2-9-19.6 4-29.3 15-29.3 15-13.9 14.7-24 41.5-24 41.5-9.1 27.6-5.8 45.4-5.8 45.4 3 17.5 13.9 24.6 13.9 24.6 18.3 11 41.6 3.1 41.6 3.1 25.9-9.1 52.8-28.5 52.8-28.5 45.7-32.9 116.5-29 116.5-29 48.7-.9 87.2 21.6 87.2 21.6 16.5 9.7 28.3 23.3 28.3 23.3 24.6 32.7 13.9 66 13.9 66-12.4 35.7-44.1 48-44.1 48-28.8 11.2-61.6 2.3-61.6 2.3-33.1-9.9-63.5-31.5-63.5-31.5-40.4-30-101.4-27.1-101.4-27.1-41.9.4-74.9-16.7-74.9-16.7-24.9-14-42.5-33.2-42.5-33.2-22-26.6-21.2-56-21.2-56-1-31.3 14.1-57.1 14.1-57.1 16-29.2 41.1-43 41.1-43 27-14.7 57.6-11.4 57.6-11.4 36.3 3.9 68.7 22.8 68.7 22.8 39.5 24.8 95.8 28.2 95.8 28.2 45.2.2 82.5-16.8 82.5-16.8 21.3-10 35.7-25.2 35.7-25.2 24.1-27 18.5-56.1 18.5-56.1-5.7-28-25.5-44.1-25.5-44.1zM140.4 316.5c-15.6-10.6-21.9-27.9-21.9-27.9-7-20.9 2-41.4 2-41.4 12-24.8 33.6-35.4 33.6-35.4 22.5-10.8 48.7-6 48.7-6 26.6 4.7 47.7 21 47.7 21 17.5 14.8 24.7 34 24.7 34 8.7 23.3-1.6 45.2-1.6 45.2-14.4 26.5-38.6 37.3-38.6 37.3-25.1 11.9-52.9 6-52.9 6-25-4.4-41.7-22.8-41.7-22.8z"/></svg> Linux</button>
+                </div>
+            </div>
+
+            <div class="footer-container">
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4 data-i18n="footerHelpTitle">Aide</h4>
+                        <a class="footer-link" id="nav-contact" onclick="navigateTo('#contact', 'contact')" data-i18n="navContact">Contactez-nous</a>
+                        <a class="footer-link" href="#">Support</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4 data-i18n="footerNovalyTitle">Novaly</h4>
+                        <a class="footer-link" onclick="navigateTo('#apropos', 'about')" data-i18n="navAbout">À propos</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div>© 2026 Novaly Games, LLC. <span data-i18n="footerRights">Tous droits réservés.</span></div>
+            </div>
+        </footer>
+
+        <div id="game-container" style="display: none; position: absolute; top: 75px; left: 0; width: 100%; height: calc(100vh - 75px); z-index: 50; background: #000;">
+            <div class="game-controls">
+                <button onclick="quitterJeu()" class="game-control-btn btn-quit">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Quitter le jeu
+                </button>
+                <button onclick="toggleFullscreen()" class="game-control-btn btn-fullscreen">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                    Plein Écran
+                </button>
+            </div>
+            <iframe id="game-frame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+        <div id="chat-box" style="display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px 8px 0 0; z-index: 1500; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+    <div style="padding: 12px 15px; background: #0a0a0a; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0;">
+        <span id="chat-title" style="font-weight: bold; font-size: 13px; color: white;">Chat</span>
+        <span style="cursor: pointer; color: #888; font-weight: bold;" onclick="document.getElementById('chat-box').style.display='none'">✕</span>
+    </div>
+    <div id="chat-messages" style="height: 250px; overflow-y: auto; padding: 15px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <!-- Les messages apparaitront ici -->
+    </div>
+    <div style="display: flex; padding: 10px; border-top: 1px solid #333; background: #111;">
+        <input type="text" id="chat-input" placeholder="Écrire un message..." style="flex-grow: 1; background: #000; color: white; border: 1px solid #444; padding: 10px; border-radius: 4px; outline: none; font-family: 'Inter', sans-serif;">
+        <button onclick="envoyerMessage()" style="background: #0984e3; color: white; border: none; padding: 0 15px; margin-left: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">></button>
+    </div>
+</div>
+<!-- POP-UP D'ALERTE PERSONNALISÉ MODERNE -->
+<div id="novaly-alert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+    <div style="background: rgba(25, 25, 30, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; text-align: center; max-width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+        
+        <div style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        </div>
+        
+        <h3 style="margin: 0 0 10px; color: #fff; font-size: 16px; font-weight: 600;">Information</h3>
+        <p id="novaly-alert-text" style="color: #aaa; font-size: 13px; margin-bottom: 25px; line-height: 1.5;"></p>
+        
+        <button style="background: white; color: black; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#ddd'" onmouseout="this.style.background='white'" onclick="document.getElementById('novaly-alert').style.display='none'">Compris</button>
+    </div>
+</div>
+    </main>
+
+    <script>
+        // 1. GESTION DU PLEIN ÉCRAN
+        window.toggleFullscreen = function() {
+            const container = document.getElementById('game-container');
+            if (!document.fullscreenElement) {
+                if(container.requestFullscreen) {
+                    container.requestFullscreen().catch(err => console.log(err));
+                }
+            } else {
+                if(document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        };
+
+        // 2. RETRAIT DE L'EFFET SKELETON APRÈS 1.5 SECONDES
+// 2. RETRAIT DE L'EFFET SKELETON ET CHARGEMENT DE LA LANGUE
+window.addEventListener('DOMContentLoaded', () => {
+    // Retrait du skeleton
+    setTimeout(() => {
+        document.querySelectorAll('.skeleton').forEach(el => el.classList.remove('skeleton'));
+    }, 1500);
+
+    // --- NOUVEAU : Appliquer la langue sauvegardée ---
+    const savedLang = localStorage.getItem('novaly_lang') || 'fr';
+    
+    // Petit dictionnaire pour faire correspondre la langue au bon drapeau
+    const flags = {
+        'fr': 'https://flagcdn.com/w40/fr.png',
+        'en': 'https://flagcdn.com/w40/gb.png',
+        'es': 'https://flagcdn.com/w40/es.png',
+        'de': 'https://flagcdn.com/w40/de.png',
+        'it': 'https://flagcdn.com/w40/it.png'
+    };
+    
+    // On force l'affichage avec la langue sauvegardée
+    changeLanguage(savedLang, flags[savedLang]);
+});
+
+// 3. ANIMATION MOTION "NOVALY" (SPOTLIGHT) FIXÉ
+        const motionContainer = document.getElementById('motion-container');
+        const motionLogo = document.getElementById('motion-logo');
+        if (motionContainer && motionLogo) {
+            motionContainer.addEventListener('mousemove', (e) => {
+                if (window.innerWidth > 768) { // Appliquer uniquement sur les écrans plus larges que mobile
+                    motionLogo.classList.add('active-light'); // Allume la lumière
+                    const rect = motionLogo.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    motionLogo.style.setProperty('--mouse-x', `${x}px`);
+                    motionLogo.style.setProperty('--mouse-y', `${y}px`);
+                }
+            });
+            
+            motionContainer.addEventListener('mouseleave', () => {
+                if (window.innerWidth > 768) { // Appliquer uniquement sur les écrans plus larges que mobile
+                    motionLogo.classList.remove('active-light'); // Éteint la lumière
+                }
+            });
+        }
+        const translations = {
+            fr: {
+                navStore: "Magasin", navOnline: "Jeux Rapide", navLibrary: "Bibliothèque", navCommunity: "Communauté", navAbout: "À propos", navCart: "Panier", navContact: "Contactez-nous",
+                searchPh: "Rechercher un jeu...", onlineStatus: "En ligne",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Découvrez la nouvelle extension majeure. Explorez de nouveaux territoires et forgez votre propre destin.", bannerBtn: "Acheter Maintenant",
+                storeSubtitle: "Nouveautés et Tendances", searchResults: "Résultats de recherche...", readyToPlay: "Prêt à jouer",
+                communityTitle: "Communauté Novaly", communityDesc: "Rejoignez la discussion, partagez vos créations et trouvez des coéquipiers.",
+                commNews1Title: "📢 Mise à jour v1.2 : Patch Notes", commNews1Desc: "Découvrez toutes les nouveautés, corrections de bugs et équilibrages apportés par la dernière mise à jour.",
+                commNews2Title: "🏆 Tournoi Galactic Warfare", commNews2Desc: "Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.",
+                commNews3Title: "🎨 Créations de la semaine", commNews3Desc: "Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.",
+                aboutTitle: "À propos de Novaly", aboutDesc1: "Novaly est votre plateforme de jeu de nouvelle génération, conçue pour offrir des performances optimales, une bibliothèque unifiée et une expérience utilisateur fluide sans distraction.",
+                aboutVersion: "Version du Launcher : 1.0.4 (Build 2026)", aboutStatus: "Tous les systèmes sont opérationnels.", aboutBtn: "Vérifier les mises à jour",
+                cartEmpty: "Votre panier est vide", cartDesc: "Découvrez nos nouveautés dans le magasin.", goStore: "Aller au magasin",
+                contactTitle: "Nous contacter", contactSubject: "Sujet", contactMessage: "Message", contactBtn: "Envoyer le message",
+                tabPublic: "Profil Public", tabSecurity: "Sécurité & Connexion", tabPayment: "Moyens de paiement",
+                profName: "Nom d'utilisateur", profSave: "Enregistrer les modifications", profSaved: "Profil mis à jour !",
+                footerAppsTitle: "Téléchargez Novaly", footerHelpTitle: "Aide", footerNovalyTitle: "Novaly", footerRights: "Tous droits réservés.",
+                title_store: "Magasin", title_online: "Jeux Rapide", title_library: "Bibliothèque", title_community: "Communauté", title_about: "À propos", title_cart: "Mon Panier", title_contact: "Nous Contacter", title_profile: "Paramètres"
+            },
+            en: {
+                navStore: "Store", navOnline: "Online Games", navLibrary: "Library", navCommunity: "Community", navAbout: "About", navCart: "Cart", navContact: "Contact Us",
+                searchPh: "Search for a game...", onlineStatus: "Online",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Discover the new major expansion. Explore new territories and forge your own destiny.", bannerBtn: "Buy Now",
+                storeSubtitle: "New & Trending", searchResults: "Search Results...", readyToPlay: "Ready to Play",
+                communityTitle: "Novaly Community", communityDesc: "Join the discussion, share your creations, and find teammates.",
+                commNews1Title: "📢 Update v1.2 : Patch Notes", commNews1Desc: "Discover all the new features, bug fixes, and balancing brought by the latest update.",
+                commNews2Title: "🏆 Galactic Warfare Tournament", commNews2Desc: "Registrations for the summer tournament are open! Form your team and try to win the grand prize.",
+                commNews3Title: "🎨 Creations of the week", commNews3Desc: "Check out the most popular mods and fan-arts voted by players this week.",
+                aboutTitle: "About Novaly", aboutDesc1: "Novaly is your next-generation gaming platform, designed to offer optimal performance, a unified library, and a seamless distraction-free user experience.",
+                aboutVersion: "Launcher Version: 1.0.4 (Build 2026)", aboutStatus: "All systems operational.", aboutBtn: "Check for updates",
+                cartEmpty: "Your cart is empty", cartDesc: "Check out our new releases in the store.", goStore: "Go to Store",
+                contactTitle: "Contact Us", contactSubject: "Subject", contactMessage: "Message", contactBtn: "Send Message",
+                tabPublic: "Public Profile", tabSecurity: "Security & Login", tabPayment: "Payment Methods",
+                profName: "Username", profSave: "Save Changes", profSaved: "Profile updated!",
+                footerAppsTitle: "Download Novaly", footerHelpTitle: "Help", footerNovalyTitle: "Novaly", footerRights: "All rights reserved.",
+                title_store: "Store", title_online: "Online Games", title_library: "Library", title_community: "Community", title_about: "About", title_cart: "My Cart", title_contact: "Contact Us", title_profile: "Settings"
+            },
+            es: {
+                navStore: "Tienda", navOnline: "Juegos Online", navLibrary: "Biblioteca", navCommunity: "Comunidad", navAbout: "Acerca de", navCart: "Carrito", navContact: "Contáctenos",
+                searchPh: "Buscar un juego...", onlineStatus: "En línea",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Descubre la nueva expansión mayor. Explora nuevos territorios y forja tu propio destino.", bannerBtn: "Comprar Ahora",
+                storeSubtitle: "Novedades y Tendencias", searchResults: "Resultados de búsqueda...", readyToPlay: "Listo para jugar",
+                communityTitle: "Comunidad Novaly", communityDesc: "Únete a la discusión, comparte tus creaciones y encuentra compañeros de equipo.",
+                commNews1Title: "📢 Actualización v1.2 : Notas del Parche", commNews1Desc: "Descubre todas las novedades, correcciones de errores y ajustes de equilibrio de la última actualización.",
+                commNews2Title: "🏆 Torneo Galactic Warfare", commNews2Desc: "¡Las inscripciones para el torneo de verano están abiertas! Forma tu equipo y compite por el gran premio.",
+                commNews3Title: "🎨 Creaciones de la semana", commNews3Desc: "Descubre los mods y fan-arts más populares votados por los jugadores esta semana.",
+                aboutTitle: "Acerca de Novaly", aboutDesc1: "Novaly es tu plataforma de juegos de próxima generación, diseñada para ofrecer un rendimiento óptimo y una experiencia fluida sin distracciones.",
+                aboutVersion: "Versión del Launcher: 1.0.4 (Build 2026)", aboutStatus: "Todos los sistemas operativos.", aboutBtn: "Buscar actualizaciones",
+                cartEmpty: "Tu carrito está vacío", cartDesc: "Descubre nuestras novedades en la tienda.", goStore: "Ir a la tienda",
+                contactTitle: "Contáctenos", contactSubject: "Asunto", contactMessage: "Mensaje", contactBtn: "Enviar mensaje",
+                tabPublic: "Perfil Público", tabSecurity: "Seguridad e Inicio", tabPayment: "Métodos de pago",
+                profName: "Nombre de usuario", profSave: "Guardar cambios", profSaved: "¡Perfil actualizado!",
+                footerAppsTitle: "Descargar Novaly", footerHelpTitle: "Ayuda", footerNovalyTitle: "Novaly", footerRights: "Todos los derechos reservados.",
+                title_store: "Tienda", title_online: "Juegos Online", title_library: "Biblioteca", title_community: "Comunidad", title_about: "Acerca de", title_cart: "Mi Carrito", title_contact: "Contáctenos", title_profile: "Ajustes"
+            },
+            de: {
+                navStore: "Shop", navOnline: "Online-Spiele", navLibrary: "Bibliothek", navCommunity: "Gemeinschaft", navAbout: "Über uns", navCart: "Warenkorb", navContact: "Kontakt",
+                searchPh: "Spiel suchen...", onlineStatus: "Online",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Entdecken Sie die neue große Erweiterung. Erkunden Sie neue Gebiete und schmieden Sie Ihr eigenes Schicksal.", bannerBtn: "Jetzt Kaufen",
+                storeSubtitle: "Neu & im Trend", searchResults: "Suchergebnisse...", readyToPlay: "Bereit zum Spielen",
+                communityTitle: "Novaly Gemeinschaft", communityDesc: "Tritt der Diskussion bei, teile deine Kreationen und finde Teamkollegen.",
+                commNews1Title: "📢 Update v1.2 : Patchnotes", commNews1Desc: "Entdecken Sie alle neuen Funktionen, Fehlerbehebungen und Anpassungen des neuesten Updates.",
+                commNews2Title: "🏆 Galactic Warfare Turnier", commNews2Desc: "Die Anmeldungen für das Sommerturnier sind eröffnet! Bilde dein Team und gewinne den Hauptpreis.",
+                commNews3Title: "🎨 Kreationen der Woche", commNews3Desc: "Sieh dir die beliebtesten Mods und Fan-Arts an, die diese Woche von den Spielern gewählt wurden.",
+                aboutTitle: "Über Novaly", aboutDesc1: "Novaly ist Ihre Gaming-Plattform der nächsten Generation, entwickelt für optimale Leistung und ein nahtloses Benutzererlebnis.",
+                aboutVersion: "Launcher-Version: 1.0.4 (Build 2026)", aboutStatus: "Alle Systeme sind betriebsbereit.", aboutBtn: "Nach Updates suchen",
+                cartEmpty: "Dein Warenkorb ist leer", cartDesc: "Entdecke unsere Neuheiten im Shop.", goStore: "Zum Shop",
+                contactTitle: "Kontaktiere uns", contactSubject: "Betreff", contactMessage: "Nachricht", contactBtn: "Nachricht senden",
+                tabPublic: "Öffentliches Profil", tabSecurity: "Sicherheit & Login", tabPayment: "Zahlungsmethoden",
+                profName: "Benutzername", profSave: "Änderungen speichern", profSaved: "Profil aktualisiert!",
+                footerAppsTitle: "Novaly Herunterladen", footerHelpTitle: "Hilfe", footerNovalyTitle: "Novaly", footerRights: "Alle Rechte vorbehalten.",
+                title_store: "Shop", title_online: "Online-Spiele", title_library: "Bibliothek", title_community: "Gemeinschaft", title_about: "Über uns", title_cart: "Mein Warenkorb", title_contact: "Kontakt", title_profile: "Einstellungen"
+            },
+            it: {
+                navStore: "Negozio", navOnline: "Giochi Online", navLibrary: "Libreria", navCommunity: "Comunità", navAbout: "Chi siamo", navCart: "Carrello", navContact: "Contattaci",
+                searchPh: "Cerca un gioco...", onlineStatus: "Online",
+                bannerTitle: "Cyberpunk Adventures", bannerDesc: "Scopri la nuova grande espansione. Esplora nuovi territori e forgia il tuo destino.", bannerBtn: "Acquista Ora",
+                storeSubtitle: "Novità e Tendenze", searchResults: "Risultati della ricerca...", readyToPlay: "Pronto per giocare",
+                communityTitle: "Comunità Novaly", communityDesc: "Unisciti alla discussione, condividi le tue creazioni e trova compagni di squadra.",
+                commNews1Title: "📢 Aggiornamento v1.2: Note sulla patch", commNews1Desc: "Scopri tutte le novità, le correzioni di bug e i bilanciamenti apportati dall'ultimo aggiornamento.",
+                commNews2Title: "🏆 Torneo Galactic Warfare", commNews2Desc: "Le iscrizioni per il torneo estivo sono aperte! Forma la tua squadra e prova a vincere il primo premio.",
+                commNews3Title: "🎨 Creazioni della settimana", commNews3Desc: "Scopri le mod e le fan-art più popolari votate dai giocatori questa settimana.",
+                aboutTitle: "Informazioni su Novaly", aboutDesc1: "Novaly è la tua piattaforma di gioco di nuova generazione, progettata per offrire prestazioni ottimali e un'esperienza fluida.",
+                aboutVersion: "Versione Launcher: 1.0.4 (Build 2026)", aboutStatus: "Tutti i sistemi sono operativi.", aboutBtn: "Verifica aggiornamenti",
+                cartEmpty: "Il tuo carrello è vuoto", cartDesc: "Scopri le nostre novità nel negozio.", goStore: "Vai al negozio",
+                contactTitle: "Contattaci", contactSubject: "Oggetto", contactMessage: "Messaggio", contactBtn: "Invia messaggio",
+                tabPublic: "Profilo Pubblico", tabSecurity: "Sicurezza e Accesso", tabPayment: "Metodi di pagamento",
+                profName: "Nome utente", profSave: "Salva modifiche", profSaved: "Profilo aggiornato!",
+                footerAppsTitle: "Scarica Novaly", footerHelpTitle: "Aiuto", footerNovalyTitle: "Novaly", footerRights: "Tutti i diritti riservati.",
+                title_store: "Negozio", title_online: "Giochi Online", title_library: "Libreria", title_community: "Comunità", title_about: "Chi siamo", title_cart: "Il mio Carrello", title_contact: "Contattaci", title_profile: "Impostazioni"
+            }
+        };
+
+        let currentLang = 'fr';
+        let currentViewId = 'store';
+
+        function toggleLangMenu() {
+            document.getElementById('lang-menu').classList.toggle('show');
+        }
+
+        function changeLanguage(langCode, flagUrl) {
+            currentLang = langCode;
+            
+            // --- NOUVEAU : Sauvegarde la langue dans le navigateur ---
+            localStorage.setItem('novaly_lang', langCode);
+
+            document.getElementById('lang-btn').innerHTML = `<img src="${flagUrl}" alt="${langCode}" class="flag-icon">`;
+            document.getElementById('lang-menu').classList.remove('show');
+
+            const t = translations[langCode] || translations['en'];
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(t[key]) el.textContent = t[key];
+            });
+
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if(t[key]) el.placeholder = t[key];
+            });
+
+            updatePageTitle();
+        }
+
+        const searchInput = document.getElementById('main-search-bar');
+        searchInput.addEventListener('input', function(e) {
+            const termeRecherche = e.target.value.toLowerCase();
+            document.querySelectorAll('.game-card').forEach(carte => {
+                const titreElement = carte.querySelector('.game-title');
+                if (titreElement) {
+                    carte.style.display = titreElement.textContent.toLowerCase().includes(termeRecherche) ? '' : 'none';
+                }
+            });
+
+            const banner = document.getElementById('store-banner');
+            const subtitle = document.getElementById('store-subtitle');
+            if(banner && subtitle) {
+                if(termeRecherche.length > 0) {
+                    banner.style.display = 'none';
+                    subtitle.textContent = translations[currentLang].searchResults;
+                } else {
+                    banner.style.display = 'flex';
+                    subtitle.textContent = translations[currentLang].storeSubtitle;
+                }
+            }
+        });
+
+        function navigateTo(path, viewId) {
+            currentViewId = viewId;
+            window.history.pushState({ viewId: viewId }, "", path);
+            renderView(viewId);
+        }
+
+        function renderView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item, .footer-link').forEach(el => el.classList.remove('active'));
+            
+            let viewElement = document.getElementById('view-' + viewId);
+            if (viewElement) viewElement.classList.add('active');
+            
+            let navItem = document.getElementById('nav-' + viewId);
+            if(navItem) navItem.classList.add('active');
+
+            if(searchInput.value !== "") {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input')); 
+            }
+
+            document.querySelector('.content').scrollTop = 0;
+            
+            // Gestion du scroll du sidebar de profil sur mobile
+            if (viewId === 'profile') {
+                const sidebar = document.getElementById('profileSidebar');
+                if (sidebar) sidebar.scrollLeft = 0;
+            }
+
+            updatePageTitle();
+        }
+
+        function updatePageTitle() {
+            let pageTitleEl = document.getElementById('dynamic-page-title');
+            if (currentViewId === 'store') {
+                pageTitleEl.style.display = 'none';
+            } else {
+                pageTitleEl.style.display = 'block';
+                pageTitleEl.textContent = translations[currentLang]["title_" + currentViewId] || "";
+            }
+        }
+
+        function switchProfileTab(tabId, element) {
+            document.querySelectorAll('.profile-tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.profile-tab-content').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            // Auto-scroll pour rendre l'onglet visible sur mobile
+            const sidebar = document.getElementById('profileSidebar');
+            if (sidebar && window.innerWidth <= 1024) {
+                sidebar.scrollTo({
+                    left: element.offsetLeft - 20,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function previewAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                document.getElementById('profile-avatar-preview').style.backgroundImage = `url(${url})`;
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.querySelector('.main-header').classList.toggle('open');
+        }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            // Ne pas fermer si on clique sur un trigger de dropdown
+            if(!item.classList.contains('profile-trigger') && !item.classList.contains('friends-btn')) {
+                item.addEventListener('click', () => {
+                    document.querySelector('.main-header').classList.remove('open');
+                });
+            }
+        });
+
+        // ================= GESTION DES MENUS (PROFIL & AMIS) =================
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            document.getElementById('user-dropdown').classList.toggle('show');
+            const friendsMenu = document.getElementById('friends-dropdown');
+            if(friendsMenu) friendsMenu.classList.remove('show');
+        }
+
+        function toggleFriendsMenu(event) {
+            event.stopPropagation();
+            document.getElementById('friends-dropdown').classList.toggle('show');
+            const userMenu = document.getElementById('user-dropdown');
+            if(userMenu) userMenu.classList.remove('show');
+        }
+
+        window.addEventListener('click', function(event) {
+            const langWrapper = document.querySelector('.lang-wrapper');
+            if (langWrapper && !langWrapper.contains(event.target)) {
+                document.getElementById('lang-menu').classList.remove('show');
+            }
+
+            const userDropdown = document.getElementById('user-dropdown');
+            if (userDropdown && userDropdown.classList.contains('show') && !event.target.closest('.user-section')) {
+                userDropdown.classList.remove('show');
+            }
+            
+            const friendsDropdown = document.getElementById('friends-dropdown');
+            if (friendsDropdown && friendsDropdown.classList.contains('show') && !event.target.closest('#friends-menu-container')) {
+                friendsDropdown.classList.remove('show');
+            }
+        });
+
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.viewId) {
+                renderView(event.state.viewId);
+            } else {
+                renderView('store'); // Vue par défaut
+        }
+        });
+        window.afficherAlerte = function(message) {
+    document.getElementById('novaly-alert-text').innerText = message;
+    document.getElementById('novaly-alert').style.display = 'flex';
+};
+    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
+            authDomain: "novaly-a80f7.firebaseapp.com",
+            projectId: "novaly-a80f7",
+            storageBucket: "novaly-a80f7.firebasestorage.app",
+            messagingSenderId: "58102958990",
+            appId: "1:58102958990:web:6bdc2d3f049015fd0672df",
+            measurementId: "G-HE39HWQB70"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        window.currentAvatarFile = null;
+        window.currentAvatarDataUrl = null;
+        window.mesJeux = [];
+
+        // --- COMPTEURS GLOBAUX ---
+        window.unreadChatsCount = 0;
+        window.pendingReqCount = 0;
+        window.updateGlobalBadge = function() {
+            const badgeGlobal = document.getElementById('unread-badge');
+            if (badgeGlobal) {
+                const total = window.unreadChatsCount + window.pendingReqCount;
+                if (total > 0) {
+                    badgeGlobal.style.display = 'inline-block';
+                    badgeGlobal.innerText = total;
+                } else {
+                    badgeGlobal.style.display = 'none';
+                }
+            }
+        };
+
+        // SURVEILLANCE DU COMPTE
+        onAuthStateChanged(auth, async (user) => {
+            const loggedOutView = document.getElementById('logged-out-view');
+            const loggedInView = document.getElementById('logged-in-view');
+            const friendsMenuContainer = document.getElementById('friends-menu-container');
+
+            if (user) {
+                if (loggedOutView) loggedOutView.style.display = 'none';
+                if (loggedInView) loggedInView.style.display = 'flex';
+                if (friendsMenuContainer) friendsMenuContainer.style.display = 'flex'; 
+
+                const displayName = user.displayName || "Joueur";
+                document.getElementById('nav-username').innerText = displayName;
+                document.getElementById('profile-username').value = displayName;
+                document.getElementById('profile-email').value = user.email || "";
+
+                const initial = displayName.charAt(0).toUpperCase();
+                document.getElementById('nav-avatar').innerText = initial;
+                document.getElementById('profile-avatar-preview').innerText = initial;
+
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    await setDoc(userDocRef, { 
+                        pseudo: displayName, 
+                        pseudoLower: displayName.toLowerCase(),
+                        isOnline: true 
+                    }, { merge: true });
+
+                    window.addEventListener('beforeunload', () => {
+                        setDoc(userDocRef, { isOnline: false }, { merge: true });
+                    });
+
+                    const docSnap = await getDoc(userDocRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        window.mesJeux = data.jeuxPossedes || [];
+                        window.mesJeux.forEach(gameId => {
+                            let btn = document.getElementById('btn-add-' + gameId);
+                            if(btn) {
+                                btn.innerText = "Dans la bibliothèque";
+                                btn.disabled = true;
+                                btn.style.background = "#2a2a2a";
+                                btn.style.color = "#888";
+                            }
+                        });
+                        if(window.actualiserBibliotheque) window.actualiserBibliotheque();
+                        
+                        if (data.avatarUrl) {
+                            document.getElementById('nav-avatar').innerText = "";
+                            document.getElementById('nav-avatar').style.backgroundImage = `url(${data.avatarUrl})`;
+                            document.getElementById('profile-avatar-preview').innerText = "";
+                            document.getElementById('profile-avatar-preview').style.backgroundImage = `url(${data.avatarUrl})`;
+                        }
+
+                        const titleVal = data.titre || "NOVICE";
+                        if(document.getElementById('profile-title')) document.getElementById('profile-title').value = titleVal;
+                        if(document.getElementById('nav-title')) document.getElementById('nav-title').innerText = titleVal;
+                        
+                        if(document.getElementById('profile-firstname')) document.getElementById('profile-firstname').value = data.prenom || "";
+                        if(document.getElementById('profile-lastname')) document.getElementById('profile-lastname').value = data.nom || "";
+                        if(document.getElementById('profile-address1')) document.getElementById('profile-address1').value = data.adresse1 || "";
+                        if(document.getElementById('profile-address2')) document.getElementById('profile-address2').value = data.adresse2 || "";
+                        if(document.getElementById('profile-city')) document.getElementById('profile-city').value = data.ville || "";
+                        if(document.getElementById('profile-region')) document.getElementById('profile-region').value = data.region || "";
+                        if(document.getElementById('profile-zip')) document.getElementById('profile-zip').value = data.zip || "";
+                        if(document.getElementById('profile-country')) document.getElementById('profile-country').value = data.country || "";
+
+                        if (data.paymentCardLast4) {
+                            document.getElementById('add-card-btn').style.display = 'none';
+                            document.getElementById('saved-cards-list').style.display = 'block';
+                            document.getElementById('card-last4').innerText = data.paymentCardLast4;
+                        }
+
+                        if (data.a2f_app) {
+                            const btn = document.getElementById('btn-a2f-app');
+                            if(btn) {
+                                btn.innerText = "Désactiver";
+                                btn.style.background = "transparent";
+                                btn.style.color = "#ff4757";
+                                btn.style.border = "1px solid #ff4757";
+                            }
+                        }
+                        if (data.a2f_email) {
+                            const btn = document.getElementById('btn-a2f-email');
+                            if(btn) {
+                                btn.innerText = "Désactiver";
+                                btn.style.background = "transparent";
+                                btn.style.color = "#ff4757";
+                                btn.style.border = "1px solid #ff4757";
+                            }
+                        }
+                    }
+                } catch(error) {
+                    console.error("Erreur Firestore:", error);
+                }
+
+                // GESTION DES REQUÊTES D'AMIS
+                const requestsRef = collection(db, "friend_requests");
+                const qRequests = query(requestsRef, where("receiverId", "==", user.uid), where("status", "==", "pending"));
+                
+                onSnapshot(qRequests, (snapshot) => {
+                    const listEl = document.getElementById('friend-requests-list');
+                    const container = document.getElementById('pending-requests-container');
+                    
+                    window.pendingReqCount = snapshot.empty ? 0 : snapshot.docs.length;
+                    window.updateGlobalBadge();
+
+                    if (snapshot.empty) {
+                        if(container) container.style.display = 'none';
+                        if(listEl) listEl.innerHTML = '';
+                        return;
+                    }
+                    
+                    if(container) container.style.display = 'block';
+                    let html = "";
+                    snapshot.forEach(docRequest => {
+                        const req = docRequest.data();
+                        html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 10px; border-radius: 4px; margin-bottom: 5px; border: 1px solid #333;">
+                            <span style="color: white; font-weight: bold; font-size: 11px;">${req.senderPseudo}</span>
+                            <div style="display: flex; gap: 5px;">
+                                <button onclick="acceptFriend('${docRequest.id}', '${req.senderId}', '${req.senderPseudo}')" style="background: #4cd137; color: black; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 800;">OK</button>
+                                <button onclick="declineFriend('${docRequest.id}')" style="background: transparent; color: #ff4757; border: 1px solid #ff4757; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 800;">X</button>
+                            </div>
+                        </div>`;
+                    });
+                    if(listEl) listEl.innerHTML = html;
+                });
+
+                // CHARGEMENT ET TRI DES AMIS (EN LIGNE / HORS LIGNE)
+                const friendsRef = collection(db, "users", user.uid, "friends");
+                onSnapshot(friendsRef, async (snapshot) => {
+                    const onlineList = document.getElementById('friends-online-list');
+                    const offlineList = document.getElementById('friends-offline-list');
+                    
+                    let onlineHtml = "";
+                    let offlineHtml = "";
+                    let onlineCount = 0;
+                    let offlineCount = 0;
+                    let totalUnread = 0;
+
+                    for (const docFriend of snapshot.docs) {
+                        const friendLink = docFriend.data();
+                        const friendId = docFriend.id;
+                        
+                        const friendSnap = await getDoc(doc(db, "users", friendId));
+                        const friendData = friendSnap.exists() ? friendSnap.data() : null;
+                        const isOnline = friendData ? friendData.isOnline : false;
+
+                        const hasUnread = friendLink.hasUnread === true;
+                        if (hasUnread) totalUnread++;
+                        const badgeUnread = hasUnread ? `<span style="background: #ff4757; color: white; font-size: 9px; padding: 2px 5px; border-radius: 10px; font-weight: bold; margin-left: auto; box-shadow: 0 0 5px rgba(255,71,87,0.5);">NOUVEAU</span>` : '';
+
+                        const itemHtml = `
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 4px; opacity: ${isOnline ? '1' : '0.5'}; cursor: pointer; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='transparent'" onclick="ouvrirChat('${friendId}', '${friendLink.pseudo}')">
+                            <div style="width: 7px; height: 7px; background: ${isOnline ? '#4cd137' : '#555'}; border-radius: 50%; ${isOnline ? 'box-shadow: 0 0 5px #4cd137;' : ''}"></div>
+                            <span style="font-size: 13px; color: ${isOnline ? '#eee' : '#777'}; font-weight: 500;">${friendLink.pseudo}</span>
+                            ${badgeUnread}
+                        </div>`;
+
+                        if (isOnline) {
+                            onlineHtml += itemHtml;
+                            onlineCount++;
+                        } else {
+                            offlineHtml += itemHtml;
+                            offlineCount++;
+                        }
+                    }
+
+                    if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
+                    if(offlineList) offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
+
+                    window.unreadChatsCount = totalUnread;
+                    window.updateGlobalBadge();
+                });
+
+            } else {
+                if (loggedOutView) loggedOutView.style.display = 'block';
+                if (loggedInView) loggedInView.style.display = 'none';
+                if (friendsMenuContainer) friendsMenuContainer.style.display = 'none'; 
+            }
+        });
+
+        // ---------------- FONCTIONS DE GESTION ----------------
+
+        window.previewAvatar = function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 2 * 1024 * 1024) {
+                    afficherAlerte("L'image est trop lourde ! Choisissez une image de moins de 2 Mo.");
+                    return;
+                }
+                window.currentAvatarFile = file; 
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('profile-avatar-preview');
+                    if(preview) {
+                        preview.style.backgroundImage = `url(${e.target.result})`;
+                        preview.innerText = "";
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.sendFriendRequest = async function() {
+            const pseudoInput = document.getElementById('friend-search-input');
+            const msg = document.getElementById('friend-msg');
+            const targetPseudo = pseudoInput.value.trim();
+
+            if (targetPseudo === "") {
+                msg.style.color = "#ff4757";
+                msg.innerText = "Veuillez entrer un pseudo.";
+                msg.style.display = "block";
+                return;
+            }
+
+            if (!auth.currentUser) return;
+            const myPseudo = document.getElementById('profile-username').value;
+            
+            if (targetPseudo.toLowerCase() === myPseudo.toLowerCase()) {
+                msg.style.color = "#ff4757";
+                msg.innerText = "Vous ne pouvez pas vous ajouter vous-même !";
+                msg.style.display = "block";
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="sendFriendRequest()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "...";
+            btn.disabled = true;
+
+            try {
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("pseudoLower", "==", targetPseudo.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    msg.style.color = "#ff4757";
+                    msg.innerText = "Joueur introuvable.";
+                    msg.style.display = "block";
+                } else {
+                    const targetUserDoc = querySnapshot.docs[0];
+                    const targetUserId = targetUserDoc.id;
+                    const realTargetPseudo = targetUserDoc.data().pseudo;
+
+                    await addDoc(collection(db, "friend_requests"), {
+                        senderId: auth.currentUser.uid,
+                        senderPseudo: myPseudo,
+                        receiverId: targetUserId,
+                        receiverPseudo: realTargetPseudo,
+                        status: "pending",
+                        timestamp: serverTimestamp()
+                    });
+
+                    msg.style.color = "#4cd137";
+                    msg.innerText = "Demande envoyée !";
+                    msg.style.display = "block";
+                    pseudoInput.value = "";
+                }
+            } catch(error) {
+                msg.style.color = "#ff4757";
+                msg.innerText = "Erreur de connexion.";
+                msg.style.display = "block";
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+                setTimeout(() => msg.style.display = "none", 4000);
+            }
+        };
+
+        window.acceptFriend = async function(requestId, senderId, senderPseudo) {
+            try {
+                await deleteDoc(doc(db, "friend_requests", requestId));
+                await setDoc(doc(db, "users", auth.currentUser.uid, "friends", senderId), { 
+                    pseudo: senderPseudo, 
+                    addedAt: serverTimestamp() 
+                });
+                
+                const myPseudo = document.getElementById('profile-username').value;
+                await setDoc(doc(db, "users", senderId, "friends", auth.currentUser.uid), { 
+                    pseudo: myPseudo, 
+                    addedAt: serverTimestamp() 
+                });
+                // Alerte supprimée pour éviter le pop-up indésirable
+            } catch (error) {
+                console.error("Erreur acceptation:", error);
+            }
+        };
+
+        window.declineFriend = async function(requestId) {
+            try {
+                await deleteDoc(doc(db, "friend_requests", requestId));
+            } catch (error) {
+                console.error("Erreur refus:", error);
+            }
+        };
+
+        window.saveProfile = async function() {
+            const btn = document.querySelector('button[onclick="saveProfile()"]');
+            let msg = document.getElementById('save-msg');
+
+            if (auth.currentUser) {
+                const originalText = btn.innerText;
+                btn.innerText = "Vérification...";
+                btn.disabled = true;
+
+                try {
+                    const newUsername = document.getElementById('profile-username').value.trim();
+                    const newTitle = document.getElementById('profile-title').value;
+
+                    const usersRef = collection(db, "users");
+                    const q = query(usersRef, where("pseudoLower", "==", newUsername.toLowerCase()));
+                    const querySnapshot = await getDocs(q);
+                    
+                    let isTaken = false;
+                    querySnapshot.forEach((docSnap) => {
+                        if (docSnap.id !== auth.currentUser.uid) isTaken = true;
+                    });
+
+                    if (isTaken) {
+                        msg.style.color = "#ff4757";
+                        msg.innerText = "Erreur : Ce pseudo est déjà utilisé.";
+                        msg.style.display = "block";
+                        return;
+                    }
+
+                    btn.innerText = "Sauvegarde...";
+                    await updateProfile(auth.currentUser, { displayName: newUsername });
+                    const userDocRef = doc(db, "users", auth.currentUser.uid);
+                    
+                    let dataToSave = {
+                        pseudo: newUsername,
+                        pseudoLower: newUsername.toLowerCase(),
+                        titre: newTitle,
+                        prenom: document.getElementById('profile-firstname').value,
+                        nom: document.getElementById('profile-lastname').value,
+                        adresse1: document.getElementById('profile-address1').value,
+                        adresse2: document.getElementById('profile-address2').value || "",
+                        ville: document.getElementById('profile-city').value,
+                        region: document.getElementById('profile-region').value || "",
+                        zip: document.getElementById('profile-zip').value || "",
+                        country: document.getElementById('profile-country').value || ""
+                    };
+
+                    if (window.currentAvatarFile) {
+                        btn.innerText = "Upload de l'image...";
+                        const storageRef = ref(storage, 'avatars/' + auth.currentUser.uid + '.jpg');
+                        await uploadBytes(storageRef, window.currentAvatarFile);
+                        const downloadUrl = await getDownloadURL(storageRef);
+                        dataToSave.avatarUrl = downloadUrl;
+                        window.currentAvatarFile = null; 
+                    }
+
+                    await setDoc(userDocRef, dataToSave, { merge: true });
+
+                    document.getElementById('nav-username').innerText = newUsername;
+                    document.getElementById('nav-title').innerText = newTitle;
+                    
+                    if (window.currentAvatarDataUrl) {
+                        document.getElementById('nav-avatar').innerText = "";
+                        document.getElementById('nav-avatar').style.backgroundImage = `url(${window.currentAvatarDataUrl})`;
+                    } else if (!document.getElementById('nav-avatar').style.backgroundImage) {
+                        document.getElementById('nav-avatar').innerText = newUsername.charAt(0).toUpperCase();
+                    }
+
+                    msg.style.color = "#4cd137";
+                    msg.innerText = "Données sauvegardées !";
+                    msg.style.display = "block";
+
+                } catch (error) {
+                    msg.style.color = "#ff4757";
+                    msg.innerText = "Erreur de connexion à la base.";
+                    msg.style.display = "block";
+                } finally {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    setTimeout(() => msg.style.display = "none", 4000);
+                }
+            }
+        };
+
+        window.confirmDeleteAccount = async function() {
+            const email = document.getElementById('delete-email').value;
+            const password = document.getElementById('delete-password').value;
+            const msg = document.getElementById('delete-msg');
+
+            if(!email || !password) {
+                msg.innerText = "Veuillez remplir votre e-mail et mot de passe.";
+                msg.style.display = "block";
+                return;
+            }
+
+            try {
+                const user = auth.currentUser;
+                const credential = EmailAuthProvider.credential(email, password);
+                await reauthenticateWithCredential(user, credential);
+                
+                await deleteDoc(doc(db, "users", user.uid));
+                await deleteUser(user);
+                
+                localStorage.clear();
+                window.location.href = "index.html";
+            } catch (error) {
+                msg.innerText = "Identifiants incorrects.";
+                msg.style.display = "block";
+            }
+        };
+
+        window.toggleA2F = async function(type) {
+            const btnId = type === 'app' ? 'btn-a2f-app' : 'btn-a2f-email';
+            const btn = document.getElementById(btnId);
+            const msg = document.getElementById('a2f-msg');
+            const userDocRef = doc(db, "users", auth.currentUser.uid);
+
+            if (btn.innerText === "Activer") {
+                btn.innerText = "Désactiver";
+                btn.style.background = "transparent";
+                btn.style.color = "#ff4757";
+                btn.style.border = "1px solid #ff4757";
+                msg.innerText = "Sécurité A2F activée avec succès !";
+                await setDoc(userDocRef, { ["a2f_" + type]: true }, { merge: true });
+            } else {
+                btn.innerText = "Activer";
+                btn.style.background = "#4cd137";
+                btn.style.color = "black";
+                btn.style.border = "none";
+                msg.innerText = "Sécurité A2F désactivée.";
+                await setDoc(userDocRef, { ["a2f_" + type]: false }, { merge: true });
+            }
+            msg.style.display = "block";
+            setTimeout(() => msg.style.display = "none", 3000);
+        };
+
+        window.saveFakeCard = async function() {
+            const cardNum = document.getElementById('fake-card-num').value;
+            if (cardNum.length < 16) {
+                afficherAlerte("Veuillez entrer une fausse carte à 16 chiffres.");
+                return;
+            }
+            const last4 = cardNum.substring(12, 16);
+            
+            document.getElementById('stripe-modal').style.display = 'none';
+            document.getElementById('add-card-btn').style.display = 'none';
+            document.getElementById('saved-cards-list').style.display = 'block';
+            document.getElementById('card-last4').innerText = last4;
+
+            const userDocRef = doc(db, "users", auth.currentUser.uid);
+            await setDoc(userDocRef, { paymentCardLast4: last4 }, { merge: true });
+        };
+
+        window.removeCard = async function() {
+            if(confirm("Supprimer ce moyen de paiement ?")) {
+                document.getElementById('saved-cards-list').style.display = 'none';
+                document.getElementById('add-card-btn').style.display = 'block';
+                document.getElementById('fake-card-num').value = "";
+                
+                const userDocRef = doc(db, "users", auth.currentUser.uid);
+                await setDoc(userDocRef, { paymentCardLast4: null }, { merge: true });
+            }
+        };
+
+        window.linkAccount = async function(platform) {
+            const btnId = "link-" + platform + "-btn";
+            const btn = document.getElementById(btnId);
+            const msg = document.getElementById('link-msg');
+            const userDocRef = doc(db, "users", auth.currentUser.uid);
+
+            if (btn.innerText === "Associer") {
+                let popup = window.open("", "Connexion", "width=500,height=600");
+                popup.document.write(`<div style="font-family:sans-serif;text-align:center;margin-top:50px;"><h2>Connexion à ${platform.toUpperCase()}</h2><p>Veuillez patienter pendant l'autorisation sécurisée...</p></div>`);
+                
+                setTimeout(async () => {
+                    popup.close();
+                    btn.innerText = "Dissocier";
+                    btn.style.background = "#ff4757";
+                    btn.style.color = "white";
+                    msg.innerText = `Compte ${platform.toUpperCase()} associé avec succès !`;
+                    msg.style.display = "block";
+                    
+                    await setDoc(userDocRef, { ["linked_" + platform]: true }, { merge: true });
+                    setTimeout(() => msg.style.display = "none", 3000);
+                }, 2000);
+            } else {
+                btn.innerText = "Associer";
+                btn.style.background = "#fff";
+                btn.style.color = "black";
+                await setDoc(userDocRef, { ["linked_" + platform]: false }, { merge: true });
+            }
+        };
+
+        window.logout = async function() {
+            try {
+                if (auth.currentUser) {
+                    await setDoc(doc(db, "users", auth.currentUser.uid), { isOnline: false }, { merge: true });
+                }
+                localStorage.clear();
+                await signOut(auth);
+                window.location.reload();
+            } catch (error) {
+                console.error("Erreur lors de la déconnexion", error);
+            }
+        };
+
+        // ================= GESTION DES JEUX ONLINE =================
+        window.currentGameSelected = "";
+
+        window.lancerJeu = function(jeuId) {
+            window.currentGameSelected = jeuId;
+            const titles = { 'imposteur': 'The Imposteur', 'nolimite': 'Nolimite' };
+            document.getElementById('lobby-game-title').innerText = titles[jeuId];
+            document.getElementById('game-lobby-modal').style.display = 'flex';
+            document.getElementById('private-match-section').style.display = 'none';
+            document.getElementById('private-room-code').value = '';
+        };
+
+        window.closeGameModal = function() {
+            document.getElementById('game-lobby-modal').style.display = 'none';
+        };
+
+        window.togglePrivateMatchInput = function() {
+            const sec = document.getElementById('private-match-section');
+            sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+        };
+
+        function chargerLeJeuEnPleinEcran() {
+            window.closeGameModal();
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('game-container').style.display = 'block';
+            if(window.currentGameSelected === 'nolimite') {
+                document.getElementById('game-frame').src = 'nolimite.html';
+            } else if (window.currentGameSelected === 'imposteur') {
+                document.getElementById('game-frame').src = 'imposteur.html'; 
+            }
+        }
+
+        window.startPublicMatch = function() { chargerLeJeuEnPleinEcran(); };
+        window.joinPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
+        window.createPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
+
+        window.quitterJeu = function() {
+            if(confirm("Êtes-vous sûr de vouloir quitter le jeu en cours ?")) {
+                document.getElementById('game-container').style.display = 'none';
+                document.getElementById('game-frame').src = '';
+                navigateTo('#magasin', 'store');
+            }
+        };
+
+        window.ajouterALaBibliotheque = async function(gameId, btnElement) {
+            if (!auth.currentUser) {
+                afficherAlerte("Vous devez être connecté !");
+                return;
+            }
+            if (window.mesJeux.includes(gameId)) {
+                afficherAlerte("Vous possédez déjà ce jeu !");
+                return;
+            }
+            
+            window.mesJeux.push(gameId);
+            await setDoc(doc(db, "users", auth.currentUser.uid), { jeuxPossedes: window.mesJeux }, { merge: true });
+            
+            if(btnElement) {
+                btnElement.innerText = "Dans la bibliothèque";
+                btnElement.disabled = true;
+                btnElement.style.background = "#2a2a2a";
+                btnElement.style.color = "#888";
+            }
+            if(window.actualiserBibliotheque) window.actualiserBibliotheque();
+        };
+
+        window.actualiserBibliotheque = function() {
+            const biblioView = document.getElementById('view-library');
+            if (!biblioView) return;
+            if (window.mesJeux.length === 0) {
+                biblioView.innerHTML = `
+                    <div class="generic-view-content">
+                        <h2>Votre bibliothèque est vide</h2>
+                        <p>Les jeux que vous achèterez apparaîtront ici.</p>
+                    </div>`;
+                return;
+            }
+
+            let html = `<h2 style="font-size: 18px; margin-bottom: 20px;">Vos Jeux</h2><div class="grid">`;
+            if (window.mesJeux.includes('imposteur')) {
+                html += `<div class="game-card" onclick="lancerJeu('imposteur')">
+                            <div class="game-cover" style="background: linear-gradient(135deg, #2c3e50, #000); display: flex; align-items: center; justify-content: center;">
+                                <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">
+                            </div>
+                            <div class="game-title">The Imposteur</div>
+                            <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
+                         </div>`;
+            }
+            if (window.mesJeux.includes('nolimite')) {
+                html += `<div class="game-card" onclick="lancerJeu('nolimite')">
+                            <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;"></div>
+                            <div class="game-title">Nolimite</div>
+                            <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
+                         </div>`;
+            }
+            html += `</div>`;
+            biblioView.innerHTML = html;
+        };
+
+        // ================= GESTION DU CHAT =================
+        
+        window.activeChatId = null;
+        window.currentFriendId = null; 
+        let chatUnsubscribe = null;
+
+        function formatChatDate(timestamp) {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const targetDate = new Date(date);
+            targetDate.setHours(0, 0, 0, 0);
+
+            const diffTime = today - targetDate;
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return "Aujourd'hui";
+            if (diffDays === 1) return "Hier";
+            if (diffDays >= 2 && diffDays <= 6) return `Il y a ${diffDays} jours`;
+            
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        window.ouvrirChat = function(friendId, friendPseudo) {
+            document.getElementById('chat-box').style.display = 'flex';
+            document.getElementById('chat-title').innerText = "Discussion avec " + friendPseudo;
+            
+            window.currentFriendId = friendId;
+            const chatId = [auth.currentUser.uid, friendId].sort().join('_');
+            window.activeChatId = chatId;
+
+            if (chatUnsubscribe) chatUnsubscribe(); 
+            
+            const msgsRef = collection(db, "chats", chatId, "messages");
+            const q = query(msgsRef, orderBy("timestamp", "asc"));
+            
+            chatUnsubscribe = onSnapshot(q, (snap) => {
+                const box = document.getElementById('chat-messages');
+                box.innerHTML = '';
+                let lastDateStr = null;
+
+                snap.forEach(docSnap => {
+                    const msg = docSnap.data();
+                    const msgId = docSnap.id;
+                    const isMe = msg.senderId === auth.currentUser.uid;
+                    
+                    const dateStr = formatChatDate(msg.timestamp);
+                    if (dateStr !== lastDateStr) {
+                        box.innerHTML += `<div style="text-align: center; color: #666; font-size: 10px; margin: 15px 0 5px 0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">${dateStr}</div>`;
+                        lastDateStr = dateStr;
+                    }
+
+                    const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
+
+                    if (!isMe && msg.status !== 'read') {
+                        setDoc(doc(db, "chats", chatId, "messages", msgId), { status: 'read' }, { merge: true });
+                    }
+
+                    let statusHtml = '';
+                    if (isMe) {
+                        if (msg.status === 'read') {
+                            statusHtml = `<span style="color: #4cd137; font-size: 10px; margin-left: 4px; font-weight: bold;">✓✓</span>`;
+                        } else {
+                            statusHtml = `<span style="color: #888; font-size: 10px; margin-left: 4px; font-weight: bold;">✓</span>`;
+                        }
+                    }
+
+                    box.innerHTML += `
+                        <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 80%; display: flex; flex-direction: column;">
+                            <div style="background: ${isMe ? '#0984e3' : '#2a2a2a'}; padding: 8px 12px; border-radius: 12px; color: white; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                                ${msg.text}
+                            </div>
+                            <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; font-size: 9px; color: #777; margin-top: 4px; display: flex; align-items: center;">
+                                ${timeStr} ${statusHtml}
+                            </div>
+                        </div>`;
+                });
+                box.scrollTop = box.scrollHeight; 
+                
+                setDoc(doc(db, "users", auth.currentUser.uid, "friends", friendId), { 
+                    hasUnread: false 
+                }, { merge: true });
+            });
+        };
+
+        window.envoyerMessage = async function() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !window.activeChatId || !window.currentFriendId) return;
+
+            input.value = ""; 
+            
+            await addDoc(collection(db, "chats", window.activeChatId, "messages"), {
+                text: text,
+                senderId: auth.currentUser.uid,
+                timestamp: Date.now(),
+                status: 'sent'
+            });
+
+            await setDoc(doc(db, "users", window.currentFriendId, "friends", auth.currentUser.uid), { 
+                hasUnread: true 
+            }, { merge: true });
+        };
+
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') window.envoyerMessage(); 
+        });
+// ================= CONTRÔLES DE LA FENÊTRE =================
+        const appWindow = window.__TAURI__.window.getCurrentWindow();
+
+        document.getElementById('titlebar-minimize').addEventListener('click', () => {
+            appWindow.minimize();
+        });
+        
+        document.getElementById('titlebar-maximize').addEventListener('click', () => {
+            appWindow.toggleMaximize();
+        });
+        
+        document.getElementById('titlebar-close').addEventListener('click', () => {
+            appWindow.close();
+        });
+    </script>
+</body>
+</html>

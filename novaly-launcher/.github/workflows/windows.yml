@@ -1,0 +1,35 @@
+name: Fabriquer le .exe Windows
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: 1. Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: 2. Préparer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Préparer le moteur Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 4. Installer les dépendances
+        run: npm install
+        working-directory: ./novaly-launcher
+
+      - name: 5. Compiler le logiciel
+        run: npm run tauri build
+        working-directory: ./novaly-launcher
+
+      - name: 6. Sauvegarder l'installeur
+        uses: actions/upload-artifact@v4
+        with:
+          name: Novaly-Windows-Installer
+          path: novaly-launcher/src-tauri/target/release/bundle/nsis/*.exe
