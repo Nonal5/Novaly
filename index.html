@@ -1896,13 +1896,15 @@ window.envoyerMessage = async function() {
     await addDoc(collection(db, "chats", window.activeChatId, "messages"), {
         text: text,
         senderId: auth.currentUser.uid,
-        timestamp: serverTimestamp()
+        // CORRECTION 1 : On utilise l'heure locale pour un affichage immédiat
+        timestamp: Date.now() 
     });
 };
 
 // Ajoute l'envoi avec la touche Entrée
 document.getElementById('chat-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') envoyerMessage();
+    // CORRECTION 2 : On ajoute 'window.' pour que le module trouve la fonction
+    if (e.key === 'Enter') window.envoyerMessage(); 
 });
     </script>
 </body>
