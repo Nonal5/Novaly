@@ -1205,8 +1205,7 @@ window.addEventListener('DOMContentLoaded', () => {
 };
     </script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
@@ -1225,9 +1224,26 @@ window.addEventListener('DOMContentLoaded', () => {
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
-window.currentAvatarFile = null; // On va stocker le fichier brut ici
 
+        window.currentAvatarFile = null;
         window.currentAvatarDataUrl = null;
+        window.mesJeux = [];
+
+        // --- COMPTEURS GLOBAUX ---
+        window.unreadChatsCount = 0;
+        window.pendingReqCount = 0;
+        window.updateGlobalBadge = function() {
+            const badgeGlobal = document.getElementById('unread-badge');
+            if (badgeGlobal) {
+                const total = window.unreadChatsCount + window.pendingReqCount;
+                if (total > 0) {
+                    badgeGlobal.style.display = 'inline-block';
+                    badgeGlobal.innerText = total;
+                } else {
+                    badgeGlobal.style.display = 'none';
+                }
+            }
+        };
 
         // SURVEILLANCE DU COMPTE
         onAuthStateChanged(auth, async (user) => {
@@ -1251,7 +1267,6 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
 
                 try {
                     const userDocRef = doc(db, "users", user.uid);
-                    
                     await setDoc(userDocRef, { 
                         pseudo: displayName, 
                         pseudoLower: displayName.toLowerCase(),
@@ -1268,15 +1283,16 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                         const data = docSnap.data();
                         window.mesJeux = data.jeuxPossedes || [];
                         window.mesJeux.forEach(gameId => {
-                        let btn = document.getElementById('btn-add-' + gameId);
-                        if(btn) {
-                            btn.innerText = "Dans la bibliothèque";
-                            btn.disabled = true;
-                            btn.style.background = "#2a2a2a";
-                            btn.style.color = "#888";
-                        }
+                            let btn = document.getElementById('btn-add-' + gameId);
+                            if(btn) {
+                                btn.innerText = "Dans la bibliothèque";
+                                btn.disabled = true;
+                                btn.style.background = "#2a2a2a";
+                                btn.style.color = "#888";
+                            }
                         });
                         if(window.actualiserBibliotheque) window.actualiserBibliotheque();
+                        
                         if (data.avatarUrl) {
                             document.getElementById('nav-avatar').innerText = "";
                             document.getElementById('nav-avatar').style.backgroundImage = `url(${data.avatarUrl})`;
@@ -1305,30 +1321,21 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
 
                         if (data.a2f_app) {
                             const btn = document.getElementById('btn-a2f-app');
-                            btn.innerText = "Désactiver";
-                            btn.style.background = "transparent";
-                            btn.style.color = "#ff4757";
-                            btn.style.border = "1px solid #ff4757";
+                            if(btn) {
+                                btn.innerText = "Désactiver";
+                                btn.style.background = "transparent";
+                                btn.style.color = "#ff4757";
+                                btn.style.border = "1px solid #ff4757";
+                            }
                         }
                         if (data.a2f_email) {
                             const btn = document.getElementById('btn-a2f-email');
-                            btn.innerText = "Désactiver";
-                            btn.style.background = "transparent";
-                            btn.style.color = "#ff4757";
-                            btn.style.border = "1px solid #ff4757";
-                        }
-
-                        if (data.linked_discord) {
-                            const btn = document.getElementById('link-discord-btn');
-                            btn.innerText = "Dissocier";
-                            btn.style.background = "#ff4757";
-                            btn.style.color = "white";
-                        }
-                        if (data.linked_steam) {
-                            const btn = document.getElementById('link-steam-btn');
-                            btn.innerText = "Dissocier";
-                            btn.style.background = "#ff4757";
-                            btn.style.color = "white";
+                            if(btn) {
+                                btn.innerText = "Désactiver";
+                                btn.style.background = "transparent";
+                                btn.style.color = "#ff4757";
+                                btn.style.border = "1px solid #ff4757";
+                            }
                         }
                     }
                 } catch(error) {
@@ -1343,13 +1350,16 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     const listEl = document.getElementById('friend-requests-list');
                     const container = document.getElementById('pending-requests-container');
                     
+                    window.pendingReqCount = snapshot.empty ? 0 : snapshot.docs.length;
+                    window.updateGlobalBadge();
+
                     if (snapshot.empty) {
-                        container.style.display = 'none';
-                        listEl.innerHTML = '';
+                        if(container) container.style.display = 'none';
+                        if(listEl) listEl.innerHTML = '';
                         return;
                     }
                     
-                    container.style.display = 'block';
+                    if(container) container.style.display = 'block';
                     let html = "";
                     snapshot.forEach(docRequest => {
                         const req = docRequest.data();
@@ -1362,7 +1372,7 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                             </div>
                         </div>`;
                     });
-                    listEl.innerHTML = html;
+                    if(listEl) listEl.innerHTML = html;
                 });
 
                 // CHARGEMENT ET TRI DES AMIS (EN LIGNE / HORS LIGNE)
@@ -1375,17 +1385,16 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     let offlineHtml = "";
                     let onlineCount = 0;
                     let offlineCount = 0;
-                    let totalUnread = 0; // NOUVEAU : On compte les messages non lus
+                    let totalUnread = 0;
 
                     for (const docFriend of snapshot.docs) {
                         const friendLink = docFriend.data();
                         const friendId = docFriend.id;
                         
                         const friendSnap = await getDoc(doc(db, "users", friendId));
-                        const friendData = friendSnap.data();
+                        const friendData = friendSnap.exists() ? friendSnap.data() : null;
                         const isOnline = friendData ? friendData.isOnline : false;
 
-                        // NOUVEAU : On affiche un badge si un message n'est pas lu
                         const hasUnread = friendLink.hasUnread === true;
                         if (hasUnread) totalUnread++;
                         const badgeUnread = hasUnread ? `<span style="background: #ff4757; color: white; font-size: 9px; padding: 2px 5px; border-radius: 10px; font-weight: bold; margin-left: auto; box-shadow: 0 0 5px rgba(255,71,87,0.5);">NOUVEAU</span>` : '';
@@ -1409,21 +1418,9 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
                     if(offlineList) offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
 
-                    // NOUVEAU : Met à jour le compteur global pour les messages non lus
                     window.unreadChatsCount = totalUnread;
                     window.updateGlobalBadge();
                 });
-                    // NOUVEAU : Mise à jour de la bulle globale "AMIS"
-                    const badgeGlobal = document.getElementById('unread-badge');
-                    if(badgeGlobal) {
-                        if(totalUnread > 0) {
-                            badgeGlobal.style.display = 'inline-block';
-                            badgeGlobal.innerText = totalUnread;
-                        } else {
-                            badgeGlobal.style.display = 'none';
-                        }
-                    }
-                }); // <-- ICI, l'accolade ferme proprement !
 
             } else {
                 if (loggedOutView) loggedOutView.style.display = 'block';
@@ -1432,6 +1429,8 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
             }
         });
 
+        // ---------------- FONCTIONS DE GESTION ----------------
+
         window.previewAvatar = function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -1439,12 +1438,14 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     afficherAlerte("L'image est trop lourde ! Choisissez une image de moins de 2 Mo.");
                     return;
                 }
-                window.currentAvatarFile = file; // ON SAUVEGARDE LE FICHIER
+                window.currentAvatarFile = file; 
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const preview = document.getElementById('profile-avatar-preview');
-                    preview.style.backgroundImage = `url(${e.target.result})`;
-                    preview.innerText = "";
+                    if(preview) {
+                        preview.style.backgroundImage = `url(${e.target.result})`;
+                        preview.innerText = "";
+                    }
                 };
                 reader.readAsDataURL(file);
             }
@@ -1463,7 +1464,6 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
             }
 
             if (!auth.currentUser) return;
-
             const myPseudo = document.getElementById('profile-username').value;
             
             if (targetPseudo.toLowerCase() === myPseudo.toLowerCase()) {
@@ -1507,7 +1507,6 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     pseudoInput.value = "";
                 }
             } catch(error) {
-                console.error("Erreur d'ajout d'ami:", error);
                 msg.style.color = "#ff4757";
                 msg.innerText = "Erreur de connexion.";
                 msg.style.display = "block";
@@ -1531,7 +1530,7 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     pseudo: myPseudo, 
                     addedAt: serverTimestamp() 
                 });
-                
+                // Alerte supprimée pour éviter le pop-up indésirable
             } catch (error) {
                 console.error("Erreur acceptation:", error);
             }
@@ -1569,17 +1568,14 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
 
                     if (isTaken) {
                         msg.style.color = "#ff4757";
-                        msg.innerText = "Erreur : Ce pseudo est déjà utilisé par un autre joueur.";
+                        msg.innerText = "Erreur : Ce pseudo est déjà utilisé.";
                         msg.style.display = "block";
                         return;
                     }
 
                     btn.innerText = "Sauvegarde...";
-
                     await updateProfile(auth.currentUser, { displayName: newUsername });
                     const userDocRef = doc(db, "users", auth.currentUser.uid);
-                    
-                    await setDoc(userDocRef, { isOnline: true }, { merge: true });
                     
                     let dataToSave = {
                         pseudo: newUsername,
@@ -1601,7 +1597,7 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                         await uploadBytes(storageRef, window.currentAvatarFile);
                         const downloadUrl = await getDownloadURL(storageRef);
                         dataToSave.avatarUrl = downloadUrl;
-                        window.currentAvatarFile = null; // Réinitialise après l'upload
+                        window.currentAvatarFile = null; 
                     }
 
                     await setDoc(userDocRef, dataToSave, { merge: true });
@@ -1622,7 +1618,7 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
 
                 } catch (error) {
                     msg.style.color = "#ff4757";
-                    msg.innerText = "Erreur de connexion à la base de données.";
+                    msg.innerText = "Erreur de connexion à la base.";
                     msg.style.display = "block";
                 } finally {
                     btn.innerText = originalText;
@@ -1652,13 +1648,10 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                 await deleteUser(user);
                 
                 localStorage.clear();
-                afficherAlerte("Votre compte a été définitivement supprimé. Au revoir !");
                 window.location.href = "index.html";
-
             } catch (error) {
-                msg.innerText = "Identifiants incorrects (ou compte Google).";
+                msg.innerText = "Identifiants incorrects.";
                 msg.style.display = "block";
-                console.error("Erreur de suppression:", error);
             }
         };
 
@@ -1757,20 +1750,14 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
             }
         };
 
-// ================= GESTION DES JEUX ONLINE =================
+        // ================= GESTION DES JEUX ONLINE =================
         window.currentGameSelected = "";
 
-        // Ouvre la petite fenêtre de présentation du jeu
         window.lancerJeu = function(jeuId) {
             window.currentGameSelected = jeuId;
-            const titles = {
-                'imposteur': 'The Imposteur',
-                'nolimite': 'Nolimite'
-            };
-            
+            const titles = { 'imposteur': 'The Imposteur', 'nolimite': 'Nolimite' };
             document.getElementById('lobby-game-title').innerText = titles[jeuId];
             document.getElementById('game-lobby-modal').style.display = 'flex';
-            
             document.getElementById('private-match-section').style.display = 'none';
             document.getElementById('private-room-code').value = '';
         };
@@ -1784,21 +1771,14 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
             sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
         };
 
-        // --- NOUVEAU : OUVERTURE DU VRAI JEU DANS L'IFRAME ---
         function chargerLeJeuEnPleinEcran() {
             window.closeGameModal();
-            
-            // On cache tout le magasin
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            
-            // On affiche la zone d'iframe (le jeu)
             document.getElementById('game-container').style.display = 'block';
-            
-            // On charge le fichier HTML correspondant
             if(window.currentGameSelected === 'nolimite') {
                 document.getElementById('game-frame').src = 'nolimite.html';
             } else if (window.currentGameSelected === 'imposteur') {
-                document.getElementById('game-frame').src = 'imposteur.html'; // Plus tard
+                document.getElementById('game-frame').src = 'imposteur.html'; 
             }
         }
 
@@ -1806,7 +1786,6 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
         window.joinPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
         window.createPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
 
-        // Quitter le jeu et revenir au menu
         window.quitterJeu = function() {
             if(confirm("Êtes-vous sûr de vouloir quitter le jeu en cours ?")) {
                 document.getElementById('game-container').style.display = 'none';
@@ -1814,199 +1793,171 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                 navigateTo('#magasin', 'store');
             }
         };
-        window.mesJeux = []; // Liste des jeux possédés
 
-// Fonction pour ajouter un jeu
-window.ajouterALaBibliotheque = async function(gameId, btnElement) {
-    if (!auth.currentUser) {
-        afficherAlerte("Vous devez être connecté pour ajouter un jeu !");
-        return;
-    }
-    if (window.mesJeux.includes(gameId)) {
-        afficherAlerte("Vous possédez déjà ce jeu !");
-        return;
-    }
-    
-    window.mesJeux.push(gameId);
-    await setDoc(doc(db, "users", auth.currentUser.uid), { jeuxPossedes: window.mesJeux }, { merge: true });
-    
-    // On change l'aspect du bouton immédiatement
-    if(btnElement) {
-        btnElement.innerText = "Dans la bibliothèque";
-        btnElement.disabled = true;
-        btnElement.style.background = "#2a2a2a";
-        btnElement.style.color = "#888";
-    }
-    actualiserBibliotheque();
-};
-
-// Fonction pour afficher la bibliothèque
-window.actualiserBibliotheque = function() {
-    const biblioView = document.getElementById('view-library');
-    if (window.mesJeux.length === 0) {
-        biblioView.innerHTML = `
-            <div class="generic-view-content">
-                <h2>Votre bibliothèque est vide</h2>
-                <p>Les jeux que vous achèterez apparaîtront ici.</p>
-            </div>`;
-        return;
-    }
-
-    let html = `<h2 style="font-size: 18px; margin-bottom: 20px;">Vos Jeux</h2><div class="grid">`;
-    
-    // Copie conforme de l'HTML du magasin pour garder les mêmes images !
-    if (window.mesJeux.includes('imposteur')) {
-        html += `<div class="game-card" onclick="lancerJeu('imposteur')">
-                    <div class="game-cover" style="background: linear-gradient(135deg, #2c3e50, #000); display: flex; align-items: center; justify-content: center;">
-                        <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">
-                    </div>
-                    <div class="game-title">The Imposteur</div>
-                    <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
-                 </div>`;
-    }
-    if (window.mesJeux.includes('nolimite')) {
-        html += `<div class="game-card" onclick="lancerJeu('nolimite')">
-                    <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;"></div>
-                    <div class="game-title">Nolimite</div>
-                    <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
-                 </div>`;
-    }
-    html += `</div>`;
-    biblioView.innerHTML = html;
-};
-
-// Fonction utilitaire pour formater la date du chat
-function formatChatDate(timestamp) {
-    if (!timestamp) return "";
-    const date = new Date(timestamp);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0);
-
-    const diffTime = today - targetDate;
-    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return "Aujourd'hui";
-    if (diffDays === 1) return "Hier";
-    if (diffDays >= 2 && diffDays <= 6) return `Il y a ${diffDays} jours`;
-    
-    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-window.activeChatId = null;
-window.currentFriendId = null; 
-let chatUnsubscribe = null;
-
-// Fonction utilitaire pour formater la date du chat
-function formatChatDate(timestamp) {
-    if (!timestamp) return "";
-    const date = new Date(timestamp);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const targetDate = new Date(date);
-    targetDate.setHours(0, 0, 0, 0);
-
-    const diffTime = today - targetDate;
-    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return "Aujourd'hui";
-    if (diffDays === 1) return "Hier";
-    if (diffDays >= 2 && diffDays <= 6) return `Il y a ${diffDays} jours`;
-    
-    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-window.ouvrirChat = function(friendId, friendPseudo) {
-    document.getElementById('chat-box').style.display = 'flex';
-    document.getElementById('chat-title').innerText = "Discussion avec " + friendPseudo;
-    
-    window.currentFriendId = friendId;
-    const chatId = [auth.currentUser.uid, friendId].sort().join('_');
-    window.activeChatId = chatId;
-
-    if (chatUnsubscribe) chatUnsubscribe(); 
-    
-    const msgsRef = collection(db, "chats", chatId, "messages");
-    const q = query(msgsRef, orderBy("timestamp", "asc"));
-    
-    chatUnsubscribe = onSnapshot(q, (snap) => {
-        const box = document.getElementById('chat-messages');
-        box.innerHTML = '';
-        let lastDateStr = null;
-
-        snap.forEach(docSnap => {
-            const msg = docSnap.data();
-            const msgId = docSnap.id;
-            const isMe = msg.senderId === auth.currentUser.uid;
+        window.ajouterALaBibliotheque = async function(gameId, btnElement) {
+            if (!auth.currentUser) {
+                afficherAlerte("Vous devez être connecté !");
+                return;
+            }
+            if (window.mesJeux.includes(gameId)) {
+                afficherAlerte("Vous possédez déjà ce jeu !");
+                return;
+            }
             
-            // 1. SÉPARATEUR DE DATE
-            const dateStr = formatChatDate(msg.timestamp);
-            if (dateStr !== lastDateStr) {
-                box.innerHTML += `<div style="text-align: center; color: #666; font-size: 10px; margin: 15px 0 5px 0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">${dateStr}</div>`;
-                lastDateStr = dateStr;
+            window.mesJeux.push(gameId);
+            await setDoc(doc(db, "users", auth.currentUser.uid), { jeuxPossedes: window.mesJeux }, { merge: true });
+            
+            if(btnElement) {
+                btnElement.innerText = "Dans la bibliothèque";
+                btnElement.disabled = true;
+                btnElement.style.background = "#2a2a2a";
+                btnElement.style.color = "#888";
+            }
+            if(window.actualiserBibliotheque) window.actualiserBibliotheque();
+        };
+
+        window.actualiserBibliotheque = function() {
+            const biblioView = document.getElementById('view-library');
+            if (!biblioView) return;
+            if (window.mesJeux.length === 0) {
+                biblioView.innerHTML = `
+                    <div class="generic-view-content">
+                        <h2>Votre bibliothèque est vide</h2>
+                        <p>Les jeux que vous achèterez apparaîtront ici.</p>
+                    </div>`;
+                return;
             }
 
-            // 2. FORMATAGE DE L'HEURE
-            const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
-
-            // 3. SYSTÈME DE VU (READ RECEIPT)
-            if (!isMe && msg.status !== 'read') {
-                setDoc(doc(db, "chats", chatId, "messages", msgId), { status: 'read' }, { merge: true });
+            let html = `<h2 style="font-size: 18px; margin-bottom: 20px;">Vos Jeux</h2><div class="grid">`;
+            if (window.mesJeux.includes('imposteur')) {
+                html += `<div class="game-card" onclick="lancerJeu('imposteur')">
+                            <div class="game-cover" style="background: linear-gradient(135deg, #2c3e50, #000); display: flex; align-items: center; justify-content: center;">
+                                <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">
+                            </div>
+                            <div class="game-title">The Imposteur</div>
+                            <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
+                         </div>`;
             }
-
-            // 4. AFFICHAGE DES TICKS
-            let statusHtml = '';
-            if (isMe) {
-                if (msg.status === 'read') {
-                    statusHtml = `<span style="color: #4cd137; font-size: 10px; margin-left: 4px; font-weight: bold;">✓✓</span>`;
-                } else {
-                    statusHtml = `<span style="color: #888; font-size: 10px; margin-left: 4px; font-weight: bold;">✓</span>`;
-                }
+            if (window.mesJeux.includes('nolimite')) {
+                html += `<div class="game-card" onclick="lancerJeu('nolimite')">
+                            <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;"></div>
+                            <div class="game-title">Nolimite</div>
+                            <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
+                         </div>`;
             }
+            html += `</div>`;
+            biblioView.innerHTML = html;
+        };
 
-            // 5. RENDU DE LA BULLE
-            box.innerHTML += `
-                <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 80%; display: flex; flex-direction: column;">
-                    <div style="background: ${isMe ? '#0984e3' : '#2a2a2a'}; padding: 8px 12px; border-radius: 12px; color: white; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-                        ${msg.text}
-                    </div>
-                    <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; font-size: 9px; color: #777; margin-top: 4px; display: flex; align-items: center;">
-                        ${timeStr} ${statusHtml}
-                    </div>
-                </div>`;
-        });
-        box.scrollTop = box.scrollHeight; 
+        // ================= GESTION DU CHAT =================
         
-        setDoc(doc(db, "users", auth.currentUser.uid, "friends", friendId), { 
-            hasUnread: false 
-        }, { merge: true });
-    });
-};
+        window.activeChatId = null;
+        window.currentFriendId = null; 
+        let chatUnsubscribe = null;
 
-window.envoyerMessage = async function() {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if (!text || !window.activeChatId || !window.currentFriendId) return;
+        function formatChatDate(timestamp) {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const targetDate = new Date(date);
+            targetDate.setHours(0, 0, 0, 0);
 
-    input.value = ""; 
-    
-    await addDoc(collection(db, "chats", window.activeChatId, "messages"), {
-        text: text,
-        senderId: auth.currentUser.uid,
-        timestamp: Date.now(),
-        status: 'sent'
-    });
+            const diffTime = today - targetDate;
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-    await setDoc(doc(db, "users", window.currentFriendId, "friends", auth.currentUser.uid), { 
-        hasUnread: true 
-    }, { merge: true });
-};
+            if (diffDays === 0) return "Aujourd'hui";
+            if (diffDays === 1) return "Hier";
+            if (diffDays >= 2 && diffDays <= 6) return `Il y a ${diffDays} jours`;
+            
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
 
-// Ajoute l'envoi avec la touche Entrée
-document.getElementById('chat-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') window.envoyerMessage(); 
-});
+        window.ouvrirChat = function(friendId, friendPseudo) {
+            document.getElementById('chat-box').style.display = 'flex';
+            document.getElementById('chat-title').innerText = "Discussion avec " + friendPseudo;
+            
+            window.currentFriendId = friendId;
+            const chatId = [auth.currentUser.uid, friendId].sort().join('_');
+            window.activeChatId = chatId;
+
+            if (chatUnsubscribe) chatUnsubscribe(); 
+            
+            const msgsRef = collection(db, "chats", chatId, "messages");
+            const q = query(msgsRef, orderBy("timestamp", "asc"));
+            
+            chatUnsubscribe = onSnapshot(q, (snap) => {
+                const box = document.getElementById('chat-messages');
+                box.innerHTML = '';
+                let lastDateStr = null;
+
+                snap.forEach(docSnap => {
+                    const msg = docSnap.data();
+                    const msgId = docSnap.id;
+                    const isMe = msg.senderId === auth.currentUser.uid;
+                    
+                    const dateStr = formatChatDate(msg.timestamp);
+                    if (dateStr !== lastDateStr) {
+                        box.innerHTML += `<div style="text-align: center; color: #666; font-size: 10px; margin: 15px 0 5px 0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">${dateStr}</div>`;
+                        lastDateStr = dateStr;
+                    }
+
+                    const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
+
+                    if (!isMe && msg.status !== 'read') {
+                        setDoc(doc(db, "chats", chatId, "messages", msgId), { status: 'read' }, { merge: true });
+                    }
+
+                    let statusHtml = '';
+                    if (isMe) {
+                        if (msg.status === 'read') {
+                            statusHtml = `<span style="color: #4cd137; font-size: 10px; margin-left: 4px; font-weight: bold;">✓✓</span>`;
+                        } else {
+                            statusHtml = `<span style="color: #888; font-size: 10px; margin-left: 4px; font-weight: bold;">✓</span>`;
+                        }
+                    }
+
+                    box.innerHTML += `
+                        <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 80%; display: flex; flex-direction: column;">
+                            <div style="background: ${isMe ? '#0984e3' : '#2a2a2a'}; padding: 8px 12px; border-radius: 12px; color: white; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                                ${msg.text}
+                            </div>
+                            <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; font-size: 9px; color: #777; margin-top: 4px; display: flex; align-items: center;">
+                                ${timeStr} ${statusHtml}
+                            </div>
+                        </div>`;
+                });
+                box.scrollTop = box.scrollHeight; 
+                
+                setDoc(doc(db, "users", auth.currentUser.uid, "friends", friendId), { 
+                    hasUnread: false 
+                }, { merge: true });
+            });
+        };
+
+        window.envoyerMessage = async function() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !window.activeChatId || !window.currentFriendId) return;
+
+            input.value = ""; 
+            
+            await addDoc(collection(db, "chats", window.activeChatId, "messages"), {
+                text: text,
+                senderId: auth.currentUser.uid,
+                timestamp: Date.now(),
+                status: 'sent'
+            });
+
+            await setDoc(doc(db, "users", window.currentFriendId, "friends", auth.currentUser.uid), { 
+                hasUnread: true 
+            }, { merge: true });
+        };
+
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') window.envoyerMessage(); 
+        });
+
     </script>
 </body>
 </html>
