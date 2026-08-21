@@ -1421,10 +1421,6 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     }
                 });
 
-                    if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
-                    if(offlineList) offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
-                });
-
             } else {
                 if (loggedOutView) loggedOutView.style.display = 'block';
                 if (loggedInView) loggedInView.style.display = 'none';
