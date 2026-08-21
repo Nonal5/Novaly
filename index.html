@@ -1409,6 +1409,10 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami en ligne.</p>';
                     if(offlineList) offlineList.innerHTML = offlineCount > 0 ? offlineHtml : '<p style="font-size: 11px; color: #666; font-style: italic; margin: 0;">Aucun ami hors ligne.</p>';
 
+                    // NOUVEAU : Met à jour le compteur global pour les messages non lus
+                    window.unreadChatsCount = totalUnread;
+                    window.updateGlobalBadge();
+                });
                     // NOUVEAU : Mise à jour de la bulle globale "AMIS"
                     const badgeGlobal = document.getElementById('unread-badge');
                     if(badgeGlobal) {
@@ -1527,8 +1531,7 @@ window.currentAvatarFile = null; // On va stocker le fichier brut ici
                     pseudo: myPseudo, 
                     addedAt: serverTimestamp() 
                 });
-
-                afficherAlerte("Ami ajouté !");
+                
             } catch (error) {
                 console.error("Erreur acceptation:", error);
             }
@@ -1876,6 +1879,29 @@ window.activeChatId = null;
 window.currentFriendId = null; // Mémorise l'ID de l'ami
 let chatUnsubscribe = null;
 
+// Fonction utilitaire pour formater la date du chat
+function formatChatDate(timestamp) {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+
+    const diffTime = today - targetDate;
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return "Aujourd'hui";
+    if (diffDays === 1) return "Hier";
+    if (diffDays >= 2 && diffDays <= 6) return `Il y a ${diffDays} jours`;
+    
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+window.activeChatId = null;
+window.currentFriendId = null; 
+let chatUnsubscribe = null;
+
 window.ouvrirChat = function(friendId, friendPseudo) {
     document.getElementById('chat-box').style.display = 'flex';
     document.getElementById('chat-title').innerText = "Discussion avec " + friendPseudo;
@@ -1892,17 +1918,53 @@ window.ouvrirChat = function(friendId, friendPseudo) {
     chatUnsubscribe = onSnapshot(q, (snap) => {
         const box = document.getElementById('chat-messages');
         box.innerHTML = '';
+        let lastDateStr = null;
+
         snap.forEach(docSnap => {
             const msg = docSnap.data();
+            const msgId = docSnap.id;
             const isMe = msg.senderId === auth.currentUser.uid;
+            
+            // 1. SÉPARATEUR DE DATE
+            const dateStr = formatChatDate(msg.timestamp);
+            if (dateStr !== lastDateStr) {
+                box.innerHTML += `<div style="text-align: center; color: #666; font-size: 10px; margin: 15px 0 5px 0; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">${dateStr}</div>`;
+                lastDateStr = dateStr;
+            }
+
+            // 2. FORMATAGE DE L'HEURE
+            const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
+
+            // 3. SYSTÈME DE VU (READ RECEIPT)
+            // Si c'est le message de l'ami et qu'il n'est pas encore lu, on le marque comme lu dans la base de données
+            if (!isMe && msg.status !== 'read') {
+                setDoc(doc(db, "chats", chatId, "messages", msgId), { status: 'read' }, { merge: true });
+            }
+
+            // 4. AFFICHAGE DES TICKS (✓ Envoyé, ✓✓ Lu)
+            let statusHtml = '';
+            if (isMe) {
+                if (msg.status === 'read') {
+                    statusHtml = `<span style="color: #4cd137; font-size: 10px; margin-left: 4px; font-weight: bold;">✓✓</span>`; // Vert = Lu
+                } else {
+                    statusHtml = `<span style="color: #888; font-size: 10px; margin-left: 4px; font-weight: bold;">✓</span>`; // Gris = Envoyé/Non lu
+                }
+            }
+
+            // 5. RENDU DE LA BULLE
             box.innerHTML += `
-                <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; background: ${isMe ? '#0984e3' : '#333'}; padding: 8px 12px; border-radius: 12px; max-width: 80%; color: white; word-wrap: break-word;">
-                    ${msg.text}
+                <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 80%; display: flex; flex-direction: column;">
+                    <div style="background: ${isMe ? '#0984e3' : '#2a2a2a'}; padding: 8px 12px; border-radius: 12px; color: white; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                        ${msg.text}
+                    </div>
+                    <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; font-size: 9px; color: #777; margin-top: 4px; display: flex; align-items: center;">
+                        ${timeStr} ${statusHtml}
+                    </div>
                 </div>`;
         });
         box.scrollTop = box.scrollHeight; 
         
-        // NOUVEAU : Dès qu'on ouvre le chat (ou qu'un message arrive en direct), on efface la notification "Nouveau"
+        // On efface la notification rouge du bouton Ami car on vient d'ouvrir le chat
         setDoc(doc(db, "users", auth.currentUser.uid, "friends", friendId), { 
             hasUnread: false 
         }, { merge: true });
@@ -1919,10 +1981,11 @@ window.envoyerMessage = async function() {
     await addDoc(collection(db, "chats", window.activeChatId, "messages"), {
         text: text,
         senderId: auth.currentUser.uid,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        status: 'sent' // NOUVEAU : Statut par défaut quand on envoie
     });
 
-    // NOUVEAU : On prévient l'ami qu'il a reçu un message
+    // On prévient l'ami qu'il a reçu un message
     await setDoc(doc(db, "users", window.currentFriendId, "friends", auth.currentUser.uid), { 
         hasUnread: true 
     }, { merge: true });
