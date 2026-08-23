@@ -2,7 +2,6 @@ name: Fabriquer le .exe Windows
 
 on:
   push:
-    branches: [ main ]
     tags:
       - 'v*'
 
