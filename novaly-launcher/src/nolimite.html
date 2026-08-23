@@ -7,8 +7,67 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #1a1a24; color: white; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+                .custom-titlebar {
+            height: 32px;
+            background: #050505;
+            display: flex;
+            flex-shrink: 0;
+            z-index: 9999;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .titlebar-drag-area {
+            flex-grow: 1;
+            height: 100%;
+            /* C'EST CETTE ZONE QUI PERMET DE DÉPLACER LA FENÊTRE */
+        }
+        .titlebar-controls {
+            display: flex;
+        }
+        .titlebar-button {
+            width: 46px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .titlebar-button:hover { background: #2a2a2a; color: white; }
+        .titlebar-close:hover { background: #e81123; color: white; }
 
+        html, body {
+            background-color: transparent !important; 
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* --- NOTRE NOUVELLE BOÎTE PRINCIPALE --- */
+/* --- NOTRE NOUVELLE BOÎTE PRINCIPALE --- */
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            
+            /* Le vrai fond sombre de Nolimite (pas d'image !) */
+            background-color: #1a1a24;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            
+            /* Essentiel pour Nolimite : l'affichage en colonne */
+            display: flex;
+            flex-direction: column;
+            
+            /* Les coins arrondis parfaits */
+            border-radius: 12px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
         /* HEADER */
         .header { text-align: center; padding: 12px 15px; background: #111; font-weight: 900; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid #8e44ad; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 10px; position: relative; }
         .header-sub { font-size: 11px; color: #8e44ad; font-weight: 700; letter-spacing: 1px; }
@@ -141,7 +200,16 @@
     </style>
 </head>
 <body>
+<div class="app-wrapper">
 
+        <div class="custom-titlebar" data-tauri-drag-region>
+            <div class="titlebar-drag-area" data-tauri-drag-region></div>
+            <div class="titlebar-controls">
+                <div class="titlebar-button" id="titlebar-minimize"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1,5 L9,5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="titlebar-button" id="titlebar-maximize"><svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="titlebar-button titlebar-close" id="titlebar-close"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1,1 L9,9 M9,1 L1,9" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            </div>
+        </div>
     <div class="header">
         NOLIMITE
         <span class="header-sub" id="header-round"></span>
@@ -272,7 +340,7 @@
             <button onclick="window.fermerNotification()">OK</button>
         </div>
     </div>
-
+</div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
@@ -933,6 +1001,23 @@
                 judgeTimerEnd: now + 90000
             });
         };
+// ================= CONTRÔLES DE LA FENÊTRE =================
+        if (window.__TAURI__) {
+            const { getCurrentWindow } = window.__TAURI__.window;
+            const appWindow = getCurrentWindow();
+
+            document.getElementById('titlebar-minimize')?.addEventListener('click', () => {
+                appWindow.minimize();
+            });
+            
+            document.getElementById('titlebar-maximize')?.addEventListener('click', () => {
+                appWindow.toggleMaximize();
+            });
+            
+            document.getElementById('titlebar-close')?.addEventListener('click', () => {
+                appWindow.close();
+            });
+        }
     </script>
 </body>
 </html>

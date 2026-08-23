@@ -29,7 +29,7 @@
             --accent-color: #ffffff;
             --card-bg: #1a1a1a;
         }
-        /* --- BARRE DE TITRE SUR-MESURE --- */
+
         .custom-titlebar {
             height: 32px;
             background: #050505;
@@ -37,6 +37,9 @@
             flex-shrink: 0;
             z-index: 9999;
             border-bottom: 1px solid #1a1a1a;
+            
+            /* --- NOUVEAU : On arrondit le haut de la barre ! --- */
+            border-radius: 11px 11px 0 0; 
         }
         .titlebar-drag-area {
             flex-grow: 1;
@@ -60,16 +63,30 @@
         .titlebar-button:hover { background: #2a2a2a; color: white; }
         .titlebar-close:hover { background: #e81123; color: white; }
 
-        body {
+        html, body {
+            /* Le fond de la fenêtre devient RÉELLEMENT transparent et vide */
+            background-color: transparent !important; 
             margin: 0;
-            font-family: 'Inter', sans-serif;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* --- NOTRE NOUVELLE BOÎTE PRINCIPALE --- */
+        .app-wrapper {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
             background-color: var(--bg-main);
             color: var(--text-main);
+            font-family: 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            
+            /* Les coins arrondis parfaits */
             border-radius: 12px;
+            border: 1px solid #333;
             overflow: hidden;
         }
 
@@ -326,55 +343,155 @@
         .footer-link:hover, .footer-link.active { color: var(--text-main); transform: translateX(2px); }
         .footer-bottom { border-top: 1px solid #222; padding-top: 25px; font-size: 12px; display: flex; justify-content: space-between; }
 
+        .btn-telecharger-principal {
+                background-color: #ffffff; /* Fond tout blanc */
+                color: #000000 ; /* Texte en noir */
+                padding: 5px 12px; /* Espace autour du texte pour faire un rectangle */
+                font-size: 13px;
+                border-radius: 12px; /* Bords arrondis (tu peux augmenter à 15px si tu veux plus rond) */
+                font-weight: bold;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                margin-left: 5px; /* Espace avec les autres liens du menu */
+                display: inline-block;
+            }
+
+            /* Petit effet sympa quand on passe la souris dessus */
+            .btn-telecharger-principal:hover {
+                background-color: #e0e0e0; /* Devient très légèrement gris au survol */
+                transform: translateY(-2px); /* Se soulève un tout petit peu */
+            }
 /* ========================================================= */
+        /* ================== RESPONSIVE MOBILE ==================== */
+        /* ========================================================= */
+        .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; margin-right: 10px; }
+        /* ========================================================= */
         /* ================== RESPONSIVE MOBILE ==================== */
         /* ========================================================= */
         .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; margin-right: 10px; }
 
         @media (max-width: 1024px) {
-            .main-header { padding: 15px 20px; flex-wrap: wrap; height: auto; min-height: 70px; gap: 15px; }
-            .header-left { width: 100%; justify-content: space-between; align-items: center; }
+            /* 1. Le conteneur principal du menu (empilement vertical propre) */
+            .main-header { 
+                padding: 15px; 
+                flex-direction: column; 
+                align-items: stretch; 
+                height: auto !important; 
+                min-height: 70px; 
+                gap: 0; 
+            }
+            
+            /* 2. Ligne Logo + Burger */
+            .header-left { 
+                width: 100%; 
+                display: flex; 
+                flex-wrap: wrap; 
+                justify-content: space-between; 
+                align-items: center; 
+                height: auto !important; 
+            }
             .logo-img { margin-right: 0; margin-top: 0; }
             .menu-toggle { display: block; margin-top: 0; }
             
-            /* On cache tout par défaut sous le menu burger */
-            .nav-links { display: none; width: 100%; flex-direction: column; align-items: flex-start; padding: 15px 0 0 0; gap: 15px; }
-            .header-right { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 15px 0; gap: 15px; border-top: 1px solid #333; margin-top: 10px; margin-left: 0; }
+            /* 3. Liens de navigation (Magasin, Bibliothèque...) */
+            .nav-links { 
+                display: none; 
+                width: 100%; 
+                flex-direction: column; 
+                align-items: stretch; 
+                padding: 10px 0 0 0; 
+                margin-top: 15px;
+                gap: 0; 
+                border-top: 1px solid #222;
+            }
+            .nav-item { 
+                height: auto; 
+                padding: 15px 10px; 
+                width: 100%; 
+                box-sizing: border-box;
+                border-bottom: 1px solid #1a1a1a;
+                justify-content: center; /* Centre le texte sur mobile */
+            }
+            .nav-item::after { display: none; } /* Enlève la barre de survol sur mobile pour un rendu plus propre */
+            
+            /* 4. Zone droite (Recherche, Télécharger, Profil) */
+            .header-right { 
+                display: none; 
+                width: 100%; 
+                flex-direction: column; 
+                align-items: stretch; 
+                padding: 15px 0; 
+                gap: 15px; 
+                margin: 0; 
+                box-sizing: border-box; 
+            }
+            
             .lang-wrapper { display: none; width: 100%; justify-content: center; padding: 10px 0; }
             .user-section { display: none; width: 100%; justify-content: center; padding: 10px 0; }
             
-            /* Quand le menu est ouvert, tout s'affiche proprement en colonne */
+            /* Activation du menu (quand on clique sur le burger) */
             .main-header.open .nav-links, 
             .main-header.open .header-right,
             .main-header.open .lang-wrapper,
             .main-header.open .user-section { 
-                display: flex; animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+                display: flex; 
+                animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
             }
             
-            .nav-item { height: auto; padding: 10px 0; width: 100%; }
-            .search-bar { width: 100%; }
+            /* Ajustements internes au menu */
+            .search-bar { width: 100%; box-sizing: border-box; text-align: center; }
+            .search-bar:focus { width: 100%; } /* Empile que la barre dépasse quand on clique dessus */
             .lang-dropdown { top: 100%; left: 0; right: auto; width: 100%; }
-            
             #friends-menu-container { width: 100%; justify-content: center; }
             .friends-btn { width: 100%; justify-content: center; }
-            .profile-trigger { width: 100%; justify-content: center; background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333;}
-            .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444;}
+            .profile-trigger { width: 100%; justify-content: center; background: #1a1a1a; padding: 12px; border-radius: 8px; border: 1px solid #333; box-sizing: border-box;}
+            .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444; box-sizing: border-box;}
             
-            .content { padding: 20px; }
-    </style>
+            /* Bouton Télécharger bien grand et centré */
+            .btn-telecharger-principal {
+                width: 100%; 
+                margin-left: 0; 
+                margin-top: 5px; 
+                text-align: center; 
+                padding: 12px;
+                box-sizing: border-box;
+                justify-content: center;
+            }
+
+            /* --- CORRECTIONS DU RESTE DE LA PAGE POUR EMPÊCHER LE ZOOM/SLIDE --- */
+            .content { padding: 15px; box-sizing: border-box; width: 100%; overflow-x: hidden; }
+            .motion-logo-container { padding: 10px 0; margin-bottom: 20px; }
+            .novaly-motion-logo { font-size: 42px; letter-spacing: 8px; width: 100%; }
+            .hero-banner { height: auto; min-height: 250px; padding: 20px; width: 100%; box-sizing: border-box; }
+            .hero-banner h1 { font-size: 28px; }
+            .hero-banner p { font-size: 14px; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; width: 100%; }
+            .game-cover { height: 160px; }
+            .game-title { font-size: 13px; }
+            .profile-layout { flex-direction: column; gap: 20px; width: 100%; }
+            .profile-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid #333; }
+            .profile-tab { white-space: nowrap; font-size: 12px; padding: 10px; }
+            .profile-tab.active { border-left: none; border-bottom: 3px solid var(--accent-color); border-radius: 6px 6px 0 0; }
+            .profile-tab-content { padding: 20px; box-sizing: border-box; width: 100%; }
+            .site-footer { padding: 30px 15px; box-sizing: border-box; width: 100%; }
+            .footer-links { flex-direction: column; gap: 30px; }
+            #game-lobby-modal > div { width: 90%; padding: 20px; box-sizing: border-box; }
+        }
+     </style>
 </head>
 <body>
+    <div class="app-wrapper">
 
-<!-- BARRE DE TITRE -->
-    <div class="custom-titlebar">
-        <div class="titlebar-drag-area" data-tauri-drag-region></div>
-        <div class="titlebar-controls">
-            <div class="titlebar-button" id="titlebar-minimize">—</div>
-            <div class="titlebar-button" id="titlebar-maximize">🗖</div>
-            <div class="titlebar-button titlebar-close" id="titlebar-close">✕</div>
+        <div class="custom-titlebar" data-tauri-drag-region>
+            <div class="titlebar-drag-area" data-tauri-drag-region></div>
+            <div class="titlebar-controls">
+                <div class="titlebar-button" id="titlebar-minimize"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1,5 L9,5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="titlebar-button" id="titlebar-maximize"><svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="titlebar-button titlebar-close" id="titlebar-close"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1,1 L9,9 M9,1 L1,9" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            </div>
         </div>
-    </div>
-<header class="main-header" data-tauri-drag-region>
+
+<header class="main-header">
         <div class="header-left">
             <div class="logo-img" onclick="navigateTo('#magasin', 'store')">NOVALY</div>
             <div class="menu-toggle" onclick="toggleMobileMenu()">☰</div>
@@ -382,15 +499,14 @@
                 <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
                 <div class="nav-item" id="nav-online" data-i18n="navOnline" onclick="navigateTo('#jeuxonline', 'online')">Jeux rapide</div>
                 <div class="nav-item" id="nav-library" data-i18n="navLibrary" onclick="navigateTo('#bibliotheque', 'library')">Bibliothèque</div>
-                <div class="nav-item" id="nav-community" data-i18n="navCommunity" onclick="navigateTo('#communaute', 'community')">Communauté</div>
-                <div class="nav-item" id="nav-cart" data-i18n="navCart" onclick="navigateTo('#panier', 'cart')">Panier</div>
                 <div class="nav-item" id="nav-about" data-i18n="navAbout" onclick="navigateTo('#apropos', 'about')">À propos</div>
+                
+                <!-- Le nouveau bouton Télécharger ! -->
             </nav>
         </div>
 
         <div class="header-right">   
             <input type="text" id="main-search-bar" class="search-bar" data-i18n-ph="searchPh" placeholder="Rechercher un jeu...">
-            
             <div id="friends-menu-container" style="position: relative; display: none; align-items: center;">
                 <div class="friends-btn" onclick="toggleFriendsMenu(event)">
                     <svg viewBox="0 0 640 512" style="width: 14px; height: 14px; fill: currentColor;"><path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
@@ -845,13 +961,18 @@
         <footer class="site-footer">
             <div class="footer-downloads">
                 <h4 data-i18n="footerAppsTitle">Téléchargez Novaly</h4>
-                <div class="app-buttons">
-                    <button class="app-btn"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> App Store</button>
-                    <button class="app-btn"><svg viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg> Google Play</button>
-                    <button class="app-btn"><svg viewBox="0 0 448 512"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg> Windows</button>
-                    <button class="app-btn"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> Mac</button>
-                    <button class="app-btn"><svg viewBox="0 0 448 512"><path d="M220.8 123.3c1.1 0 2.6-.4 2.6-.4 44.4-7.6 62.4-56.5 62.4-56.5 12.8-33.1-23-45.7-23-45.7-25-10.4-58.4-1.5-74 15.9-18.7 20.8-12.7 61.2-12.7 61.2 1.4 16.9 24.2 25.4 44.7 25.5zm199.1 154c-13.6-24.5-22.3-15-22.3-15-46.2 36.9-106.3 34.4-106.3 34.4-44.8.4-78.5-19.1-78.5-19.1-12.8-7.8-21.7-18.4-21.7-18.4-25.5-35.3-51.5-24.1-51.5-24.1-26.6 6.3-33.6 28.4-33.6 28.4-6.4 20.2-2.1 36.3-2.1 36.3 22.3 46 62.1 38.3 62.1 38.3 32.1-4 68-18.8 68-18.8 45.3-22.1 91.5-11.8 91.5-11.8 35.8 7.3 53.6 33.3 53.6 33.3 18.2 25.8 12 40.8 12 40.8-6.1 19.3-30.8 25.4-30.8 25.4-29.4 6-64.8-17.7-64.8-17.7-25-14.8-51.2-9-51.2-9-19.6 4-29.3 15-29.3 15-13.9 14.7-24 41.5-24 41.5-9.1 27.6-5.8 45.4-5.8 45.4 3 17.5 13.9 24.6 13.9 24.6 18.3 11 41.6 3.1 41.6 3.1 25.9-9.1 52.8-28.5 52.8-28.5 45.7-32.9 116.5-29 116.5-29 48.7-.9 87.2 21.6 87.2 21.6 16.5 9.7 28.3 23.3 28.3 23.3 24.6 32.7 13.9 66 13.9 66-12.4 35.7-44.1 48-44.1 48-28.8 11.2-61.6 2.3-61.6 2.3-33.1-9.9-63.5-31.5-63.5-31.5-40.4-30-101.4-27.1-101.4-27.1-41.9.4-74.9-16.7-74.9-16.7-24.9-14-42.5-33.2-42.5-33.2-22-26.6-21.2-56-21.2-56-1-31.3 14.1-57.1 14.1-57.1 16-29.2 41.1-43 41.1-43 27-14.7 57.6-11.4 57.6-11.4 36.3 3.9 68.7 22.8 68.7 22.8 39.5 24.8 95.8 28.2 95.8 28.2 45.2.2 82.5-16.8 82.5-16.8 21.3-10 35.7-25.2 35.7-25.2 24.1-27 18.5-56.1 18.5-56.1-5.7-28-25.5-44.1-25.5-44.1zM140.4 316.5c-15.6-10.6-21.9-27.9-21.9-27.9-7-20.9 2-41.4 2-41.4 12-24.8 33.6-35.4 33.6-35.4 22.5-10.8 48.7-6 48.7-6 26.6 4.7 47.7 21 47.7 21 17.5 14.8 24.7 34 24.7 34 8.7 23.3-1.6 45.2-1.6 45.2-14.4 26.5-38.6 37.3-38.6 37.3-25.1 11.9-52.9 6-52.9 6-25-4.4-41.7-22.8-41.7-22.8z"/></svg> Linux</button>
-                </div>
+                    <div class="app-buttons">
+                        <button class="app-btn"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> App Store</button>
+                        <button class="app-btn"><svg viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg> Google Play</button>
+                        
+                        <!-- Bouton Windows transformé en lien -->
+                        <a href="https://github.com/Nonal5/Novaly/releases/download/v1.0.0/Novaly_1.0.0_x64-setup.exe" class="app-btn" style="text-decoration: none; color: inherit;"><svg viewBox="0 0 448 512"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg> Windows</a>
+                        
+                        <!-- Bouton Mac transformé en lien -->
+                        <a href="https://github.com/Nonal5/Novaly/releases/download/v1.0.0/Novaly_1.0.0_aarch64.dmg" class="app-btn" style="text-decoration: none; color: inherit;"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> Mac</a>
+                        
+                        <button class="app-btn"><svg viewBox="0 0 448 512"><path d="M220.8 123.3c1.1 0 2.6-.4 2.6-.4... (j'ai raccourci le SVG Linux pour la lisibilité mais garde le tien !) ...-25.5-44.1-25.5-44.1zM140.4 316.5... (etc) ...-41.7-22.8z"/></svg> Linux</button>
+                    </div>
             </div>
 
             <div class="footer-container">
@@ -1998,7 +2119,8 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('chat-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') window.envoyerMessage(); 
         });
-// ================= CONTRÔLES DE LA FENÊTRE =================
+
+                // ================= CONTRÔLES DE LA FENÊTRE =================
         const appWindow = window.__TAURI__.window.getCurrentWindow();
 
         document.getElementById('titlebar-minimize').addEventListener('click', () => {

@@ -6,18 +6,66 @@
     <title>Connexion - NOVALY</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(15,15,20,0.9)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
-            background-repeat: no-repeat;
-            color: #f5f5f5;
+        .custom-titlebar {
+            height: 32px;
+            background: #050505;
+            display: flex;
+            flex-shrink: 0;
+            z-index: 9999;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .titlebar-drag-area {
+            flex-grow: 1;
+            height: 100%;
+            /* C'EST CETTE ZONE QUI PERMET DE DÉPLACER LA FENÊTRE */
+        }
+        .titlebar-controls {
+            display: flex;
+        }
+        .titlebar-button {
+            width: 46px;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            color: #999;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .titlebar-button:hover { background: #2a2a2a; color: white; }
+        .titlebar-close:hover { background: #e81123; color: white; }
+
+        html, body {
+            background-color: transparent !important; 
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
+        }
+
+        /* --- NOTRE NOUVELLE BOÎTE PRINCIPALE --- */
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            
+            /* On déplace ton fond image ici ! */
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(15,15,20,0.9)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
+            background-repeat: no-repeat;
+            font-family: 'Inter', sans-serif;
+            color: #f5f5f5;
+            
+            /* Centre la boîte de login */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            /* Les coins arrondis parfaits */
             border-radius: 12px;
+            border: 1px solid #333;
             overflow: hidden;
         }
 
@@ -104,14 +152,16 @@
     </style>
 </head>
 <body>
-    <div class="custom-titlebar">
-        <div class="titlebar-drag-area" data-tauri-drag-region></div>
-        <div class="titlebar-controls">
-            <div class="titlebar-button" id="titlebar-minimize">—</div>
-            <div class="titlebar-button" id="titlebar-maximize">🗖</div>
-            <div class="titlebar-button titlebar-close" id="titlebar-close">✕</div>
+    <div class="app-wrapper">
+
+        <div class="custom-titlebar" data-tauri-drag-region>
+            <div class="titlebar-drag-area" data-tauri-drag-region></div>
+            <div class="titlebar-controls">
+                <div class="titlebar-button" id="titlebar-minimize"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1,5 L9,5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="titlebar-button" id="titlebar-maximize"><svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="titlebar-button titlebar-close" id="titlebar-close"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1,1 L9,9 M9,1 L1,9" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            </div>
         </div>
-    </div>
     <div class="login-box">
         <div class="logo">NOVALY</div>
 
@@ -361,6 +411,20 @@ window.finalizeGoogleLogin = async function() {
             document.getElementById('titlebar-maximize').addEventListener('click', () => appWindow.toggleMaximize());
             document.getElementById('titlebar-close').addEventListener('click', () => appWindow.close());
         }
+                        // ================= CONTRÔLES DE LA FENÊTRE =================
+        const appWindow = window.__TAURI__.window.getCurrentWindow();
+
+        document.getElementById('titlebar-minimize').addEventListener('click', () => {
+            appWindow.minimize();
+        });
+        
+        document.getElementById('titlebar-maximize').addEventListener('click', () => {
+            appWindow.toggleMaximize();
+        });
+        
+        document.getElementById('titlebar-close').addEventListener('click', () => {
+            appWindow.close();
+        });
     </script>
 </body>
 </html>
