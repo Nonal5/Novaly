@@ -3,6 +3,8 @@ name: Fabriquer le .dmg Mac
 on:
   push:
     branches: [ main ]
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -20,16 +22,41 @@ jobs:
       - name: 3. Préparer le moteur Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: 4. Installer les dépendances
+      # --- MAGIE : MET À JOUR LA VERSION AUTOMATIQUEMENT DEPUIS LE TAG ---
+      - name: 4. Extraire le numéro de version du Tag
+        id: tag_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version détectée : $VERSION"
+
+      - name: 5. Injecter la version dans les configs
+        run: |
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('./novaly-launcher/package.json', 'utf8'));
+            pkg.version = process.env.VERSION;
+            fs.writeFileSync('./novaly-launcher/package.json', JSON.stringify(pkg, null, 2));
+
+            const tauri = JSON.parse(fs.readFileSync('./novaly-launcher/src-tauri/tauri.conf.json', 'utf8'));
+            tauri.version = process.env.VERSION;
+            fs.writeFileSync('./novaly-launcher/src-tauri/tauri.conf.json', JSON.stringify(tauri, null, 2));
+          "
+      # -----------------------------------------------------------------
+
+      - name: 6. Installer les dépendances
         run: npm install
         working-directory: ./novaly-launcher
 
-      - name: 5. Compiler le logiciel Mac
+      - name: 7. Compiler le logiciel
         run: npm run tauri build
         working-directory: ./novaly-launcher
 
-      - name: 6. Sauvegarder l'installeur Mac
-        uses: actions/upload-artifact@v4
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: Novaly-Mac-Installer
-          path: novaly-launcher/src-tauri/target/release/bundle/dmg/*.dmg
+          files: |
+            novaly-launcher/src-tauri/target/release/bundle/dmg/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
