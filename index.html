@@ -316,62 +316,119 @@
         /* ================== RESPONSIVE MOBILE ==================== */
         /* ========================================================= */
         .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; margin-right: 10px; }
+        /* ========================================================= */
+        /* ================== RESPONSIVE MOBILE ==================== */
+        /* ========================================================= */
+        .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; margin-right: 10px; }
 
         @media (max-width: 1024px) {
-            .main-header { padding: 15px 20px; flex-wrap: wrap; height: auto; min-height: 70px; gap: 15px; }
-            .header-left { width: 100%; justify-content: space-between; align-items: center; }
+            /* 1. Le conteneur principal du menu (empilement vertical propre) */
+            .main-header { 
+                padding: 15px; 
+                flex-direction: column; 
+                align-items: stretch; 
+                height: auto !important; 
+                min-height: 70px; 
+                gap: 0; 
+            }
+            
+            /* 2. Ligne Logo + Burger */
+            .header-left { 
+                width: 100%; 
+                display: flex; 
+                flex-wrap: wrap; 
+                justify-content: space-between; 
+                align-items: center; 
+                height: auto !important; 
+            }
             .logo-img { margin-right: 0; margin-top: 0; }
             .menu-toggle { display: block; margin-top: 0; }
             
-            /* On cache tout par défaut sous le menu burger */
-            .nav-links { display: none; width: 100%; flex-direction: column; align-items: flex-start; padding: 15px 0 0 0; gap: 15px; }
-            .header-right { display: none; width: 100%; flex-direction: column; align-items: stretch; padding: 15px 0; gap: 15px; border-top: 1px solid #333; margin-top: 10px; margin-left: 0; }
+            /* 3. Liens de navigation (Magasin, Bibliothèque...) */
+            .nav-links { 
+                display: none; 
+                width: 100%; 
+                flex-direction: column; 
+                align-items: stretch; 
+                padding: 10px 0 0 0; 
+                margin-top: 15px;
+                gap: 0; 
+                border-top: 1px solid #222;
+            }
+            .nav-item { 
+                height: auto; 
+                padding: 15px 10px; 
+                width: 100%; 
+                box-sizing: border-box;
+                border-bottom: 1px solid #1a1a1a;
+                justify-content: center; /* Centre le texte sur mobile */
+            }
+            .nav-item::after { display: none; } /* Enlève la barre de survol sur mobile pour un rendu plus propre */
+            
+            /* 4. Zone droite (Recherche, Télécharger, Profil) */
+            .header-right { 
+                display: none; 
+                width: 100%; 
+                flex-direction: column; 
+                align-items: stretch; 
+                padding: 15px 0; 
+                gap: 15px; 
+                margin: 0; 
+                box-sizing: border-box; 
+            }
+            
             .lang-wrapper { display: none; width: 100%; justify-content: center; padding: 10px 0; }
             .user-section { display: none; width: 100%; justify-content: center; padding: 10px 0; }
             
-            /* Quand le menu est ouvert, tout s'affiche proprement en colonne */
+            /* Activation du menu (quand on clique sur le burger) */
             .main-header.open .nav-links, 
             .main-header.open .header-right,
             .main-header.open .lang-wrapper,
             .main-header.open .user-section { 
-                display: flex; animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+                display: flex; 
+                animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
             }
             
-            .nav-item { height: auto; padding: 10px 0; width: 100%; }
-            .search-bar { width: 100%; }
+            /* Ajustements internes au menu */
+            .search-bar { width: 100%; box-sizing: border-box; text-align: center; }
+            .search-bar:focus { width: 100%; } /* Empile que la barre dépasse quand on clique dessus */
             .lang-dropdown { top: 100%; left: 0; right: auto; width: 100%; }
-            
             #friends-menu-container { width: 100%; justify-content: center; }
             .friends-btn { width: 100%; justify-content: center; }
-            .profile-trigger { width: 100%; justify-content: center; background: #1a1a1a; padding: 10px; border-radius: 8px; border: 1px solid #333;}
-            .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444;}
+            .profile-trigger { width: 100%; justify-content: center; background: #1a1a1a; padding: 12px; border-radius: 8px; border: 1px solid #333; box-sizing: border-box;}
+            .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444; box-sizing: border-box;}
             
-            .content { padding: 20px; }
-            /* ... (tout ton code mobile existant pour le menu) ... */
-            .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444;}
-            
-            .content { padding: 20px; }
+            /* Bouton Télécharger bien grand et centré */
+            .btn-telecharger-principal {
+                width: 100%; 
+                margin-left: 0; 
+                margin-top: 5px; 
+                text-align: center; 
+                padding: 12px;
+                box-sizing: border-box;
+                justify-content: center;
+            }
 
-            /* --- NOUVEAUX AJOUTS POUR LE RESTE DU SITE SUR MOBILE --- */
-            .hero-banner { height: 300px; padding: 20px; }
-            .hero-banner h1 { font-size: 32px; }
+            /* --- CORRECTIONS DU RESTE DE LA PAGE POUR EMPÊCHER LE ZOOM/SLIDE --- */
+            .content { padding: 15px; box-sizing: border-box; width: 100%; overflow-x: hidden; }
+            .motion-logo-container { padding: 10px 0; margin-bottom: 20px; }
+            .novaly-motion-logo { font-size: 42px; letter-spacing: 8px; width: 100%; }
+            .hero-banner { height: auto; min-height: 250px; padding: 20px; width: 100%; box-sizing: border-box; }
+            .hero-banner h1 { font-size: 28px; }
             .hero-banner p { font-size: 14px; }
-            
-            /* Grille de jeux plus petite pour mobile */
-            .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-            .game-cover { height: 180px; }
-            
-            /* Le menu Profil passe à la verticale */
-            .profile-layout { flex-direction: column; gap: 20px; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; width: 100%; }
+            .game-cover { height: 160px; }
+            .game-title { font-size: 13px; }
+            .profile-layout { flex-direction: column; gap: 20px; width: 100%; }
             .profile-sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding-bottom: 10px; border-bottom: 1px solid #333; }
             .profile-tab { white-space: nowrap; font-size: 12px; padding: 10px; }
             .profile-tab.active { border-left: none; border-bottom: 3px solid var(--accent-color); border-radius: 6px 6px 0 0; }
-            
-            /* Pied de page et Pop-up */
+            .profile-tab-content { padding: 20px; box-sizing: border-box; width: 100%; }
+            .site-footer { padding: 30px 15px; box-sizing: border-box; width: 100%; }
             .footer-links { flex-direction: column; gap: 30px; }
-            #game-lobby-modal > div { width: 90%; padding: 20px; }
-        } /* <-- Cette accolade ferme le @media (max-width: 1024px) */
-    </style>
+            #game-lobby-modal > div { width: 90%; padding: 20px; box-sizing: border-box; }
+        }
+     </style>
 </head>
 <body>
 
