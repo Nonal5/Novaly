@@ -23,6 +23,14 @@
       "csp": null
     }
   },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/Nonal5/Novaly/releases/latest/download/latest.json"
+      ],
+      "pubkey": "/Users/noah/Desktop/Novaly/novaly-launcher/novaly.key.pub"
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

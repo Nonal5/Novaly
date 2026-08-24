@@ -1361,16 +1361,74 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         });
         window.afficherAlerte = function(message) {
-    document.getElementById('novaly-alert-text').innerText = message;
-    document.getElementById('novaly-alert').style.display = 'flex';
-};
+            document.getElementById('novaly-alert-text').innerText = message;
+            document.getElementById('novaly-alert').style.display = 'flex';
+        };
+
+// ================= GESTION DE LA MISE À JOUR =================
+        async function verifierMiseAJour() {
+            try {
+                // On récupère uniquement l'outil de mise à jour
+                const check = window.__TAURI__.updater.check;
+
+                const update = await check();
+                
+                if (update) {
+                    console.log(`Mise à jour v${update.version} trouvée !`);
+                    
+                    // Télécharge et installe en arrière-plan
+                    await update.downloadAndInstall();
+                    
+                    // Affiche ton beau pop-up personnalisé pour prévenir le joueur !
+                    afficherAlerte("Mise à jour installée avec succès ! Veuillez fermer et relancer Novaly pour l'appliquer.");
+                    
+                } else {
+                    console.log("Le launcher est à jour.");
+                }
+            } catch (erreur) {
+                console.error("Erreur lors de la vérification :", erreur);
+            }
+        }
+
+        // Lancer la vérification quand l'application démarre
+        window.addEventListener('DOMContentLoaded', () => {
+            // Un petit délai (optionnel) pour laisser l'interface charger d'abord
+            setTimeout(verifierMiseAJour, 1000); 
+        });
+
+        // ================= CONTRÔLES DE LA FENÊTRE ET VERSION =================
+        const appWindow = window.__TAURI__.window.getCurrentWindow();
+
+        document.getElementById('titlebar-minimize').addEventListener('click', () => {
+            appWindow.minimize();
+        });
+        
+        document.getElementById('titlebar-maximize').addEventListener('click', () => {
+            appWindow.toggleMaximize();
+        });
+        
+        document.getElementById('titlebar-close').addEventListener('click', () => {
+            appWindow.close();
+        });
+
+        // Affichage dynamique de la version corrigé
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (window.__TAURI__) {
+                const { getVersion } = window.__TAURI__.app;
+                const version = await getVersion();
+                document.getElementById('version-text').innerText = `Version du Launcher : v${version}`;
+            } else {
+                document.getElementById('version-text').innerText = `Version du Launcher : v1.0.1`;
+            }
+        });
     </script>
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
-        
+
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
             authDomain: "novaly-a80f7.firebaseapp.com",
@@ -2119,7 +2177,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') window.envoyerMessage(); 
         });
 
-                // ================= CONTRÔLES DE LA FENÊTRE =================
+// ================= CONTRÔLES DE LA FENÊTRE =================
         const appWindow = window.__TAURI__.window.getCurrentWindow();
 
         document.getElementById('titlebar-minimize').addEventListener('click', () => {
@@ -2133,15 +2191,15 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('titlebar-close').addEventListener('click', () => {
             appWindow.close();
         });
-        // Le launcher Tauri peut récupérer sa propre version dynamiquement
+
+        // Affichage dynamique de la version corrigé
         window.addEventListener('DOMContentLoaded', async () => {
             if (window.__TAURI__) {
                 const { getVersion } = window.__TAURI__.app;
                 const version = await getVersion();
-                document.getElementById('app-version').innerText = `Version du Launcher : v${version}`;
+                document.getElementById('version-text').innerText = `Version du Launcher : v${version}`;
             } else {
-                // Si tu es sur le site web classique (hors application)
-                document.getElementById('app-version').innerText = `Version du Launcher : v1.0.1`;
+                document.getElementById('version-text').innerText = `Version du Launcher : v1.0.1`;
             }
         });
     </script>
