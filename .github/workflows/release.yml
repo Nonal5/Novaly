@@ -1,4 +1,4 @@
-name: Fabriquer le .dmg Mac
+name: Publier Release
 
 on:
   push:
@@ -6,8 +6,15 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    runs-on: macos-latest
+  publish:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - name: 1. Récupérer le code
@@ -21,15 +28,17 @@ jobs:
       - name: 3. Préparer le moteur Rust
         uses: dtolnay/rust-toolchain@stable
 
-      # --- MAGIE : MET À JOUR LA VERSION AUTOMATIQUEMENT DEPUIS LE TAG ---
-      - name: 4. Extraire le numéro de version du Tag
+      # --- EXTRACTION DE VERSION (Multiplateforme) ---
+      - name: 4. Extraire le numéro de version
         id: tag_version
+        shell: bash
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Version détectée : $VERSION"
 
       - name: 5. Injecter la version dans les configs
+        shell: bash
         run: |
           node -e "
             const fs = require('fs');
@@ -41,21 +50,18 @@ jobs:
             tauri.version = process.env.VERSION;
             fs.writeFileSync('./novaly-launcher/src-tauri/tauri.conf.json', JSON.stringify(tauri, null, 2));
           "
-      # -----------------------------------------------------------------
 
       - name: 6. Installer les dépendances
         run: npm install
         working-directory: ./novaly-launcher
 
-# --- LE NOUVEAU ROBOT TAURI (COMPILE, SIGNE ET UPLOAD TOUT SEUL) ---
+      # --- LE ROBOT TAURI UNIFIÉ ---
       - name: 7. Compiler et Publier (Robot Tauri)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Noms pour le robot Tauri
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          # Noms pour le moteur Tauri v2
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
@@ -65,4 +71,3 @@ jobs:
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true
-          updaterJsonPreferNsis: true
