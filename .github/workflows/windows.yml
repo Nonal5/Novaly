@@ -49,15 +49,22 @@ jobs:
         working-directory: ./novaly-launcher
 
       # --- LE NOUVEAU ROBOT TAURI (COMPILE, SIGNE ET UPLOAD TOUT SEUL) ---
+# --- LE NOUVEAU ROBOT TAURI (COMPILE, SIGNE ET UPLOAD TOUT SEUL) ---
       - name: 7. Compiler et Publier (Robot Tauri)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Noms pour le robot Tauri
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          # Noms pour le moteur Tauri v2
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           projectPath: "./novaly-launcher"
           tagName: ${{ github.ref_name }}
           releaseName: "Novaly ${{ github.ref_name }}"
           releaseDraft: false
           prerelease: false
+          includeUpdaterJson: true
+          updaterJsonPreferNsis: true
