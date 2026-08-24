@@ -28,14 +28,12 @@ jobs:
       - name: 3. Préparer le moteur Rust
         uses: dtolnay/rust-toolchain@stable
 
-      # --- EXTRACTION DE VERSION (Multiplateforme) ---
       - name: 4. Extraire le numéro de version
         id: tag_version
         shell: bash
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Version détectée : $VERSION"
 
       - name: 5. Injecter la version dans les configs
         shell: bash
@@ -55,13 +53,11 @@ jobs:
         run: npm install
         working-directory: ./novaly-launcher
 
-      # --- LE ROBOT TAURI UNIFIÉ ---
+      # --- COMPILATION & SIGNATURE OFFICIELLE ---
       - name: 7. Compiler et Publier (Robot Tauri)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
