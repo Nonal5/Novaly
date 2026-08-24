@@ -7,9 +7,10 @@ fn greet(name: &str) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_updater::Builder::new().build()) // <-- AJOUTE CETTE LIGNE ICI
-        // Tu as peut-être d'autres plugins en dessous, comme shell ou os, laisse-les !
-        .invoke_handler(tauri::generate_handler![])
+        .plugin(tauri_plugin_shell::init())
+        // 🚀 L'UPDATER EST INITIALISÉ JUSTE ICI :
+        .plugin(tauri_plugin_updater::Builder::new().build()) 
+        .invoke_handler(tauri::generate_handler![greet]) // (Si tu as la fonction greet)
         .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .expect("erreur lors du lancement de l'application tauri");
 }
