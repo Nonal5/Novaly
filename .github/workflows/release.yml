@@ -11,6 +11,8 @@ jobs:
       contents: write
     strategy:
       fail-fast: false
+      # LA MAGIE EST ICI : On force les robots à passer un par un pour ne pas écraser le latest.json
+      max-parallel: 1 
       matrix:
         platform: [macos-latest, windows-latest]
 
@@ -35,7 +37,7 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: 5. Injecter la version dans les configs
+      - name: 5. Injecter la version automatiquement
         shell: bash
         run: |
           node -e "
@@ -53,7 +55,7 @@ jobs:
         run: npm install
         working-directory: ./novaly-launcher
 
-      # --- COMPILATION & SIGNATURE OFFICIELLE ---
+      # --- LE ROBOT TAURI (Qui génère les .sig et le latest.json) ---
       - name: 7. Compiler et Publier (Robot Tauri)
         uses: tauri-apps/tauri-action@v0
         env:
