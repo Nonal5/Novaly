@@ -76,4 +76,4 @@ jobs:
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true
-          args: --verbose --bundles app,dmg,updater
+          args: -vv --verbose
