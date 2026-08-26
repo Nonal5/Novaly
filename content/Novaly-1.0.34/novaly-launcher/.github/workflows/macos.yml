@@ -1,0 +1,35 @@
+name: Fabriquer le .dmg Mac
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: 1. Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: 2. Préparer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Préparer le moteur Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 4. Installer les dépendances
+        run: npm install
+        working-directory: ./novaly-launcher
+
+      - name: 5. Compiler le logiciel Mac
+        run: npm run tauri build
+        working-directory: ./novaly-launcher
+
+      - name: 6. Sauvegarder l'installeur Mac
+        uses: actions/upload-artifact@v4
+        with:
+          name: Novaly-Mac-Installer
+          path: novaly-launcher/src-tauri/target/release/bundle/dmg/*.dmg

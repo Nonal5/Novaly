@@ -75,10 +75,3 @@ jobs:
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true
-
-      - name: 8. Fouiller le dossier (Preuve du bug)
-        if: always()
-        run: |
-          echo "=== CONTENU DU DOSSIER MACOS ==="
-          ls -la ./novaly-launcher/src-tauri/target/release/bundle/macos/
-          echo "================================"

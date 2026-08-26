@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - NOVALY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .custom-titlebar {
+            height: 32px;
+            background: #050505;
+            display: flex;
+            flex-shrink: 0;
+            z-index: 9999;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .titlebar-drag-area {
+            flex-grow: 1;
+            height: 100%;
+            /* C'EST CETTE ZONE QUI PERMET DE DÉPLACER LA FENÊTRE */
+        }
+        .titlebar-controls {
+            display: flex;
+        }
+        .titlebar-button {
+            width: 46px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+        .titlebar-button:hover { background: #2a2a2a; color: white; }
+        .titlebar-close:hover { background: #e81123; color: white; }
+
+        html, body {
+            background-color: transparent !important; 
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* --- NOTRE NOUVELLE BOÎTE PRINCIPALE --- */
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            
+            /* On déplace ton fond image ici ! */
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(15,15,20,0.9)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
+            background-repeat: no-repeat;
+            font-family: 'Inter', sans-serif;
+            color: #f5f5f5;
+            
+            /* Centre la boîte de login */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            /* Les coins arrondis parfaits */
+            border-radius: 12px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .login-box {
+            background: rgba(20, 20, 25, 0.65);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo { font-size: 32px; font-weight: 800; margin-bottom: 10px; letter-spacing: 2px; color: #fff; }
+        .subtitle { color: #a0a0a0; font-size: 14px; margin-bottom: 30px; }
+        
+        .form-group { margin-bottom: 20px; text-align: left; position: relative; }
+        .form-group label { display: block; margin-bottom: 8px; color: #b0b0b0; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .form-group input {
+            width: 100%; padding: 14px 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1);
+            color: white; border-radius: 8px; outline: none; transition: all 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif;
+        }
+        .form-group input:focus { border-color: #ffffff; background: rgba(0,0,0,0.5); box-shadow: 0 0 0 3px rgba(255,255,255,0.1); }
+
+        .btn {
+            background-color: #ffffff; color: black; border: none; padding: 14px;
+            width: 100%; font-size: 14px; font-weight: 800; border-radius: 8px;
+            cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.2s; letter-spacing: 1px;
+        }
+        .btn:hover { background-color: #d0d0d0; transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-google {
+            background-color: transparent; border: 1px solid rgba(255,255,255,0.2); color: white;
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;
+        }
+        .btn-google:hover { background-color: rgba(255,255,255,0.05); color: white; }
+        .btn-google img { width: 18px; height: 18px; }
+
+        .divider { display: flex; align-items: center; text-align: center; color: #777; font-size: 12px; margin: 20px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .divider:not(:empty)::before { margin-right: .5em; }
+        .divider:not(:empty)::after { margin-left: .5em; }
+
+        .back-link { display: inline-block; margin-top: 25px; color: #777; text-decoration: none; font-size: 13px; transition: 0.2s; }
+        .back-link:hover { color: #fff; }
+
+        .toggle-text { font-size: 13px; color: #a0a0a0; margin-top: 25px; }
+        .toggle-text span { color: white; text-decoration: underline; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .toggle-text span:hover { color: #d0d0d0; }
+
+        .section-fade { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .error-message {
+            background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; color: #ff4757;
+            padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; display: none; text-align: left;
+        }
+        /* --- BARRE DE TITRE --- */
+        .custom-titlebar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.5); /* Légèrement transparent pour aller avec ton fond */
+            display: flex;
+            z-index: 9999;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .titlebar-drag-area { flex-grow: 1; height: 100%; }
+        .titlebar-controls { display: flex; }
+        .titlebar-button { width: 46px; height: 100%; display: flex; justify-content: center; align-items: center; color: #999; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .titlebar-button:hover { background: rgba(255,255,255,0.1); color: white; }
+        .titlebar-close:hover { background: #e81123; color: white; }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+
+        <div class="custom-titlebar" data-tauri-drag-region>
+            <div class="titlebar-drag-area" data-tauri-drag-region></div>
+            <div class="titlebar-controls">
+                <div class="titlebar-button" id="titlebar-minimize"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1,5 L9,5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="titlebar-button" id="titlebar-maximize"><svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></div>
+                <div class="titlebar-button titlebar-close" id="titlebar-close"><svg width="10" height="10" viewBox="0 0 10 10"><path d="M1,1 L9,9 M9,1 L1,9" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            </div>
+        </div>
+    <div class="login-box">
+        <div class="logo">NOVALY</div>
+
+        <div id="login-section" class="section-fade">
+            <div class="subtitle">Heureux de vous revoir</div>
+            <div id="login-error" class="error-message"></div>
+
+            <div class="form-group">
+                <label>Adresse e-mail</label>
+                <input type="email" id="login-email" placeholder="exemple@mail.com">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="login-password" placeholder="••••••••">
+            </div>
+            
+            <button class="btn" onclick="login()">Se connecter</button>
+            <div class="divider">OU</div>
+
+            <!-- LE VRAI LOGO GOOGLE EST ICI -->
+            <button class="btn btn-google" onclick="loginWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Continuer avec Google
+            </button>
+
+            <p class="toggle-text">Pas encore de compte ? <span onclick="toggleForm()">S'inscrire</span></p>
+        </div>
+
+        <div id="register-section" class="section-fade" style="display: none;">
+            <div class="subtitle">Rejoignez l'écosystème</div>
+            <div id="reg-error" class="error-message"></div>
+
+            <div class="form-group">
+                <label>Pseudo</label>
+                <input type="text" id="reg-username" placeholder="Votre pseudo en jeu">
+            </div>
+            <div class="form-group">
+                <label>Adresse e-mail</label>
+                <input type="email" id="reg-email" placeholder="exemple@mail.com">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="reg-password" placeholder="••••••••">
+            </div>
+            
+            <button class="btn" onclick="register()">Créer mon compte</button>
+            <p class="toggle-text">Déjà un compte ? <span onclick="toggleForm()">Se connecter</span></p>
+        </div>
+        <div id="google-pseudo-section" class="section-fade" style="display: none;">
+    <div class="subtitle">Dernière étape !</div>
+    <div id="google-error" class="error-message"></div>
+    <p style="font-size: 13px; color: #ccc; margin-bottom: 20px;">Choisissez un pseudo unique pour le réseau Novaly.</p>
+    
+    <div class="form-group">
+        <label>Votre Pseudo</label>
+        <input type="text" id="google-username" placeholder="Ex: JoueurPro">
+    </div>
+    
+    <button class="btn" onclick="finalizeGoogleLogin()">Valider et entrer</button>
+</div>
+
+        <a href="index.html" class="back-link">← Retour au magasin</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
+            authDomain: "novaly-a80f7.firebaseapp.com",
+            projectId: "novaly-a80f7",
+            storageBucket: "novaly-a80f7.firebasestorage.app",
+            messagingSenderId: "58102958990",
+            appId: "1:58102958990:web:6bdc2d3f049015fd0672df",
+            measurementId: "G-HE39HWQB70"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        const db = getFirestore(app);
+
+        function showError(elementId, message) {
+            const errorDiv = document.getElementById(elementId);
+            errorDiv.innerText = message;
+            errorDiv.style.display = "block";
+            errorDiv.animate([{ transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }], { duration: 300, iterations: 2 });
+        }
+
+        function hideErrors() {
+            document.getElementById('login-error').style.display = "none";
+            document.getElementById('reg-error').style.display = "none";
+        }
+
+        window.register = async function() {
+            hideErrors();
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+
+            if (!username || !email || !password) {
+                showError('reg-error', "Veuillez remplir tous les champs.");
+                return;
+            }
+
+            const btn = document.querySelector('#register-section .btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Vérification...";
+            
+            try {
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("pseudoLower", "==", username.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    showError('reg-error', "Ce pseudo est déjà pris par un autre joueur.");
+                    btn.innerText = originalText;
+                    return; 
+                }
+
+                btn.innerText = "Création...";
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, { displayName: username });
+                
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    pseudo: username,
+                    pseudoLower: username.toLowerCase()
+                });
+                
+                localStorage.setItem('isLoggedIn', 'true');
+                window.location.href = 'index.html';
+            } catch (error) {
+                let errorMsg = "Une erreur est survenue.";
+                if(error.code === 'auth/email-already-in-use') errorMsg = "Cet e-mail est déjà utilisé.";
+                if(error.code === 'auth/weak-password') errorMsg = "Le mot de passe doit faire au moins 6 caractères.";
+                showError('reg-error', errorMsg);
+                btn.innerText = originalText;
+            }
+        };
+
+        window.login = async function() {
+            hideErrors();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                showError('login-error', "Veuillez entrer vos identifiants.");
+                return;
+            }
+
+            const btn = document.querySelector('#login-section .btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Connexion...";
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', userCredential.user.displayName || "Joueur");
+                localStorage.setItem('email', userCredential.user.email);
+                window.location.href = 'index.html';
+            } catch (error) {
+                showError('login-error', "Adresse e-mail ou mot de passe incorrect.");
+                btn.innerText = originalText;
+            }
+        };
+
+window.tempGoogleUser = null; // Stocke l'utilisateur temporairement
+
+window.loginWithGoogle = async function() {
+    hideErrors();
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const userDocRef = doc(db, "users", result.user.uid);
+        
+        // On vérifie si ce compte Google a déjà un profil Novaly
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+            // Le compte existe déjà, on le connecte direct
+            localStorage.setItem('isLoggedIn', 'true');
+            window.location.href = 'index.html';
+        } else {
+            // NOUVEAU COMPTE : On cache le reste et on demande le pseudo
+            window.tempGoogleUser = result.user;
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('google-pseudo-section').style.display = 'block';
+        }
+    } catch (error) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+            showError('login-error', "Erreur avec Google.");
+        }
+    }
+};
+
+window.finalizeGoogleLogin = async function() {
+    hideErrors();
+    const pseudo = document.getElementById('google-username').value.trim();
+    const btn = document.querySelector('#google-pseudo-section .btn');
+    
+    if (!pseudo) return showError('google-error', "Veuillez entrer un pseudo.");
+    
+    btn.innerText = "Vérification...";
+    try {
+        // On vérifie si le pseudo est déjà pris
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("pseudoLower", "==", pseudo.toLowerCase()));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            btn.innerText = "Valider et entrer";
+            return showError('google-error', "Ce pseudo est déjà pris !");
+        }
+
+        // Pseudo libre : on met à jour le profil et on crée le document
+        await updateProfile(window.tempGoogleUser, { displayName: pseudo });
+        await setDoc(doc(db, "users", window.tempGoogleUser.uid), {
+            pseudo: pseudo,
+            pseudoLower: pseudo.toLowerCase()
+        });
+
+        localStorage.setItem('isLoggedIn', 'true');
+        window.location.href = 'index.html';
+        
+    } catch (error) {
+        showError('google-error', "Une erreur est survenue.");
+        btn.innerText = "Valider et entrer";
+    }
+};
+
+        window.toggleForm = function() {
+            hideErrors();
+            let loginSec = document.getElementById('login-section');
+            let regSec = document.getElementById('register-section');
+            
+            if (loginSec.style.display === "none") {
+                loginSec.style.display = "block";
+                regSec.style.display = "none";
+            } else {
+                loginSec.style.display = "none";
+                regSec.style.display = "block";
+            }
+        };
+        if (window.__TAURI__) {
+            const appWindow = window.__TAURI__.window.getCurrentWindow();
+            document.getElementById('titlebar-minimize').addEventListener('click', () => appWindow.minimize());
+            document.getElementById('titlebar-maximize').addEventListener('click', () => appWindow.toggleMaximize());
+            document.getElementById('titlebar-close').addEventListener('click', () => appWindow.close());
+        }
+                        // ================= CONTRÔLES DE LA FENÊTRE =================
+        const appWindow = window.__TAURI__.window.getCurrentWindow();
+
+        document.getElementById('titlebar-minimize').addEventListener('click', () => {
+            appWindow.minimize();
+        });
+        
+        document.getElementById('titlebar-maximize').addEventListener('click', () => {
+            appWindow.toggleMaximize();
+        });
+        
+        document.getElementById('titlebar-close').addEventListener('click', () => {
+            appWindow.close();
+        });
+    </script>
+</body>
+</html>
