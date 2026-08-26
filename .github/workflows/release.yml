@@ -55,15 +55,24 @@ jobs:
         run: npm install
         working-directory: ./novaly-launcher
 
+# 🔍 NOUVELLE ÉTAPE : ON TESTE CE QUE GITHUB VOIT VRAIMENT
+      - name: 🔍 Mode Détective - Vérifier les clés
+        shell: bash
+        env:
+          MY_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          MY_PASS: ${{ secrets.TAURI_KEY_PASSWORD }}
+        run: |
+          echo "=== DÉTECTIVE GITHUB ==="
+          if [ -z "$MY_KEY" ]; then echo "❌ ERREUR : La clé secrète est VIDE ou INTROUVABLE !"; else echo "✅ Clé secrète trouvée (Longueur : ${#MY_KEY} caractères)."; fi
+          if [ -z "$MY_PASS" ]; then echo "❌ ERREUR : Le mot de passe est VIDE !"; else echo "✅ Mot de passe trouvé (Longueur : ${#MY_PASS} caractères)."; fi
+          echo "========================"
       # --- LE ROBOT TAURI (Qui génère les .sig et le latest.json) ---
       - name: 7. Compiler et Publier (Robot Tauri)
         uses: tauri-apps/tauri-action@v0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+                TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
         with:
           projectPath: "./novaly-launcher"
           tagName: ${{ github.ref_name }}
