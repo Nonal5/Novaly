@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       max-parallel: 1 
       matrix:
-        platform: [macos-latest, windows-latest]
+        platform: [macos-latest] # On garde que le Mac pour l'instant pour aller plus vite
 
     runs-on: ${{ matrix.platform }}
 
@@ -36,39 +36,38 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: 5. Injecter la version automatiquement
+      - name: 5. Injecter la version ET Vérifier le fichier (Le Radar)
         shell: bash
         run: |
           node -e "
             const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('./novaly-launcher/package.json', 'utf8'));
-            pkg.version = process.env.VERSION;
-            fs.writeFileSync('./novaly-launcher/package.json', JSON.stringify(pkg, null, 2));
-
-            const tauri = JSON.parse(fs.readFileSync('./novaly-launcher/src-tauri/tauri.conf.json', 'utf8'));
+            const path = './novaly-launcher/src-tauri/tauri.conf.json';
+            const tauri = JSON.parse(fs.readFileSync(path, 'utf8'));
             tauri.version = process.env.VERSION;
-            fs.writeFileSync('./novaly-launcher/src-tauri/tauri.conf.json', JSON.stringify(tauri, null, 2));
+            fs.writeFileSync(path, JSON.stringify(tauri, null, 2));
+            
+            console.log('\n=============================================');
+            console.log('🔍 RADAR : Voici ce que GitHub voit dans tauri.conf.json :');
+            if (tauri.plugins && tauri.plugins.updater) {
+               console.log('✅ UPDATER TROUVÉ ! Pubkey :', tauri.plugins.updater.pubkey);
+            } else {
+               console.log('❌ ERREUR FATALE : AUCUN UPDATER TROUVÉ DANS CE FICHIER !');
+            }
+            console.log('=============================================\n');
           "
 
       - name: 6. Installer les dépendances
         run: npm install
         working-directory: ./novaly-launcher
 
-      - name: 🔍 Mode Détective - Vérifier la clé
-        shell: bash
-        env:
-          MY_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-        run: |
-          echo "=== DÉTECTIVE GITHUB ==="
-          if [ -z "$MY_KEY" ]; then echo "❌ ERREUR : La clé secrète est VIDE !"; else echo "✅ Clé secrète trouvée (Longueur : ${#MY_KEY} caractères)."; fi
-          echo "========================"
-
       - name: 7. Compiler et Publier (Robot Tauri)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ""
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         with:
           projectPath: "./novaly-launcher"
           tagName: ${{ github.ref_name }}
@@ -76,4 +75,3 @@ jobs:
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true
-          args: -vv --verbose
