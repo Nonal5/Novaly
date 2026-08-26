@@ -64,16 +64,16 @@ jobs:
           echo "========================"
 
       - name: 7. Compiler et Publier (Robot Tauri)
-              uses: tauri-apps/tauri-action@v0
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-                TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-              with:
-                projectPath: "./novaly-launcher"
-                tagName: ${{ github.ref_name }}
-                releaseName: "Novaly ${{ github.ref_name }}"
-                releaseDraft: false
-                prerelease: false
-                includeUpdaterJson: true
-                args: --verbose --bundles app,dmg,updater
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+        with:
+          projectPath: "./novaly-launcher"
+          tagName: ${{ github.ref_name }}
+          releaseName: "Novaly ${{ github.ref_name }}"
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true
+          args: --verbose --bundles app,dmg,updater
