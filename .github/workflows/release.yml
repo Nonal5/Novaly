@@ -60,21 +60,12 @@ jobs:
         run: npm install
         working-directory: ./novaly-launcher
 
-      - name: 7. Compiler et Publier (Robot Tauri)
-        uses: tauri-apps/tauri-action@v0
+      - name: 7. Interrogatoire de Tauri (Compilation manuelle)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_KEY_PASSWORD: ""
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
-        with:
-          projectPath: "./novaly-launcher"
-          tagName: ${{ github.ref_name }}
-          releaseName: "Novaly ${{ github.ref_name }}"
-          releaseDraft: false
-          prerelease: false
-          includeUpdaterJson: true
+        run: npx tauri build --verbose
+        working-directory: ./novaly-launcher
 
       - name: 8. Fouiller le dossier (Preuve du bug)
         if: always()
