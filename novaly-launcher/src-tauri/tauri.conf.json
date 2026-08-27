@@ -28,12 +28,12 @@
       "endpoints": [
         "https://github.com/Nonal5/Novaly/releases/latest/download/latest.json"
       ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDJCQzhDRjE2OUY5NkU0NTUKUldSVjVKYWZGcy9JSzM3b0pVNVJsS2NYcXZIbnUyMEVjUG1DdjlSZkZKR2l1ZkZrdjJqMlQ2ZG8K"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVCRkU3QzJCNTEzQzU1ODEKUldTQlZUeFJLM3orVzFBbm5tWHVwSnd3cFlFUHBGbVBERmVtQkIvYytsQWl5YnB2eUw4clJzRUYK"
     }
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["app"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
