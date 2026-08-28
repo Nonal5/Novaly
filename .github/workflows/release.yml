@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       max-parallel: 1 
       matrix:
-        platform: [macos-latest] # On garde que le Mac pour l'instant pour aller plus vite
+        platform: [macos-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
 
