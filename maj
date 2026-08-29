@@ -10,8 +10,8 @@ echo "⏳ Signature de l'archive v$VERSION en cours..."
 # 2. Signe l'archive
 SIGNATURE=$(npm run tauri -- signer sign --private-key-path ~/Desktop/secret.txt ~/Desktop/Novaly_aarch64.app.tar.gz | awk '/Public signature:/{getline; print}')
 
-# 3. Crée le fichier latest.json
-cat <<EOF > ~/Desktop/latest.json
+# 3. Crée le fichier latest.json (on le met directement dans le dossier src-tauri pour qu'il soit versionné)
+cat <<EOF > src-tauri/latest.json
 {
   "version": "v$VERSION",
   "notes": "Mise à jour v$VERSION",
@@ -25,14 +25,17 @@ cat <<EOF > ~/Desktop/latest.json
 }
 EOF
 
-echo "📤 Envoi des fichiers sur GitHub..."
-# 4. Upload directement sur la release GitHub
-gh release upload v$VERSION ~/Desktop/latest.json ~/Desktop/Novaly_aarch64.app.tar.gz.sig --clobber
+echo "📤 Envoi de l'archive sur la release GitHub..."
+gh release upload v$VERSION ~/Desktop/Novaly_aarch64.app.tar.gz ~/Desktop/Novaly_aarch64.app.tar.gz.sig --clobber
+
+echo "🔄 Publication du latest.json sur le dépôt principal..."
+cd ..
+git add novaly-launcher/src-tauri/latest.json
+git commit -m "Mise à jour du latest.json pour la v$VERSION"
+git push origin main
 
 echo "🧹 Nettoyage du Bureau..."
-# 5. Supprime les fichiers temporaires
 rm ~/Desktop/Novaly_aarch64.app.tar.gz
 rm ~/Desktop/Novaly_aarch64.app.tar.gz.sig
-rm ~/Desktop/latest.json
 
-echo "✅ Terminé ! Le bureau est propre et la mise à jour est en ligne."
+echo "✅ Tout est automatisé ! Le launcher trouvera la mise à jour en direct."

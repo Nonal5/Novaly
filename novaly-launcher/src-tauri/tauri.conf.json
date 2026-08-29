@@ -26,7 +26,7 @@
     "updater": {
       "dialog": true,
       "endpoints": [
-        "https://github.com/Nonal5/Novaly/releases/latest/download/latest.json"
+        "https://raw.githubusercontent.com/Nonal5/Novaly/main/novaly-launcher/src-tauri/latest.json"
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVCRkU3QzJCNTEzQzU1ODEKUldTQlZUeFJLM3orVzFBbm5tWHVwSnd3cFlFUHBGbVBERmVtQkIvYytsQWl5YnB2eUw4clJzRUYK"
     }
