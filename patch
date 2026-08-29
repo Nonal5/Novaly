@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "📦 Sauvegarde de TOUT le projet (Site web + Launcher)..."
+git add -A
+git commit -m "Préparation de la mise à jour globale"
+
+echo "⬆️ Incrémentation de la version..."
+cd novaly-launcher || exit
+npm version patch
+
+echo "🚀 Envoi du code et des tags vers GitHub..."
+git push origin main --tags
+
+echo "✅ Déploiement lancé ! Le robot GitHub prend le relais."

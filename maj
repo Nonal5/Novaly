@@ -1,0 +1,38 @@
+#!/bin/bash
+cd novaly-launcher || exit
+
+# 1. Lit la version
+VERSION=$(node -p "require('./package.json').version")
+DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+echo "⏳ Signature de l'archive v$VERSION en cours..."
+
+# 2. Signe l'archive
+SIGNATURE=$(npm run tauri -- signer sign --private-key-path ~/Desktop/secret.txt ~/Desktop/Novaly_aarch64.app.tar.gz | awk '/Public signature:/{getline; print}')
+
+# 3. Crée le fichier latest.json
+cat <<EOF > ~/Desktop/latest.json
+{
+  "version": "v$VERSION",
+  "notes": "Mise à jour v$VERSION",
+  "pub_date": "$DATE",
+  "platforms": {
+    "darwin-aarch64": {
+      "signature": "$SIGNATURE",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v$VERSION/Novaly_aarch64.app.tar.gz"
+    }
+  }
+}
+EOF
+
+echo "📤 Envoi des fichiers sur GitHub..."
+# 4. Upload directement sur la release GitHub
+gh release upload v$VERSION ~/Desktop/latest.json ~/Desktop/Novaly_aarch64.app.tar.gz.sig --clobber
+
+echo "🧹 Nettoyage du Bureau..."
+# 5. Supprime les fichiers temporaires
+rm ~/Desktop/Novaly_aarch64.app.tar.gz
+rm ~/Desktop/Novaly_aarch64.app.tar.gz.sig
+rm ~/Desktop/latest.json
+
+echo "✅ Terminé ! Le bureau est propre et la mise à jour est en ligne."
