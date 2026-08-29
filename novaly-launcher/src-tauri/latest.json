@@ -1,10 +1,10 @@
 {
   "version": "v1.0.59",
   "notes": "Mise à jour v1.0.59",
-  "pub_date": "2026-08-29T14:15:59Z",
+  "pub_date": "2026-08-29T14:16:23Z",
   "platforms": {
     "macos-aarch64": {
-      "signature": "",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSVjVKYWZGcy9JSzVwelFvcjg3M0YxU05BUTlZRFIrenVNTHFxb1RLSkE4YTkwZk40eEFyRitISjVpdVlkbkFZK0RJMmVUZWo2T3ZnZzk4NTV5UkNHcmt6NkhQOGVPZ3dNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg4MDEyOTg0CWZpbGU6Tm92YWx5X2FhcmNoNjQuYXBwLnRhci5negppM1VNRFlKRFg4N3JQVDZyMnpCaXlKVWEvdlZhVE1HN2hHWmNYdVJNR3F4RUVoYXdJbEtTRXRLaTlJWkQyRXpvKy9sci9iLzZrckI2a29haHRsYVlEUT09Cg==",
       "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.59/Novaly_aarch64.app.tar.gz"
     }
   }
