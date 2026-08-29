@@ -1,14 +1,22 @@
 #!/bin/bash
 
-echo "📦 Sauvegarde de TOUT le projet (Site web + Launcher)..."
-git add -A
-git commit -m "Préparation de la mise à jour globale"
-
 echo "⬆️ Incrémentation de la version..."
 cd novaly-launcher || exit
-npm version patch
+# npm met à jour la version dans les fichiers sans toucher à Git
+npm version patch --no-git-tag-version
+# Le script lit et mémorise la nouvelle version (ex: 1.0.54)
+VERSION=$(node -p "require('./package.json').version")
+
+echo "📦 Sauvegarde de TOUT le projet (Site web + Launcher)..."
+cd ..
+git add -A
+git commit -m "Mise à jour globale v$VERSION"
+
+echo "🏷️ Création du tag officiel v$VERSION..."
+# On force la création du tag manuellement pour déclencher le robot
+git tag v$VERSION
 
 echo "🚀 Envoi du code et des tags vers GitHub..."
 git push origin main --tags
 
-echo "✅ Déploiement lancé ! Le robot GitHub prend le relais."
+echo "✅ Déploiement lancé ! Le robot GitHub compile la v$VERSION."
