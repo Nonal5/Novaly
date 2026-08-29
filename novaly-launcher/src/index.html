@@ -1428,6 +1428,8 @@ window.addEventListener('DOMContentLoaded', () => {
         import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
+        import { check } from '@tauri-apps/plugin-updater';
+        import { relaunch } from '@tauri-apps/plugin-process';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
@@ -1647,7 +1649,17 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (friendsMenuContainer) friendsMenuContainer.style.display = 'none'; 
             }
         });
-
+        async function updateSilencieuse() {
+            try {
+            const update = await check();
+            if (update) {
+                await update.downloadAndInstall();
+                await relaunch(); 
+            }
+            } catch (erreur) {
+            console.error(erreur);
+            }
+        }
         // ---------------- FONCTIONS DE GESTION ----------------
 
         window.previewAvatar = function(event) {
@@ -2202,6 +2214,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('version-text').innerText = `Version du Launcher : v1.0.1`;
             }
         });
+        updateSilencieuse();
     </script>
 </body>
 </html>

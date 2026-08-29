@@ -24,7 +24,7 @@
   },
   "plugins": {
     "updater": {
-      "dialog": true,
+      "dialog": false,
       "endpoints": [
         "https://raw.githubusercontent.com/Nonal5/Novaly/main/novaly-launcher/src-tauri/latest.json"
       ],
