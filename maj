@@ -10,7 +10,7 @@ echo "⏳ Signature de l'archive v$VERSION en cours..."
 # 2. Signe l'archive
 SIGNATURE=$(npm run tauri -- signer sign --private-key-path ~/Desktop/secret.txt ~/Desktop/Novaly_aarch64.app.tar.gz | awk '/Public signature:/{getline; print}')
 
-# 3. Crée le fichier latest.json (on le met directement dans le dossier src-tauri pour qu'il soit versionné)
+# 3. Crée le fichier latest.json
 cat <<EOF > src-tauri/latest.json
 {
   "version": "v$VERSION",

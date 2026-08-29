@@ -28,7 +28,7 @@
       "endpoints": [
         "https://raw.githubusercontent.com/Nonal5/Novaly/main/novaly-launcher/src-tauri/latest.json"
       ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVCRkU3QzJCNTEzQzU1ODEKUldTQlZUeFJLM3orVzFBbm5tWHVwSnd3cFlFUHBGbVBERmVtQkIvYytsQWl5YnB2eUw4clJzRUYK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDkyNDkwMTc5RTc0QjE0N0QKUldSOUZFdm5lUUZKa3IvUCtvbFlYK0J4aGorRkJhczBXUmlJV2xjVlg0bDJodU5Tc3R4cmlxcVMK"
     }
   },
   "bundle": {
