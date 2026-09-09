@@ -2064,7 +2064,28 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('chat-input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') window.envoyerMessage(); 
         });
+        // ================= GESTION DU DEEP LINK VERS LE LAUNCHER =================
+        window.ouvrirNovaly = function(idDuJeu) {
+            // Tente d'ouvrir le launcher avec l'ID du jeu
+            const lienApp = `novaly://game/${idDuJeu}`;
+            const lienDownload = "telecharger.html"; // Ta page de téléchargement existante
+            let appOuverte = false;
 
+            // Si la fenêtre perd le focus, ça veut dire que le launcher s'est ouvert par-dessus
+            const blurHandler = () => { appOuverte = true; };
+            window.addEventListener('blur', blurHandler);
+
+            // Lancement de la requête d'ouverture
+            window.location.href = lienApp;
+
+            // Si après 2 secondes le navigateur a toujours le focus, le launcher n'est pas installé
+            setTimeout(() => {
+                window.removeEventListener('blur', blurHandler);
+                if (!appOuverte && !document.hidden) {
+                    window.location.href = lienDownload;
+                }
+            }, 2000);
+        };
     </script>
 </body>
 </html>

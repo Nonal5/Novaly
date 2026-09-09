@@ -5,18 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novaly Launcher | Just Play.</title>
 
-    <meta name="description" content="Novaly est la plateforme de jeux vidéo indépendants de nouvelle génération. Jouez instantanément sans limites à Clutch, Nolimite et bien d'autres. Just Play.">
-    <meta name="keywords" content="novaly, novaly launcher, novelestorer, jeu video, jeux gratuits, launcher jeux video, jeux PC, jeux independants, play clutch, jouer en ligne, multijoueur">
-    <meta name="author" content="Novaly Games">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://www.novastorer.fr/">
-
-    <meta property="og:title" content="Novaly Launcher | Just Play.">
-    <meta property="og:description" content="Découvrez la plateforme de jeux vidéo nouvelle génération. Performances optimales, catalogue unifié et expérience pure.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.novastorer.fr/">
-    <meta property="og:image" content="https://www.novastorer.fr/assets/banner-seo.jpg"> <meta property="og:site_name" content="Novaly">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
@@ -37,14 +25,11 @@
             flex-shrink: 0;
             z-index: 9999;
             border-bottom: 1px solid #1a1a1a;
-            
-            /* --- NOUVEAU : On arrondit le haut de la barre ! --- */
             border-radius: 11px 11px 0 0; 
         }
         .titlebar-drag-area {
             flex-grow: 1;
             height: 100%;
-            /* C'EST CETTE ZONE QUI PERMET DE DÉPLACER LA FENÊTRE */
         }
         .titlebar-controls {
             display: flex;
@@ -64,7 +49,6 @@
         .titlebar-close:hover { background: #e81123; color: white; }
 
         html, body {
-            /* Le fond de la fenêtre devient RÉELLEMENT transparent et vide */
             background-color: transparent !important; 
             margin: 0;
             padding: 0;
@@ -73,7 +57,6 @@
             overflow: hidden;
         }
 
-        /* --- NOTRE NOUVELLE BOÎTE PRINCIPALE --- */
         .app-wrapper {
             width: 100%;
             height: 100%;
@@ -83,14 +66,11 @@
             font-family: 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
-            
-            /* Les coins arrondis parfaits */
             border-radius: 12px;
             border: 1px solid #333;
             overflow: hidden;
         }
 
-        /* --- ANIMATIONS UX --- */
         @keyframes slideUpFade { 
             from { opacity: 0; transform: translateY(15px); } 
             to { opacity: 1; transform: translateY(0); } 
@@ -100,7 +80,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-/* --- EN-TÊTE HORIZONTAL --- */
         .main-header {
             height: 75px; background-color: var(--bg-header); display: flex; align-items: center;
             padding: 0 40px; border-bottom: 1px solid #222; flex-shrink: 0;
@@ -126,7 +105,6 @@
 
         .nav-item:hover, .nav-item.active { color: var(--text-main); }
         
-        /* Animation fluide du soulignement */
         .nav-item::after { 
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; 
             background-color: var(--accent-color); 
@@ -142,7 +120,6 @@
         }
         .search-bar:focus { border-color: #888; width: 250px; background-color: rgba(255,255,255,0.05); }
 
-        /* --- SÉLECTEUR DE LANGUE (FIX DRAPEAUX POUR TOUS LES NAVIGATEURS) --- */
         .lang-wrapper { position: relative; display: flex; align-items: center; }
         .lang-selector {
             width: 36px; height: 36px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center;
@@ -173,7 +150,6 @@
             flex-shrink: 0;
         }
 
-        /* --- PROFIL HEADER --- */
         .user-section { display: flex; height: 100%; align-items: center; }
         .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; padding-left: 10px; padding-right: 5px; border-radius: 8px; transition: background 0.2s;}
         .profile-trigger:hover { background: #222; }
@@ -185,14 +161,12 @@
         .online-dot { color: #4cd137; font-size: 9px; text-transform: none; letter-spacing: 0; display: flex; align-items: center; gap: 4px; }
         .online-dot.offline { color: #888; }
 
-        /* --- BOUTON AMIS --- */
         .friends-btn {
             display: flex; align-items: center; gap: 8px; background: #1a1a1a; border: 1px solid #333; 
             padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); color: white; font-weight: bold; font-size: 12px;
         }
         .friends-btn:hover { background: #2a2a2a; border-color: #777; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        /* --- MENUS DÉROULANTS --- */
         .user-dropdown {
             position: absolute; top: 110%; right: 0; background: #18181c; border: 1px solid #333;
             border-radius: 8px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.6); overflow: hidden;
@@ -207,13 +181,11 @@
         .dropdown-item.logout img { filter: invert(34%) sepia(98%) saturate(3501%) hue-rotate(333deg) brightness(101%) contrast(106%); }
         .dropdown-item.logout:hover { background: #ff475722; padding-left: 20px; }
 
-        /* --- CONTENU & VUES --- */
         .content { flex-grow: 1; padding: 40px 80px; overflow-y: auto; display: flex; flex-direction: column; scroll-behavior: smooth; }
         .page-title { margin: 0 0 30px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; display: none; }
         .view-section { display: none; flex-grow: 1; }
         .view-section.active { display: block; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* --- ANIMATION MOTION NOVALY CORRIGÉE --- */
         .motion-logo-container {
             text-align: center;
             margin-bottom: 40px;
@@ -225,10 +197,10 @@
             letter-spacing: 15px;
             text-transform: uppercase;
             margin: 0;
-            color: rgba(255, 255, 255, 0.2); /* Aspect par défaut quand la souris n'est pas là */
+            color: rgba(255, 255, 255, 0.2); 
             display: inline-block;
             user-select: none;
-            position: relative; /* Pour le pseudo-élément */
+            position: relative; 
             cursor: default;
             animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
             transition: color 0.3s ease;
@@ -239,7 +211,7 @@
             -webkit-text-fill-color: transparent;
             color: transparent;
         }
- @media (max-width: 768px) {
+        @media (max-width: 768px) {
             .novaly-motion-logo {
                 background: radial-gradient(circle 120px at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.2) 100%);
                 -webkit-background-clip: text;
@@ -250,7 +222,6 @@
             @keyframes mobileLogoAnim { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
         }
 
-        /* --- BANNIÈRE & GRILLES --- */
         .hero-banner {
             background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover;
             height: 450px; border-radius: 12px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; padding: 40px; margin-bottom: 40px;
@@ -263,7 +234,6 @@
         .btn-hero:hover { background: white; color: black; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,255,255,0.2); }
         .btn-hero:disabled { background: transparent !important; border-color: #333 !important; color: #555 !important; cursor: not-allowed; box-shadow: none; transform: none;}
 
-        /* --- TAGS JEUX --- */
         .game-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
         .tag { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
         .tag-action { background: rgba(231, 76, 60, 0.15); color: #ff6b81; border: 1px solid #ff4757; }
@@ -272,7 +242,6 @@
         .tag-soon { background: rgba(241, 196, 15, 0.15); color: #eccc68; border: 1px solid #ffa502; }
         .tag-reflexion { background: rgba(46, 204, 113, 0.15); color: #7bed9f; border: 1px solid #2ed573; }
 
-        /* --- SKELETON LOADING --- */
         .skeleton { position: relative; overflow: hidden; border-color: #222 !important; pointer-events: none; }
         .skeleton .game-cover, .skeleton .game-title, .skeleton .game-price, .skeleton .game-tags { visibility: hidden; }
         .skeleton::after {
@@ -293,7 +262,6 @@
         .game-price { background: #2a2a2a; color: #eee; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; display: inline-block; transition: 0.2s; }
         .game-card:hover .game-price { background: #333; color: white; }
 
-        /* --- PROFIL & PARAMÈTRES --- */
         .profile-layout { display: flex; gap: 40px; max-width: 1000px; margin-bottom: 60px; }
         .profile-sidebar { width: 250px; display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
         .profile-tab { padding: 12px 15px; color: var(--text-muted); cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 14px; transition: all 0.2s ease; }
@@ -319,7 +287,6 @@
         .news-card h4 { margin: 0 0 10px 0; color: white; font-size: 16px; display: flex; align-items: center; gap: 8px; }
         .news-card p { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
-        /* --- BOUTONS PLEIN ECRAN --- */
         .game-controls { position: absolute; top: 15px; left: 15px; z-index: 60; display: flex; gap: 10px; }
         .game-control-btn { 
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); color: white; border: 1px solid rgba(255,255,255,0.2); 
@@ -328,7 +295,6 @@
         .game-control-btn:hover { background: rgba(0, 0, 0, 0.9); border-color: white; transform: scale(1.05); }
         .game-control-btn.btn-quit:hover { background: rgba(231, 76, 60, 0.9); border-color: #ff4757; }
 
-        /* --- FOOTER --- */
         .site-footer { background-color: var(--bg-main); border-top: 1px solid #222; padding: 50px 0 20px 0; margin-top: auto; font-size: 13px; color: var(--text-muted); }
         .site-footer h4 { color: var(--text-main); font-size: 14px; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 0.5px; }
         .footer-downloads { margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 40px; }
@@ -344,34 +310,26 @@
         .footer-bottom { border-top: 1px solid #222; padding-top: 25px; font-size: 12px; display: flex; justify-content: space-between; }
 
         .btn-telecharger-principal {
-                background-color: #ffffff; /* Fond tout blanc */
-                color: #000000 ; /* Texte en noir */
-                padding: 5px 12px; /* Espace autour du texte pour faire un rectangle */
+                background-color: #ffffff;
+                color: #000000 ; 
+                padding: 5px 12px; 
                 font-size: 13px;
-                border-radius: 12px; /* Bords arrondis (tu peux augmenter à 15px si tu veux plus rond) */
+                border-radius: 12px; 
                 font-weight: bold;
                 text-decoration: none;
                 transition: all 0.2s ease;
-                margin-left: 5px; /* Espace avec les autres liens du menu */
+                margin-left: 5px; 
                 display: inline-block;
             }
 
-            /* Petit effet sympa quand on passe la souris dessus */
             .btn-telecharger-principal:hover {
-                background-color: #e0e0e0; /* Devient très légèrement gris au survol */
-                transform: translateY(-2px); /* Se soulève un tout petit peu */
+                background-color: #e0e0e0; 
+                transform: translateY(-2px); 
             }
-/* ========================================================= */
-        /* ================== RESPONSIVE MOBILE ==================== */
-        /* ========================================================= */
-        .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; margin-right: 10px; }
-        /* ========================================================= */
-        /* ================== RESPONSIVE MOBILE ==================== */
-        /* ========================================================= */
+
         .menu-toggle { display: none; font-size: 28px; cursor: pointer; color: white; margin-right: 10px; }
 
         @media (max-width: 1024px) {
-            /* 1. Le conteneur principal du menu (empilement vertical propre) */
             .main-header { 
                 padding: 15px; 
                 flex-direction: column; 
@@ -381,7 +339,6 @@
                 gap: 0; 
             }
             
-            /* 2. Ligne Logo + Burger */
             .header-left { 
                 width: 100%; 
                 display: flex; 
@@ -393,7 +350,6 @@
             .logo-img { margin-right: 0; margin-top: 0; }
             .menu-toggle { display: block; margin-top: 0; }
             
-            /* 3. Liens de navigation (Magasin, Bibliothèque...) */
             .nav-links { 
                 display: none; 
                 width: 100%; 
@@ -410,11 +366,10 @@
                 width: 100%; 
                 box-sizing: border-box;
                 border-bottom: 1px solid #1a1a1a;
-                justify-content: center; /* Centre le texte sur mobile */
+                justify-content: center;
             }
-            .nav-item::after { display: none; } /* Enlève la barre de survol sur mobile pour un rendu plus propre */
+            .nav-item::after { display: none; } 
             
-            /* 4. Zone droite (Recherche, Télécharger, Profil) */
             .header-right { 
                 display: none; 
                 width: 100%; 
@@ -429,7 +384,6 @@
             .lang-wrapper { display: none; width: 100%; justify-content: center; padding: 10px 0; }
             .user-section { display: none; width: 100%; justify-content: center; padding: 10px 0; }
             
-            /* Activation du menu (quand on clique sur le burger) */
             .main-header.open .nav-links, 
             .main-header.open .header-right,
             .main-header.open .lang-wrapper,
@@ -438,16 +392,14 @@
                 animation: dropDownAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
             }
             
-            /* Ajustements internes au menu */
             .search-bar { width: 100%; box-sizing: border-box; text-align: center; }
-            .search-bar:focus { width: 100%; } /* Empile que la barre dépasse quand on clique dessus */
+            .search-bar:focus { width: 100%; } 
             .lang-dropdown { top: 100%; left: 0; right: auto; width: 100%; }
             #friends-menu-container { width: 100%; justify-content: center; }
             .friends-btn { width: 100%; justify-content: center; }
             .profile-trigger { width: 100%; justify-content: center; background: #1a1a1a; padding: 12px; border-radius: 8px; border: 1px solid #333; box-sizing: border-box;}
             .user-dropdown { position: static; width: 100%; margin-top: 10px; box-shadow: none; border: 1px solid #444; box-sizing: border-box;}
             
-            /* Bouton Télécharger bien grand et centré */
             .btn-telecharger-principal {
                 width: 100%; 
                 margin-left: 0; 
@@ -458,7 +410,6 @@
                 justify-content: center;
             }
 
-            /* --- CORRECTIONS DU RESTE DE LA PAGE POUR EMPÊCHER LE ZOOM/SLIDE --- */
             .content { padding: 15px; box-sizing: border-box; width: 100%; overflow-x: hidden; }
             .motion-logo-container { padding: 10px 0; margin-bottom: 20px; }
             .novaly-motion-logo { font-size: 42px; letter-spacing: 8px; width: 100%; }
@@ -500,8 +451,6 @@
                 <div class="nav-item" id="nav-online" data-i18n="navOnline" onclick="navigateTo('#jeuxonline', 'online')">Jeux rapide</div>
                 <div class="nav-item" id="nav-library" data-i18n="navLibrary" onclick="navigateTo('#bibliotheque', 'library')">Bibliothèque</div>
                 <div class="nav-item" id="nav-about" data-i18n="navAbout" onclick="navigateTo('#apropos', 'about')">À propos</div>
-                
-                <!-- Le nouveau bouton Télécharger ! -->
             </nav>
         </div>
 
@@ -700,7 +649,25 @@
                 <p>Les jeux que vous achèterez apparaîtront ici.</p>
             </div>
         </div>
-
+        <div id="view-game-detail" class="view-section">
+            <button class="btn" style="background: transparent; border: 1px solid #444; color: white; margin-bottom: 20px;" onclick="navigateTo('#magasin', 'store')">← Retour au magasin</button>
+            
+            <div class="hero-banner" id="detail-banner" style="height: 350px; justify-content: flex-end; align-items: flex-start; text-align: left; padding: 40px;">
+                <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); width: 100%; max-width: 500px;">
+                    <h1 id="detail-title" style="margin: 0 0 10px; font-size: 32px;">Titre du jeu</h1>
+                    <p id="detail-desc" style="font-size: 14px; color: #ccc; margin-bottom: 20px;">Description du jeu ici...</p>
+                    <div id="detail-action-zone">
+                        <!-- Le bouton (Acheter / Télécharger / Jouer) s'affichera ici -->
+                    </div>
+                </div>
+            </div>
+            
+            <h2 style="font-size: 18px; margin-bottom: 20px;">Médias & Teasers</h2>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="height: 200px; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #555;">[ Espace Vidéo Teaser ]</div>
+                <div style="height: 200px; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #555;">[ Espace Capture d'écran ]</div>
+            </div>
+        </div>
         <div id="view-community" class="view-section">
             <div class="generic-view-content" style="background: transparent; text-align: left; padding: 0;">
                 <h2 data-i18n="communityTitle" style="color: white; margin-bottom: 10px;">Communauté Novaly</h2>
@@ -1034,7 +1001,7 @@
     </div>
 </div>
     </main>
-
+</div>
     <script>
         // 1. GESTION DU PLEIN ÉCRAN
         window.toggleFullscreen = function() {
@@ -1050,7 +1017,6 @@
             }
         };
 
-        // 2. RETRAIT DE L'EFFET SKELETON APRÈS 1.5 SECONDES
 // 2. RETRAIT DE L'EFFET SKELETON ET CHARGEMENT DE LA LANGUE
 window.addEventListener('DOMContentLoaded', () => {
     // Retrait du skeleton
@@ -1365,7 +1331,7 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('novaly-alert').style.display = 'flex';
         };
 
-// ================= GESTION DE LA MISE À JOUR =================
+        // ================= GESTION DE LA MISE À JOUR =================
         async function verifierMiseAJour() {
             try {
                 // On récupère uniquement l'outil de mise à jour
@@ -1422,14 +1388,12 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
     </script>
-    
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
-        import { check } from '@tauri-apps/plugin-updater';
-        import { relaunch } from '@tauri-apps/plugin-process';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
@@ -1450,7 +1414,6 @@ window.addEventListener('DOMContentLoaded', () => {
         window.currentAvatarDataUrl = null;
         window.mesJeux = [];
 
-        // --- COMPTEURS GLOBAUX ---
         window.unreadChatsCount = 0;
         window.pendingReqCount = 0;
         window.updateGlobalBadge = function() {
@@ -1503,16 +1466,9 @@ window.addEventListener('DOMContentLoaded', () => {
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         window.mesJeux = data.jeuxPossedes || [];
-                        window.mesJeux.forEach(gameId => {
-                            let btn = document.getElementById('btn-add-' + gameId);
-                            if(btn) {
-                                btn.innerText = "Dans la bibliothèque";
-                                btn.disabled = true;
-                                btn.style.background = "#2a2a2a";
-                                btn.style.color = "#888";
-                            }
-                        });
+                        
                         if(window.actualiserBibliotheque) window.actualiserBibliotheque();
+                        if(window.chargerMagasin) window.chargerMagasin(); // CHARGE LE MAGASIN ICI
                         
                         if (data.avatarUrl) {
                             document.getElementById('nav-avatar').innerText = "";
@@ -1596,7 +1552,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     if(listEl) listEl.innerHTML = html;
                 });
 
-                // CHARGEMENT ET TRI DES AMIS (EN LIGNE / HORS LIGNE)
+                // CHARGEMENT ET TRI DES AMIS
                 const friendsRef = collection(db, "users", user.uid, "friends");
                 onSnapshot(friendsRef, async (snapshot) => {
                     const onlineList = document.getElementById('friends-online-list');
@@ -1649,19 +1605,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (friendsMenuContainer) friendsMenuContainer.style.display = 'none'; 
             }
         });
-        async function updateSilencieuse() {
-            try {
-            const update = await check();
-            if (update) {
-                await update.downloadAndInstall();
-                await relaunch(); 
-            }
-            } catch (erreur) {
-            console.error(erreur);
-            }
-        }
-        // ---------------- FONCTIONS DE GESTION ----------------
 
+        // ---------------- FONCTIONS DE GESTION ----------------
         window.previewAvatar = function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -1761,7 +1706,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     pseudo: myPseudo, 
                     addedAt: serverTimestamp() 
                 });
-                // Alerte supprimée pour éviter le pop-up indésirable
             } catch (error) {
                 console.error("Erreur acceptation:", error);
             }
@@ -1981,13 +1925,13 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // ================= GESTION DES JEUX ONLINE =================
+        // ================= GESTION DES JEUX ONLINE ET BIBLIOTHEQUE =================
         window.currentGameSelected = "";
 
         window.lancerJeu = function(jeuId) {
             window.currentGameSelected = jeuId;
             const titles = { 'imposteur': 'The Imposteur', 'nolimite': 'Nolimite' };
-            document.getElementById('lobby-game-title').innerText = titles[jeuId];
+            document.getElementById('lobby-game-title').innerText = titles[jeuId] || "Jeu";
             document.getElementById('game-lobby-modal').style.display = 'flex';
             document.getElementById('private-match-section').style.display = 'none';
             document.getElementById('private-room-code').value = '';
@@ -2047,10 +1991,39 @@ window.addEventListener('DOMContentLoaded', () => {
             if(window.actualiserBibliotheque) window.actualiserBibliotheque();
         };
 
-        window.actualiserBibliotheque = function() {
+        // ================= GESTION DU MAGASIN DYNAMIQUE =================
+        window.chargerMagasin = async function() {
+            const grid = document.getElementById('store-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = ''; 
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "games"));
+                
+                querySnapshot.forEach((docSnap) => {
+                    const gameData = docSnap.data();
+                    const gameId = docSnap.id;
+
+                    grid.innerHTML += `
+                        <div class="game-card" onclick="afficherPageJeu('${gameId}')">
+                            <div class="game-cover" style="background: url('${gameData.coverUrl}') center/cover; background-color: #222;"></div>
+                            <div class="game-tags"><span class="tag tag-action">Nouveau</span></div>
+                            <div class="game-title">${gameData.titre}</div>
+                            <button class="btn" style="width:100%; margin-top:10px; background: #ffffff; color: #000;">Voir la page du jeu</button>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("Erreur lors du chargement du magasin:", error);
+            }
+        };
+
+        window.actualiserBibliotheque = async function() {
             const biblioView = document.getElementById('view-library');
             if (!biblioView) return;
-            if (window.mesJeux.length === 0) {
+
+            if (!window.mesJeux || window.mesJeux.length === 0) {
                 biblioView.innerHTML = `
                     <div class="generic-view-content">
                         <h2>Votre bibliothèque est vide</h2>
@@ -2060,22 +2033,45 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             let html = `<h2 style="font-size: 18px; margin-bottom: 20px;">Vos Jeux</h2><div class="grid">`;
+            
             if (window.mesJeux.includes('imposteur')) {
                 html += `<div class="game-card" onclick="lancerJeu('imposteur')">
                             <div class="game-cover" style="background: linear-gradient(135deg, #2c3e50, #000); display: flex; align-items: center; justify-content: center;">
                                 <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">
                             </div>
                             <div class="game-title">The Imposteur</div>
-                            <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
+                            <div class="game-price" style="background:#4cd137; color:#000;">Jouer</div>
                          </div>`;
             }
+            
             if (window.mesJeux.includes('nolimite')) {
                 html += `<div class="game-card" onclick="lancerJeu('nolimite')">
                             <div class="game-cover" style="background: url('cover-nolimite.png') center/cover; display: flex; align-items: center; justify-content: center;"></div>
                             <div class="game-title">Nolimite</div>
-                            <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
+                            <div class="game-price" style="background:#4cd137; color:#000;">Jouer</div>
                          </div>`;
             }
+
+            // Affichage des jeux du Magasin dans la bibliothèque
+// Affichage des jeux du Magasin dans la bibliothèque
+            for (let gameId of window.mesJeux) {
+                if (gameId !== 'imposteur' && gameId !== 'nolimite') {
+                    try {
+                        const gameRef = doc(db, "games", gameId);
+                        const gameSnap = await getDoc(gameRef);
+                        if (gameSnap.exists()) {
+                            const gameData = gameSnap.data();
+                            html += `
+                            <div class="game-card" onclick="afficherPageJeu('${gameId}')">
+                                <div class="game-cover" style="background: url('${gameData.coverUrl}') center/cover; background-color: #222;"></div>
+                                <div class="game-title">${gameData.titre}</div>
+                                <button class="btn" style="width:100%; margin-top:10px; background: #ffffff; color: #000;">Voir la page du jeu</button>
+                            </div>`;
+                        }
+                    } catch(e) {}
+                }
+            }
+
             html += `</div>`;
             biblioView.innerHTML = html;
         };
@@ -2189,32 +2185,121 @@ window.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') window.envoyerMessage(); 
         });
 
-// ================= CONTRÔLES DE LA FENÊTRE =================
-        const appWindow = window.__TAURI__.window.getCurrentWindow();
+// ================= SYSTEME EPIC GAMES : PAGE JEU ET ETATS =================
+        window.acheterJeu = async function(gameId) {
+            if (!auth.currentUser) return afficherAlerte("Veuillez vous connecter.");
+            window.mesJeux.push(gameId);
+            await setDoc(doc(db, "users", auth.currentUser.uid), { jeuxPossedes: window.mesJeux }, { merge: true });
+            afficherAlerte("Jeu ajouté à votre bibliothèque !");
+            window.afficherPageJeu(gameId); // Recharge la page (passera en mode Télécharger)
+        };
 
-        document.getElementById('titlebar-minimize').addEventListener('click', () => {
-            appWindow.minimize();
-        });
-        
-        document.getElementById('titlebar-maximize').addEventListener('click', () => {
-            appWindow.toggleMaximize();
-        });
-        
-        document.getElementById('titlebar-close').addEventListener('click', () => {
-            appWindow.close();
-        });
+// 1. Ouvrir la page du jeu
+        window.afficherPageJeu = async function(gameId) {
+            navigateTo('#jeu', 'game-detail');
+            document.getElementById('detail-title').innerText = "Chargement...";
+            document.getElementById('detail-action-zone').innerHTML = `<button class="btn" disabled>Patientez...</button>`;
 
-        // Affichage dynamique de la version corrigé
-        window.addEventListener('DOMContentLoaded', async () => {
-            if (window.__TAURI__) {
-                const { getVersion } = window.__TAURI__.app;
-                const version = await getVersion();
-                document.getElementById('version-text').innerText = `Version du Launcher : v${version}`;
-            } else {
-                document.getElementById('version-text').innerText = `Version du Launcher : v1.0.1`;
+            try {
+                const gameSnap = await getDoc(doc(db, "games", gameId));
+                if (!gameSnap.exists()) {
+                    document.getElementById('detail-action-zone').innerHTML = `<button class="btn" disabled>Jeu introuvable</button>`;
+                    return;
+                }
+                const gameData = gameSnap.data();
+
+                document.getElementById('detail-title').innerText = gameData.titre;
+                document.getElementById('detail-desc').innerText = "Un jeu incroyable disponible sur Novaly."; 
+                document.getElementById('detail-banner').style.background = `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.9)), url('${gameData.coverUrl}') center/cover`;
+
+                const possede = window.mesJeux && window.mesJeux.includes(gameId);
+                const zoneAction = document.getElementById('detail-action-zone');
+
+                if (!possede) {
+                    // ACHETER
+                    zoneAction.innerHTML = `<button class="btn" style="background: #ffffff; color: #000; width: 100%; font-size: 16px; padding: 15px;" onclick="acheterJeu('${gameId}')">Obtenir (Gratuit)</button>`;
+                } else {
+                    // VÉRIFIER SI INSTALLÉ
+                    const { exists } = window.__TAURI__.fs;
+                    const savedPath = localStorage.getItem('install_path_' + gameId);
+                    let estInstalle = false;
+                    
+                    if (savedPath) {
+                        estInstalle = await exists(savedPath);
+                    }
+
+                    if (!estInstalle) {
+                        // TÉLÉCHARGER
+                        zoneAction.innerHTML = `<button class="btn" style="background: #0984e3; color: white; width: 100%; font-size: 16px; padding: 15px;" onclick="telechargerJeu('${gameId}')">Télécharger</button>`;
+                    } else {
+                        // JOUER
+                        const { join } = window.__TAURI__.path;
+                        const cheminExecutable = await join(savedPath, gameData.executable);
+                        zoneAction.innerHTML = `<button class="btn" style="background: #4cd137; color: black; width: 100%; font-size: 16px; padding: 15px;" onclick="lancerJeuInstalle('${cheminExecutable}')">► Jouer</button>`;
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('detail-action-zone').innerHTML = `<button class="btn" style="background: #ff4757; color: white;">Erreur (voir console)</button>`;
             }
-        });
-        updateSilencieuse();
+        };
+
+// 3. Fonction de Téléchargement blindée contre l'erreur d'options
+        window.telechargerJeu = async function(gameId) {
+            try {
+                const selectedFolder = await window.__TAURI__.core.invoke('plugin:dialog|open', {
+                    directory: true,
+                    multiple: false,
+                    title: "Choisissez le dossier d'installation de Novaly"
+                });
+
+                if (!selectedFolder) return;
+
+                const zoneAction = document.getElementById('detail-action-zone');
+                zoneAction.innerHTML = `<button class="btn" disabled style="background: #eccc68; color: black; width: 100%; font-size: 16px; padding: 15px;">Téléchargement en cours...</button>`;
+
+                const gameData = (await getDoc(doc(db, "games", gameId))).data();
+                
+                const { join } = window.__TAURI__.path;
+                const { mkdir, remove } = window.__TAURI__.fs;
+                const { Command } = window.__TAURI__.shell;
+
+                const dossierDuJeu = await join(selectedFolder, gameId);
+                const cheminZip = await join(selectedFolder, `${gameId}.zip`);
+
+                await mkdir(dossierDuJeu, { recursive: true });
+
+                // Téléchargement via curl AVEC les options requises
+                const curlCmd = Command.create('curl', ['-L', '-o', cheminZip, gameData.downloadUrl_mac], { options: {} });
+                await curlCmd.execute();
+
+                zoneAction.innerHTML = `<button class="btn" disabled style="background: #eccc68; color: black; width: 100%; font-size: 16px; padding: 15px;">Extraction des fichiers...</button>`;
+
+                // Extraction via unzip AVEC les options requises
+                const unzipCmd = Command.create('unzip', ['-o', cheminZip, '-d', dossierDuJeu], { options: {} });
+                await unzipCmd.execute();
+
+                try { await remove(cheminZip); } catch(e) {}
+
+                localStorage.setItem('install_path_' + gameId, dossierDuJeu);
+                window.afficherPageJeu(gameId);
+
+            } catch (err) {
+                console.error("Erreur de téléchargement :", err);
+                document.getElementById('detail-action-zone').innerHTML = `<button class="btn" style="background: #ff4757; color: white; width: 100%; font-size: 16px; padding: 15px;" onclick="telechargerJeu('${gameId}')">Erreur, réessayer</button>`;
+            }
+        };
+        // 4. Fonction Jouer
+// 4. Fonction Jouer ultra-propre (Utilise uniquement l'opener natif Tauri v2)
+        window.lancerJeuInstalle = async function(cheminExec) {
+            try {
+                // Appel direct au plugin opener officiel de Tauri v2
+                await window.__TAURI__.core.invoke('plugin:opener|open_path', { path: cheminExec });
+            } catch(e) {
+                console.error("Erreur de lancement :", e);
+                afficherAlerte("Impossible de lancer le jeu. Vérifiez que le fichier existe.");
+            }
+        };
     </script>
 </body>
 </html>

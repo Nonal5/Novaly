@@ -22,7 +22,10 @@
       "csp": null
     }
   },
-  "plugins": {
+"plugins": {
+    "deep-link": {
+      "schemes": ["novaly"]
+    },
     "updater": {
       "dialog": false,
       "endpoints": [

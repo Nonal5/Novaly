@@ -1,0 +1,32 @@
+name: Annonce Discord Novaly-Store
+on:
+  release:
+    types: [published]
+
+jobs:
+envoyer-sur-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send embed message with logo to Discord
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          COMMENTAIRE="${{ github.event.release.name }}"
+          
+          # On crée un objet JSON sophistiqué (Embed) avec une miniature (ton logo) et un lien cliquable
+          PAYLOAD=$(jq -n \
+            --arg title "🚀 Novaly $VERSION is available!" \
+            --arg desc "$COMMENTAIRE now !\n\n👉 [Joue dès maintenant sur le site](https://novaly-store.fr)" \
+            --arg logo "https://firebasestorage.googleapis.com/v0/b/novaly-a80f7.firebasestorage.app/o/logo1.png?alt=media&token=217eb083-ea50-4c6e-806a-5c6e6b5d429a" \
+            '{
+              embeds: [{
+                title: $title,
+                description: $desc,
+                color: 16711680,
+                thumbnail: { url: $logo }
+              }]
+            }')
+
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "$PAYLOAD" \
+          ${{ secrets.DISCORD_WEBHOOK }}
