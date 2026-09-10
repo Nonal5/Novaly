@@ -1,11 +1,11 @@
 {
-  "version": "v1.0.74",
-  "notes": "Mise à jour v1.0.74",
-  "pub_date": "2026-09-10T11:05:06Z",
+  "version": "v1.0.76",
+  "notes": "Mise à jour v1.0.76",
+  "pub_date": "2026-09-10T11:40:44Z",
   "platforms": {
     "darwin-aarch64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTUtCNjduTWFpT3lOc2VTREZidE5TVCtoUHk3UzZBTXQxZFJXb0srenVaTlJUbGk4NUd2MnpTK2JmZk9kUWxCY1A5RW1tcEVjU21rVXNVdGdPbzVObU0vbGVVemRDREFBPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg5MDM4MzA5CWZpbGU6Tm92YWx5X2FhcmNoNjQuYXBwLnRhci5negoxZ2w3NXJXa0ZCRFhDM1VCTDU1MEtqR1VLcXVDZkNHQkQ4MzF2SHg1T2tqQVhRVnp5NUxNbGhObnFxa3cwYnZsMzhpcHk2VDZVelBybXo4R2pkTERBdz09Cg==",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.74/Novaly_aarch64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSTUtCNjduTWFpT3ppMjFXUkhyOFpKNDBQTHBzY0lLOGNabVR5Vyt0WDU2Kzc3Z1Z6c2RwRHQ0Z2hobDdWZnBiaWYxUEIwUXZjRkhYYkhoaURydWhEUThyNk9FcWcwNGdvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzg5MDQwNDQ4CWZpbGU6Tm92YWx5X2FhcmNoNjQuYXBwLnRhci5negpRdFNaaFdQUGN4Q2tpSDlEZ1YrZS91VENGdUFWdGJjcEdSdUs2ZndaMFJKbENkc2tNdStVb3dwWWY3NDRWandYdkVIWm16WlZGM1RQUTllTzhMSEpEZz09Cg==",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.76/Novaly_aarch64.app.tar.gz"
     }
   }
 }
