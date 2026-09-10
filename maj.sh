@@ -6,8 +6,7 @@ VERSION=$(node -p "require('./package.json').version")
 DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 echo "⏳ Signature de l'archive v$VERSION en cours..."
-
-# 2. Signe l'archive
+# 2. Signe l'archive présente sur le bureau
 SIGNATURE=$(npm run tauri -- signer sign --private-key-path ~/Desktop/secret.txt ~/Desktop/Novaly_aarch64.app.tar.gz | awk '/Public signature:/{getline; print}')
 
 # 3. Crée le fichier latest.json
@@ -25,17 +24,18 @@ cat <<EOF > src-tauri/latest.json
 }
 EOF
 
-echo "📤 Envoi de l'archive sur la release GitHub..."
+echo "📤 Upload de l'archive sur la release GitHub..."
+# Envoie les fichiers dans la release qui a été créée par patch.sh
 gh release upload v$VERSION ~/Desktop/Novaly_aarch64.app.tar.gz ~/Desktop/Novaly_aarch64.app.tar.gz.sig --clobber
 
-echo "🔄 Publication du latest.json sur le dépôt principal..."
+echo "🔄 Publication du latest.json sur le dépôt principal (Déclenche les mises à jour auto)..."
 cd ..
 git add novaly-launcher/src-tauri/latest.json
-git commit -m "Mise à jour du latest.json pour la v$VERSION"
+git commit -m "Déploiement du patch auto-updater v$VERSION"
 git push origin main
 
 echo "🧹 Nettoyage du Bureau..."
-rm ~/Desktop/Novaly_aarch64.app.tar.gz
-rm ~/Desktop/Novaly_aarch64.app.tar.gz.sig
+rm -f ~/Desktop/Novaly_aarch64.app.tar.gz
+rm -f ~/Desktop/Novaly_aarch64.app.tar.gz.sig
 
-echo "✅ Tout est automatisé ! Le launcher trouvera la mise à jour en direct."
+echo "✅ TOUT EST FINI ! Les joueurs recevront la mise à jour au prochain lancement du launcher."
