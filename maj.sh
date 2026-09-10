@@ -24,9 +24,12 @@ cat <<EOF > src-tauri/latest.json
 }
 EOF
 
-echo "📤 Upload de l'archive sur la release GitHub..."
-# Envoie les fichiers dans la release qui a été créée par patch.sh
-gh release upload v$VERSION ~/Desktop/Novaly_aarch64.app.tar.gz ~/Desktop/Novaly_aarch64.app.tar.gz.sig --clobber
+echo "💬 Préparation de l'annonce Discord..."
+read -p "Titre de la mise à jour (pour l'annonce Discord) : " COMMENTAIRE
+
+echo "📤 Création de la Release GitHub et Upload des fichiers (Déclenche Discord !)..."
+# Crée la release ET attache les fichiers en même temps
+gh release create v$VERSION ~/Desktop/Novaly_aarch64.app.tar.gz ~/Desktop/Novaly_aarch64.app.tar.gz.sig --title "$COMMENTAIRE" --notes "Mise à jour automatique v$VERSION"
 
 echo "🔄 Publication du latest.json sur le dépôt principal (Déclenche les mises à jour auto)..."
 cd ..

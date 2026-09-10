@@ -6,7 +6,8 @@ npm version patch --no-git-tag-version
 VERSION=$(node -p "require('./package.json').version")
 
 echo "🔨 Compilation de Tauri pour générer le .app..."
-npm run tauri build
+# Le paramètre --bundles app force le Mac à ignorer le DMG sans bloquer GitHub
+npm run tauri build -- --bundles app
 
 echo "📦 Compression manuelle du .app en .tar.gz pour l'updater..."
 cd src-tauri/target/release/bundle/macos/
@@ -24,12 +25,6 @@ git tag v$VERSION
 
 echo "🚀 Envoi du code et des tags vers GitHub..."
 git push origin main --tags
-
-echo "💬 Préparation de l'annonce Discord..."
-read -p "Titre de la mise à jour (pour l'annonce Discord) : " COMMENTAIRE
-
-echo "🎉 Création de la Release sur GitHub..."
-gh release create v$VERSION --title "$COMMENTAIRE" --notes "Mise à jour automatique v$VERSION"
 
 echo "✅ Fichier patch terminé ! L'archive est bien sur ton Bureau."
 echo "👉 Tu peux maintenant lancer ./maj.sh"
