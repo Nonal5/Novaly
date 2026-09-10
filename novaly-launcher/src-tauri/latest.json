@@ -1,11 +1,11 @@
 {
-  "version": "v1.0.63",
-  "notes": "Mise à jour v1.0.63",
-  "pub_date": "2026-09-10T06:15:56Z",
+  "version": "v1.0.64",
+  "notes": "Mise à jour v1.0.64",
+  "pub_date": "2026-09-10T09:06:47Z",
   "platforms": {
     "darwin-aarch64": {
       "signature": "",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.63/Novaly_aarch64.app.tar.gz"
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.64/Novaly_aarch64.app.tar.gz"
     }
   }
 }
