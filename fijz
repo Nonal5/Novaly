@@ -1,0 +1,9 @@
+SELECT
+    formules.id,
+    formules.prestation_id AS pt_id,
+    ressources.id AS resouce_id,
+    formules.calcul AS calc_expression,
+    questions.prestation_id AS question_ressources_id
+FROM formules
+LEFT JOIN ressources ON formules.ressource = ressources.nom
+LEFT JOIN questions ON formules.prestation_id = question_prestation_id;
