@@ -20,7 +20,7 @@ echo "🚀 Envoi du code et des tags vers GitHub..."
 git push origin main --tags
 
 echo "🚚 Déplacement du tar.gz sur le Bureau..."
-cp cp novaly-launcher/src-tauri/target/release/bundle/macos/*.tar.gz ~/Desktop/Novaly_aarch64.app.tar.gz
+cp novaly-launcher/src-tauri/target/release/bundle/macos/*.tar.gz ~/Desktop/Novaly_aarch64.app.tar.gz
 echo "💬 Préparation de l'annonce Discord..."
 read -p "Titre de la mise à jour (pour l'annonce Discord) : " COMMENTAIRE
 
