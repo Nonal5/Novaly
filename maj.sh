@@ -27,10 +27,9 @@ EOF
 echo "💬 Préparation de l'annonce Discord..."
 read -p "Titre de la mise à jour (pour l'annonce Discord) : " COMMENTAIRE
 
-echo "📤 Création de la Release GitHub et Upload des fichiers (Déclenche Discord !)..."
-# Crée la release ET attache les fichiers en même temps
-gh release create v$VERSION ~/Desktop/Novaly_aarch64.app.tar.gz ~/Desktop/Novaly_aarch64.app.tar.gz.sig --title "$COMMENTAIRE" --notes "Mise à jour automatique v$VERSION"
 
+echo "📤 Création de la Release GitHub et Upload des fichiers (Déclenche Discord !)..."
+gh release create v$VERSION ~/Desktop/Novaly_aarch64.app.tar.gz ~/Desktop/Novaly_aarch64.app.tar.gz.sig --title "$COMMENTAIRE" --notes "Mise à jour automatique v$VERSION" --draft=false
 echo "🔄 Publication du latest.json sur le dépôt principal (Déclenche les mises à jour auto)..."
 cd ..
 git add novaly-launcher/src-tauri/latest.json
