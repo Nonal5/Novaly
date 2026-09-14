@@ -1332,29 +1332,21 @@ window.addEventListener('DOMContentLoaded', () => {
         };
 
         // ================= GESTION DE LA MISE À JOUR =================
-        async function verifierMiseAJour() {
-            try {
-                // On récupère uniquement l'outil de mise à jour
-                const check = window.__TAURI__.updater.check;
-
-                const update = await check();
-                
-                if (update) {
-                    console.log(`Mise à jour v${update.version} trouvée !`);
-                    
-                    // Télécharge et installe en arrière-plan
-                    await update.downloadAndInstall();
-                    
-                    // Affiche ton beau pop-up personnalisé pour prévenir le joueur !
-                    afficherAlerte("Mise à jour installée avec succès ! Veuillez fermer et relancer Novaly pour l'appliquer.");
-                    
-                } else {
-                    console.log("Le launcher est à jour.");
-                }
-            } catch (erreur) {
-                console.error("Erreur lors de la vérification :", erreur);
-            }
+async function verifierMiseAJour() {
+    try {
+        const { check } = window.__TAURI__.updater;
+        const update = await check();
+        if (update) {
+            alert("Mise à jour dispo : v" + update.version);
+            await update.downloadAndInstall();
+        } else {
+            alert("Aucune mise à jour détectée par le launcher.");
         }
+    } catch (error) {
+        alert("ERREUR UPDATER : " + JSON.stringify(error));
+    }
+}
+verifierMiseAJour();
 
         // Lancer la vérification quand l'application démarre
         window.addEventListener('DOMContentLoaded', () => {
