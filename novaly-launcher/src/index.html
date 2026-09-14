@@ -705,8 +705,7 @@
                 <div style="background: #121212; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #333;">
                     <p style="margin: 0; font-size: 14px; color: var(--text-main); font-weight: 600;" data-i18n="aboutVersion" id="version-text">Version du Launcher : Chargement...</p>                    <p style="margin: 5px 0 0 0; font-size: 13px;" data-i18n="aboutStatus">Tous les systèmes sont opérationnels.</p>
                 </div>
-                <button class="btn" data-i18n="aboutBtn">Vérifier les mises à jour</button>
-            </div>
+                <button class="btn" id="btn-verifier-maj" data-i18n="aboutBtn">Vérifier les mises à jour</button>            </div>
         </div>
 
         <div id="view-cart" class="view-section">
@@ -1332,22 +1331,36 @@ window.addEventListener('DOMContentLoaded', () => {
         };
 
         // ================= GESTION DE LA MISE À JOUR =================
-async function verifierMiseAJour() {
+async function verifierMiseAJourSilencieuse() {
     try {
         const { check } = window.__TAURI__.updater;
         const update = await check();
         if (update) {
-            alert("Mise à jour dispo : v" + update.version);
             await update.downloadAndInstall();
-        } else {
-            alert("Aucune mise à jour détectée par le launcher.");
+            // Optionnel : demander un redémarrage propre si Tauri ne le fait pas automatiquement
         }
     } catch (error) {
-        alert("ERREUR UPDATER : " + JSON.stringify(error));
+        console.error("Erreur silencieuse de l'updater :", error);
     }
 }
-verifierMiseAJour();
-
+// Appel discret au démarrage
+verifierMiseAJourSilencieuse();
+async function verifierMiseAJourManuelle() {
+    try {
+        const { check } = window.__TAURI__.updater;
+        const update = await check();
+        if (update) {
+            if(confirm("Une mise à jour (v" + update.version + ") est disponible. L'installer maintenant ?")) {
+                await update.downloadAndInstall();
+            }
+        } else {
+            alert("Ton launcher est déjà à jour !");
+        }
+    } catch (error) {
+        alert("Impossible de vérifier les mises à jour pour le moment.");
+    }
+}
+document.getElementById("btn-verifier-maj").addEventListener("click", verifierMiseAJourManuelle);
         // Lancer la vérification quand l'application démarre
         window.addEventListener('DOMContentLoaded', () => {
             // Un petit délai (optionnel) pour laisser l'interface charger d'abord
