@@ -1468,7 +1468,6 @@ window.addEventListener('DOMContentLoaded', () => {
                         window.mesJeux = data.jeuxPossedes || [];
                         
                         if(window.actualiserBibliotheque) window.actualiserBibliotheque();
-                        if(window.chargerMagasin) window.chargerMagasin(); // CHARGE LE MAGASIN ICI
                         
                         if (data.avatarUrl) {
                             document.getElementById('nav-avatar').innerText = "";
@@ -2018,6 +2017,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 console.error("Erreur lors du chargement du magasin:", error);
             }
         };
+
+        // Force le chargement du catalogue dès que l'interface est prête
+        window.addEventListener('DOMContentLoaded', () => {
+            if(window.chargerMagasin) window.chargerMagasin();
+        });
 
         window.actualiserBibliotheque = async function() {
             const biblioView = document.getElementById('view-library');
