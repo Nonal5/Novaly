@@ -1990,33 +1990,38 @@ window.addEventListener('DOMContentLoaded', () => {
             if(window.actualiserBibliotheque) window.actualiserBibliotheque();
         };
 
-        // ================= GESTION DU MAGASIN DYNAMIQUE =================
-        window.chargerMagasin = async function() {
-            const grid = document.getElementById('store-grid');
-            if (!grid) return;
-            
-            grid.innerHTML = ''; 
+window.chargerMagasin = async function() {
+    const grid = document.getElementById('store-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '<p style="color: #fff; font-size: 14px;">Chargement des jeux depuis Firebase...</p>';
 
-            try {
-                const querySnapshot = await getDocs(collection(db, "games"));
-                
-                querySnapshot.forEach((docSnap) => {
-                    const gameData = docSnap.data();
-                    const gameId = docSnap.id;
+    try {
+        const querySnapshot = await getDocs(collection(db, "games"));
+        
+        if (querySnapshot.empty) {
+            grid.innerHTML = '<p style="color: #ff4757; font-size: 14px;">Aucun jeu trouvé dans la collection "games" de Firebase.</p>';
+            return;
+        }
 
-                    grid.innerHTML += `
-                        <div class="game-card" onclick="afficherPageJeu('${gameId}')">
-                            <div class="game-cover" style="background: url('${gameData.coverUrl}') center/cover; background-color: #222;"></div>
-                            <div class="game-tags"><span class="tag tag-action">Nouveau</span></div>
-                            <div class="game-title">${gameData.titre}</div>
-                            <button class="btn" style="width:100%; margin-top:10px; background: #ffffff; color: #000;">Voir la page du jeu</button>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error("Erreur lors du chargement du magasin:", error);
-            }
-        };
+        grid.innerHTML = ''; // On vide pour mettre les vrais jeux
+        querySnapshot.forEach((docSnap) => {
+            const gameData = docSnap.data();
+            const gameId = docSnap.id;
+
+            grid.innerHTML += `
+                <div class="game-card" onclick="afficherPageJeu('${gameId}')">
+                    <div class="game-cover" style="background: url('${gameData.coverUrl}') center/cover; background-color: #222;"></div>
+                    <div class="game-tags"><span class="tag tag-action">Nouveau</span></div>
+                    <div class="game-title">${gameData.titre}</div>
+                    <button class="btn" style="width:100%; margin-top:10px; background: #ffffff; color: #000;">Voir la page du jeu</button>
+                </div>
+            `;
+        });
+    } catch (error) {
+        grid.innerHTML = `<p style="color: #ff4757; font-size: 14px;">Erreur Firebase : ${error.message}</p>`;
+    }
+};
 
         // Force le chargement du catalogue dès que l'interface est prête
         window.addEventListener('DOMContentLoaded', () => {
