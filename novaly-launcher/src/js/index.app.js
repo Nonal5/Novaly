@@ -24,8 +24,9 @@
         const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         // Argument sûr pour un attribut onclick="fonction(...)"
         const jsArg = (v) => esc(JSON.stringify(String(v ?? '')));
-        // URL sûre pour un url('...') CSS
-        const cssUrl = (v) => esc(String(v ?? '').replace(/['"()\\\s]/g, c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')));
+        // URL sûre pour un url('...') CSS : version brute pour element.style, version échappée pour du HTML
+        const cssUrlBrut = (v) => String(v ?? '').replace(/['"()\\\s]/g, c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'));
+        const cssUrl = (v) => esc(cssUrlBrut(v));
 
         // Données personnelles : jamais dans users/{uid} (lisible par tous les joueurs connectés),
         // mais dans users/{uid}/private/profil (lisible uniquement par le propriétaire).
@@ -94,6 +95,15 @@
 
                     // 2. On met à jour la liste globale
                     window.mesJeux = data.jeuxPossedes || [];
+                    window.mesJeux.forEach(gameId => {
+                        const btn = document.getElementById('btn-add-' + gameId);
+                        if (btn) {
+                            btn.innerText = "Dans la bibliothèque";
+                            btn.disabled = true;
+                            btn.style.background = "#2a2a2a";
+                            btn.style.color = "#888";
+                        }
+                    });
 
                     // 3. Si un nouveau jeu vient d'être ajouté (par le Webhook Stripe en arrière-plan)
                     if (window.mesJeux.length > nombreAnciensJeux) {
@@ -755,7 +765,7 @@ window.chargerMagasin = async function() {
         // 2. Gestion de la Grande Bannière (Le premier jeu)
         const featuredGame = allGames[0];
         if (banner) {
-            banner.style.background = `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.9)), url('${cssUrl(featuredGame.coverUrl)}') center/cover`;
+            banner.style.background = `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.9)), url('${cssUrlBrut(featuredGame.coverUrl)}') center/cover`;
             banner.innerHTML = `
                 <div style="background: #ffffff; color: #000; padding: 5px 15px; border-radius: 4px; font-weight: 800; font-size: 12px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;">À la une</div>
                 <h1 style="font-size: 56px; margin: 0 0 10px; font-weight: 800; text-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;">${esc(featuredGame.titre.toUpperCase())}</h1>
@@ -810,6 +820,23 @@ window.addEventListener('DOMContentLoaded', () => {
         if(window.chargerMagasin) window.chargerMagasin();
         });
 
+// Jeux web intégrés à Novaly (lancés dans l'iframe via lancerJeu)
+const JEUX_WEB = {
+    imposteur: { titre: 'The Imposteur', cover: `linear-gradient(135deg, #2c3e50, #000)`, icone: 'https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/detective.svg' },
+    nolimite: { titre: 'Nolimite', cover: `url('assets/img/cover-nolimite.png') center/cover` }
+};
+
+function carteJeuWeb(gameId) {
+    const jeu = JEUX_WEB[gameId];
+    const icone = jeu.icone ? `<img src="${jeu.icone}" style="width: 64px; height: 64px; filter: invert(1); opacity: 0.5;">` : '';
+    return `
+                <div class="game-card" onclick="lancerJeu(${jsArg(gameId)})">
+                    <div class="game-cover" style="background: ${jeu.cover}; display: flex; align-items: center; justify-content: center;">${icone}</div>
+                    <div class="game-title">${esc(jeu.titre)}</div>
+                    <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
+                </div>`;
+}
+
 window.actualiserBibliotheque = async function() {
     const biblioView = document.getElementById('view-library');
     if (!biblioView) return;
@@ -822,6 +849,11 @@ window.actualiserBibliotheque = async function() {
     let html = `<h2 style="font-size: 18px; margin-bottom: 20px;">Vos Jeux</h2><div class="grid">`;
 
     for (let gameId of window.mesJeux) {
+        // Jeux jouables directement dans Novaly (ils ne sont pas dans le catalogue Firestore)
+        if (JEUX_WEB[gameId]) {
+            html += carteJeuWeb(gameId);
+            continue;
+        }
         try {
             const gameSnap = await getDoc(doc(db, "games", gameId));
             if (gameSnap.exists()) {
@@ -852,9 +884,13 @@ window.actualiserBibliotheque = async function() {
         window.currentFriendId = null; 
         let chatUnsubscribe = null;
 
+        // Les messages peuvent avoir une date en millisecondes (Date.now()) ou un Timestamp Firestore
+        // (anciennes versions) : on convertit tout en millisecondes.
+        const enMillis = (t) => t == null ? Date.now() : (typeof t === 'number' ? t : (t.toMillis ? t.toMillis() : Date.now()));
+
         function formatChatDate(timestamp) {
             if (!timestamp) return "";
-            const date = new Date(timestamp);
+            const date = new Date(enMillis(timestamp));
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const targetDate = new Date(date);
@@ -888,9 +924,12 @@ window.actualiserBibliotheque = async function() {
                 box.innerHTML = '';
                 let lastDateStr = null;
 
-                snap.forEach(docSnap => {
-                    const msg = docSnap.data();
-                    const msgId = docSnap.id;
+                // Tri côté client : les anciens messages mélangent deux formats de date
+                const messages = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => enMillis(a.timestamp) - enMillis(b.timestamp));
+
+                messages.forEach(msg => {
+                    const msgId = msg.id;
                     const isMe = msg.senderId === auth.currentUser.uid;
 
                     const dateStr = formatChatDate(msg.timestamp);
@@ -899,7 +938,7 @@ window.actualiserBibliotheque = async function() {
                         lastDateStr = dateStr;
                     }
 
-                    const timeStr = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
+                    const timeStr = msg.timestamp ? new Date(enMillis(msg.timestamp)).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) : '';
 
                     if (!isMe && msg.status !== 'read') {
                         setDoc(doc(db, "chats", chatId, "messages", msgId), { status: 'read' }, { merge: true });
@@ -917,7 +956,7 @@ window.actualiserBibliotheque = async function() {
                     box.innerHTML += `
                         <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 80%; display: flex; flex-direction: column;">
                             <div style="background: ${isMe ? '#0984e3' : '#2a2a2a'}; padding: 8px 12px; border-radius: 12px; color: white; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-                                ${esc(msg.text)}
+                                ${esc(msg.text ?? msg.texte)}
                             </div>
                             <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; font-size: 9px; color: #777; margin-top: 4px; display: flex; align-items: center;">
                                 ${timeStr} ${statusHtml}
@@ -1028,8 +1067,8 @@ window.afficherPageJeu = async function(gameId) {
         const gameData = gameSnap.data();
 
         document.getElementById('detail-title').innerText = gameData.titre;
-        document.getElementById('detail-desc').innerText = "Un jeu incroyable disponible sur Novaly."; 
-        document.getElementById('detail-banner').style.background = `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.9)), url('${cssUrl(gameData.coverUrl)}') center/cover`;
+        document.getElementById('detail-desc').innerText = gameData.description_courte || "Un jeu incroyable disponible sur Novaly.";
+        document.getElementById('detail-banner').style.background = `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.9)), url('${cssUrlBrut(gameData.coverUrl)}') center/cover`;
 
         const possede = window.mesJeux && window.mesJeux.includes(gameId);
 
@@ -1376,81 +1415,6 @@ window.debloquerSucces = async function(succesId, titre, description) {
         }, 4000);
     }
 };
-// ================= GESTION DU CHAT EN DIRECT =================
-window.chatAmiActifId = null;
-window.unsubscribeChat = null;
-
-window.ouvrirChat = function(friendId, friendPseudo) {
-    window.chatAmiActifId = friendId;
-    const chatBox = document.getElementById('chat-box');
-    const chatTitle = document.getElementById('chat-title');
-    const messagesContainer = document.getElementById('chat-messages');
-
-    if (chatTitle) chatTitle.innerText = `Discussion avec ${friendPseudo}`;
-    if (chatBox) chatBox.style.display = 'flex';
-    if (messagesContainer) messagesContainer.innerHTML = '<p style="color: #666; font-size: 11px;">Chargement...</p>';
-
-    // Identifiant unique pour la conversation (tri alphabétique des 2 UID)
-    const user = auth.currentUser;
-    if (!user) return;
-    const chatId = [user.uid, friendId].sort().join('_');
-
-    // Réinitialiser la pastille non lu sur ce contact
-    setDoc(doc(db, "users", user.uid, "friends", friendId), { hasUnread: false }, { merge: true });
-
-    // Se désabonner de l'ancien listener si existant
-    if (window.unsubscribeChat) window.unsubscribeChat();
-
-    const messagesRef = collection(db, "chats", chatId, "messages");
-    const qMessages = query(messagesRef, orderBy("timestamp", "asc"));
-
-    window.unsubscribeChat = onSnapshot(qMessages, (snapshot) => {
-        if (!messagesContainer) return;
-        messagesContainer.innerHTML = '';
-
-        snapshot.forEach((docSnap) => {
-            const msg = docSnap.data();
-            const isMe = msg.senderId === user.uid;
-
-            const bulle = document.createElement('div');
-            bulle.style.alignSelf = isMe ? 'flex-end' : 'flex-start';
-            bulle.style.background = isMe ? '#0984e3' : '#2a2a2a';
-            bulle.style.color = '#fff';
-            bulle.style.padding = '8px 12px';
-            bulle.style.borderRadius = isMe ? '12px 12px 2px 12px' : '12px 12px 12px 2px';
-            bulle.style.maxWidth = '75%';
-            bulle.style.wordBreak = 'break-word';
-            bulle.innerText = msg.texte;
-
-            messagesContainer.appendChild(bulle);
-        });
-
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    });
-};
-
-window.envoyerMessage = async function() {
-    const input = document.getElementById('chat-input');
-    const texte = input ? input.value.trim() : '';
-    const user = auth.currentUser;
-
-    if (!texte || !user || !window.chatAmiActifId) return;
-
-    const chatId = [user.uid, window.chatAmiActifId].sort().join('_');
-    input.value = '';
-
-    // Envoi du message
-    await addDoc(collection(db, "chats", chatId, "messages"), {
-        senderId: user.uid,
-        texte: texte,
-        timestamp: serverTimestamp()
-    });
-
-    // Signaler à l'ami qu'il a un message non lu
-    await setDoc(doc(db, "users", window.chatAmiActifId, "friends", user.uid), {
-        hasUnread: true
-    }, { merge: true });
-};
 // ================= GESTION DE LA CONNEXION INTERNET (HORS-LIGNE) =================
 window.addEventListener('offline', () => {
     // Si on perd internet, on affiche une grosse alerte rouge qui bloque le haut
@@ -1503,55 +1467,6 @@ window.addEventListener('online', () => {
     }, 3000);
 
     // 4. On repasse le joueur en ligne sur Firebase
-    if (auth.currentUser) {
-        setDoc(doc(db, "users", auth.currentUser.uid), { isOnline: true }, { merge: true }).catch(()=>{});
-    }
-});
-
-// ================= GESTION DE LA CONNEXION INTERNET (HORS-LIGNE) =================
-window.addEventListener('offline', () => {
-    let offlineBanner = document.getElementById('offline-banner');
-    if (!offlineBanner) {
-        document.body.insertAdjacentHTML('afterbegin', `
-            <div id="offline-banner" style="position: fixed; top: 32px; left: 0; width: 100%; background: #ff4757; color: white; text-align: center; padding: 10px; font-weight: bold; font-size: 12px; z-index: 9998; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; gap: 10px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l20 20M8.5 8.5a5 5 0 0 0-5 5M16 16a5 5 0 0 1-5 5M12 20a8 8 0 0 1-8-8M20 12a8 8 0 0 0-8-8"></path></svg>
-                Vous êtes hors-ligne. Vérifiez votre connexion Internet. Certaines fonctionnalités sont désactivées.
-            </div>
-        `);
-    } else {
-        offlineBanner.style.display = 'flex';
-    }
-
-    if (auth.currentUser) {
-        setDoc(doc(db, "users", auth.currentUser.uid), { isOnline: false }, { merge: true }).catch(()=>{});
-    }
-});
-
-window.addEventListener('online', () => {
-    const offlineBanner = document.getElementById('offline-banner');
-    if (offlineBanner) offlineBanner.style.display = 'none';
-
-    let onlineBanner = document.getElementById('online-banner');
-    if (!onlineBanner) {
-        document.body.insertAdjacentHTML('afterbegin', `
-            <div id="online-banner" style="position: fixed; top: 32px; left: 0; width: 100%; background: #4cd137; color: black; text-align: center; padding: 10px; font-weight: bold; font-size: 12px; z-index: 9998; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; gap: 10px; transition: opacity 0.3s ease;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                Vous êtes à nouveau connecté.
-            </div>
-        `);
-        onlineBanner = document.getElementById('online-banner');
-    } else {
-        onlineBanner.style.display = 'flex';
-        onlineBanner.style.opacity = '1';
-    }
-
-    setTimeout(() => {
-        if (onlineBanner) {
-            onlineBanner.style.opacity = '0';
-            setTimeout(() => { onlineBanner.style.display = 'none'; }, 300);
-        }
-    }, 3000);
-
     if (auth.currentUser) {
         setDoc(doc(db, "users", auth.currentUser.uid), { isOnline: true }, { merge: true }).catch(()=>{});
     }

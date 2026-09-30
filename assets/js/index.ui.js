@@ -68,7 +68,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 commNews2Title: "🏆 Tournoi Galactic Warfare", commNews2Desc: "Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.",
                 commNews3Title: "🎨 Créations de la semaine", commNews3Desc: "Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.",
                 aboutTitle: "À propos de Novaly", aboutDesc1: "Novaly est votre plateforme de jeu de nouvelle génération, conçue pour offrir des performances optimales, une bibliothèque unifiée et une expérience utilisateur fluide sans distraction.",
-                aboutVersion: "Version du Launcher :  <span class='app-version'></span>", aboutStatus: "Tous les systèmes sont opérationnels.", aboutBtn: "Vérifier les mises à jour",
+                aboutVersion: "Version du Launcher :", aboutStatus: "Tous les systèmes sont opérationnels.", aboutBtn: "Vérifier les mises à jour", aboutBtnWeb: "Télécharger la dernière version",
                 cartEmpty: "Votre panier est vide", cartDesc: "Découvrez nos nouveautés dans le magasin.", goStore: "Aller au magasin",
                 contactTitle: "Nous contacter", contactSubject: "Sujet", contactMessage: "Message", contactBtn: "Envoyer le message",
                 tabPublic: "Profil Public", tabSecurity: "Sécurité & Connexion", tabPayment: "Moyens de paiement",
@@ -86,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 commNews2Title: "🏆 Galactic Warfare Tournament", commNews2Desc: "Registrations for the summer tournament are open! Form your team and try to win the grand prize.",
                 commNews3Title: "🎨 Creations of the week", commNews3Desc: "Check out the most popular mods and fan-arts voted by players this week.",
                 aboutTitle: "About Novaly", aboutDesc1: "Novaly is your next-generation gaming platform, designed to offer optimal performance, a unified library, and a seamless distraction-free user experience.",
-                aboutVersion: "Launcher Version: <span class='app-version'></span>", aboutStatus: "All systems operational.", aboutBtn: "Check for updates",
+                aboutVersion: "Launcher Version:", aboutStatus: "All systems operational.", aboutBtn: "Check for updates", aboutBtnWeb: "Download the latest version",
                 cartEmpty: "Your cart is empty", cartDesc: "Check out our new releases in the store.", goStore: "Go to Store",
                 contactTitle: "Contact Us", contactSubject: "Subject", contactMessage: "Message", contactBtn: "Send Message",
                 tabPublic: "Public Profile", tabSecurity: "Security & Login", tabPayment: "Payment Methods",
@@ -104,7 +104,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 commNews2Title: "🏆 Torneo Galactic Warfare", commNews2Desc: "¡Las inscripciones para el torneo de verano están abiertas! Forma tu equipo y compite por el gran premio.",
                 commNews3Title: "🎨 Creaciones de la semana", commNews3Desc: "Descubre los mods y fan-arts más populares votados por los jugadores esta semana.",
                 aboutTitle: "Acerca de Novaly", aboutDesc1: "Novaly es tu plataforma de juegos de próxima generación, diseñada para ofrecer un rendimiento óptimo y una experiencia fluida sin distracciones.",
-                aboutVersion: "Versión del Launcher: <span class='app-version'></span>", aboutStatus: "Todos los sistemas operativos.", aboutBtn: "Buscar actualizaciones",
+                aboutVersion: "Versión del Launcher:", aboutStatus: "Todos los sistemas operativos.", aboutBtn: "Buscar actualizaciones", aboutBtnWeb: "Descargar la última versión",
                 cartEmpty: "Tu carrito está vacío", cartDesc: "Descubre nuestras novedades en la tienda.", goStore: "Ir a la tienda",
                 contactTitle: "Contáctenos", contactSubject: "Asunto", contactMessage: "Mensaje", contactBtn: "Enviar mensaje",
                 tabPublic: "Perfil Público", tabSecurity: "Seguridad e Inicio", tabPayment: "Métodos de pago",
@@ -122,7 +122,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 commNews2Title: "🏆 Galactic Warfare Turnier", commNews2Desc: "Die Anmeldungen für das Sommerturnier sind eröffnet! Bilde dein Team und gewinne den Hauptpreis.",
                 commNews3Title: "🎨 Kreationen der Woche", commNews3Desc: "Sieh dir die beliebtesten Mods und Fan-Arts an, die diese Woche von den Spielern gewählt wurden.",
                 aboutTitle: "Über Novaly", aboutDesc1: "Novaly ist Ihre Gaming-Plattform der nächsten Generation, entwickelt für optimale Leistung und ein nahtloses Benutzererlebnis.",
-                aboutVersion: "Launcher-Version: <span class='app-version'></span>", aboutStatus: "Alle Systeme sind betriebsbereit.", aboutBtn: "Nach Updates suchen",
+                aboutVersion: "Launcher-Version:", aboutStatus: "Alle Systeme sind betriebsbereit.", aboutBtn: "Nach Updates suchen", aboutBtnWeb: "Neueste Version herunterladen",
                 cartEmpty: "Dein Warenkorb ist leer", cartDesc: "Entdecke unsere Neuheiten im Shop.", goStore: "Zum Shop",
                 contactTitle: "Kontaktiere uns", contactSubject: "Betreff", contactMessage: "Nachricht", contactBtn: "Nachricht senden",
                 tabPublic: "Öffentliches Profil", tabSecurity: "Sicherheit & Login", tabPayment: "Zahlungsmethoden",
@@ -140,7 +140,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 commNews2Title: "🏆 Torneo Galactic Warfare", commNews2Desc: "Le iscrizioni per il torneo estivo sono aperte! Forma la tua squadra e prova a vincere il primo premio.",
                 commNews3Title: "🎨 Creazioni della settimana", commNews3Desc: "Scopri le mod e le fan-art più popolari votate dai giocatori questa settimana.",
                 aboutTitle: "Informazioni su Novaly", aboutDesc1: "Novaly è la tua piattaforma di gioco di nuova generazione, progettata per offrire prestazioni ottimali e un'esperienza fluida.",
-                aboutVersion: "Versione Launcher: <span class='app-version'></span>", aboutStatus: "Tutti i sistemi sono operativi.", aboutBtn: "Verifica aggiornamenti",
+                aboutVersion: "Versione Launcher:", aboutStatus: "Tutti i sistemi sono operativi.", aboutBtn: "Verifica aggiornamenti", aboutBtnWeb: "Scarica l'ultima versione",
                 cartEmpty: "Il tuo carrello è vuoto", cartDesc: "Scopri le nostre novità nel negozio.", goStore: "Vai al negozio",
                 contactTitle: "Contattaci", contactSubject: "Oggetto", contactMessage: "Messaggio", contactBtn: "Invia messaggio",
                 tabPublic: "Profilo Pubblico", tabSecurity: "Sicurezza e Accesso", tabPayment: "Metodi di pagamento",
@@ -211,6 +211,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderView(viewId) {
+            window.currentViewId = viewId; // lu par index.app.js
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item, .footer-link').forEach(el => el.classList.remove('active'));
 
@@ -326,3 +327,13 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('novaly-alert-text').innerText = message;
     document.getElementById('novaly-alert').style.display = 'flex';
 };
+
+// ================= OUVERTURE DIRECTE D'UNE SECTION (liens du plan du site, retour de paiement) =================
+const VUES_PAR_ANCRE = {
+    '#magasin': 'store', '#jeuxonline': 'online', '#bibliotheque': 'library', '#communaute': 'community',
+    '#apropos': 'about', '#panier': 'cart', '#contact': 'contact', '#profile': 'profile'
+};
+if (VUES_PAR_ANCRE[window.location.hash]) {
+    currentViewId = VUES_PAR_ANCRE[window.location.hash];
+    renderView(currentViewId);
+}

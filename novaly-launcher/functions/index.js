@@ -93,6 +93,15 @@ exports.creerSessionAchat = onRequest(
         }
 
         const stripe = new Stripe(stripeSecretKey.value());
+        // Après le paiement, on revient sur le site ou dans le launcher
+        const depuisSite = req.body.retour === "site";
+        const urlRetour = depuisSite ?
+          "https://www.novaly-store.fr/#bibliotheque" :
+          "https://novaly-a80f7.web.app/paiement-reussi.html";
+        const urlAnnulation = depuisSite ?
+          "https://www.novaly-store.fr/#magasin" :
+          "https://novaly.games/paiement-annule";
+
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           mode: "payment",
@@ -117,8 +126,8 @@ exports.creerSessionAchat = onRequest(
             userId: userId,
             gameId: gameId,
           },
-          success_url: "https://novaly-a80f7.web.app/paiement-reussi.html",
-          cancel_url: "https://novaly.games/paiement-annule",
+          success_url: urlRetour,
+          cancel_url: urlAnnulation,
         });
 
         res.json({url: session.url});

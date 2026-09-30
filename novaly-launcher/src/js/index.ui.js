@@ -189,6 +189,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderView(viewId) {
+            window.currentViewId = viewId; // lu par index.app.js
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item, .footer-link').forEach(el => el.classList.remove('active'));
 

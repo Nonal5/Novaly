@@ -132,8 +132,10 @@ service cloud.firestore {
     }
 
     // ---------- Catalogue des jeux (modifiable uniquement depuis la console Firebase) ----------
+    // Lecture publique : la boutique du site doit s'afficher sans connexion.
+    // Les liens de téléchargement ne sont PAS ici, mais dans la sous-collection "fichiers" protégée.
     match /games/{gameId} {
-      allow read: if connecte();
+      allow read: if true;
       allow write: if false;
 
       // Liens de téléchargement : réservés aux joueurs qui possèdent le jeu
