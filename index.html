@@ -403,23 +403,22 @@
 
                     <div id="tab-security" class="profile-tab-content">
                         <h3>Authentification à deux facteurs (A2F)</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés.</p>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés. Cette fonctionnalité arrive bientôt.</p>
                         
                         <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
                             <div>
                                 <strong>Application d'authentification</strong>
                                 <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Utilisez Google Authenticator ou Authy.</p>
                             </div>
-                            <button class="btn" id="btn-a2f-app" onclick="toggleA2F('app')" style="background: #4cd137; border: none; width: 100px;">Activer</button>
+                            <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
                         </div>
                         <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                             <div>
                                 <strong>Authentification par E-mail</strong>
                                 <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Recevez un code à votre e-mail.</p>
                             </div>
-                            <button class="btn" id="btn-a2f-email" onclick="toggleA2F('email')" style="background: #4cd137; border: none; width: 100px;">Activer</button>
+                            <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
                         </div>
-                        <p id="a2f-msg" style="color: #4cd137; font-size: 12px; margin-top: 15px; display: none;"></p>
                     </div>
 
                     <div id="tab-payment" class="profile-tab-content">
@@ -427,38 +426,13 @@
                         <div style="background: linear-gradient(135deg, #2a2a35, #1a1a24); border: 1px solid #444; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 30px;">
                             <p style="color: #aaa; margin: 0 0 10px 0; text-transform: uppercase; font-size: 12px;">Solde actuel</p>
                             <h2 style="font-size: 48px; margin: 0; font-weight: 900;" id="wallet-balance">0,00 €</h2>
-                            <button class="btn" style="margin-top: 20px;" onclick="afficherAlerte('Module Stripe en cours de développement !')">Ajouter des fonds</button>
+                            <button class="btn" disabled style="margin-top: 20px; background: #333; color: #888; cursor: not-allowed;">Ajouter des fonds (bientôt)</button>
                         </div>
 
                         <h3>Moyens de paiement</h3>
-                        <div id="saved-cards-list" style="display: none; margin-bottom: 15px;">
-                            <div style="background: #111; border: 1px solid #333; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap:10px;">
-                                <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="background: #fff; color: #000; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">VISA</div>
-                                    <span style="color: white; font-family: monospace; font-size: 14px;">•••• •••• •••• <span id="card-last4"></span></span>
-                                </div>
-                                <button class="btn" onclick="removeCard()" style="background: transparent; border: 1px solid #ff4757; color: #ff4757; padding: 5px 10px; font-size: 11px;">Supprimer</button>
-                            </div>
-                        </div>
-
-                        <div id="add-card-btn" style="border: 1px dashed #555; border-radius: 8px; padding: 20px; text-align: center; color: #888; cursor: pointer;" onclick="document.getElementById('stripe-modal').style.display='block'">
-                            + Ajouter une carte de crédit
-                        </div>
-
-                        <div id="stripe-modal" style="display: none; background: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #4cd137; margin-top: 15px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <strong style="color: white;">Ajouter une carte</strong>
-                                <span style="font-size: 10px; color: #aaa;">
-                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                                    SSL Sécurisé
-                                </span>
-                            </div>
-                            <input type="text" id="fake-card-num" placeholder="Numéro (16 chiffres)" maxlength="16" style="width: 100%; box-sizing: border-box; padding: 12px; background: #111; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 4px; font-family: monospace;">
-                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                                <input type="text" placeholder="MM/AA" maxlength="5" style="width: 50%; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; font-family: monospace;">
-                                <input type="text" placeholder="CVC" maxlength="3" style="width: 50%; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; font-family: monospace;">
-                            </div>
-                            <button class="btn" style="width: 100%; background: #4cd137;" onclick="saveFakeCard()">Sauvegarder la carte</button>
+                        <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 20px; color: #aaa; font-size: 13px; line-height: 1.6;">
+                            Vos achats sont réglés sur la page de paiement sécurisée de <strong style="color: #fff;">Stripe</strong>.
+                            Novaly ne voit ni ne conserve jamais votre numéro de carte.
                         </div>
                     </div>
 
@@ -472,7 +446,7 @@
                                     </div>
                                     <strong>Discord</strong>
                                 </div>
-                                <button id="link-discord-btn" class="btn" style="padding: 6px 15px; font-size: 12px;" onclick="linkAccount('discord')">Associer</button>
+                                <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 15px;">
@@ -481,10 +455,9 @@
                                     </div>
                                     <strong>Steam</strong>
                                 </div>
-                                <button id="link-steam-btn" class="btn" style="padding: 6px 15px; font-size: 12px;" onclick="linkAccount('steam')">Associer</button>
+                                <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
                             </div>
                         </div>
-                        <p id="link-msg" style="color: #4cd137; font-size: 12px; margin-top: 15px; display: none;"></p>
                     </div>
 
                     <div id="tab-code" class="profile-tab-content">
@@ -493,7 +466,7 @@
                         <div class="form-group">
                             <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
                         </div>
-                        <button class="btn" style="width: 100%;">Échanger le code</button>
+                        <button class="btn" disabled style="width: 100%; background: #333; color: #888; cursor: not-allowed;">Bientôt disponible</button>
                     </div>
 
                     <div id="tab-parental" class="profile-tab-content">
@@ -522,7 +495,7 @@
                         <!-- Bouton Mac transformé en lien -->
                         <a href="telecharger.html" class="app-btn" style="text-decoration: none; color: inherit;"><svg viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg> Mac</a>
                         
-                        <button class="app-btn"><svg viewBox="0 0 448 512"><path d="M220.8 123.3c1.1 0 2.6-.4 2.6-.4 58.3-62 113.7-74.7 113.7-74.7 46.3 34.3 46.3 86 46.3 86 48 20.8 47.1 41.4 44.8 122.5v7.4c-2 50.7-39.6 149.3-108.9 149.3-46.9 0-74.1-21.5-98.8-38-14.1-9.4-27.7-18.4-44.2-18.4-16.5 0-30.1 9-44.2 18.4-24.7 16.5-51.9 38-98.8 38-69.3 0-106.9-98.6-108.9-149.3v-7.4c-2.3-81.1-3.2-101.7 44.8-122.5 0 0 0-51.7 46.3-86 0 0 55.4 12.7 113.7 74.7 0 0 1.5.4 2.6.4zM140.4 316.5c-35.1 0-63.5 28.4-63.5 63.5s28.4 63.5 63.5 63.5c35.1 0 63.5-28.4 63.5-63.5s-28.4-63.5-63.5-63.5zm167.2 0c-35.1 0-63.5 28.4-63.5 63.5s28.4 63.5 63.5 63.5c35.1 0 63.5-28.4 63.5-63.5s-28.4-63.5-63.5-63.5z"/></svg> Linux</button>
+                        <a href="telecharger.html" class="app-btn" style="text-decoration: none; color: inherit;"><svg viewBox="0 0 448 512"><path d="M220.8 123.3c1.1 0 2.6-.4 2.6-.4 58.3-62 113.7-74.7 113.7-74.7 46.3 34.3 46.3 86 46.3 86 48 20.8 47.1 41.4 44.8 122.5v7.4c-2 50.7-39.6 149.3-108.9 149.3-46.9 0-74.1-21.5-98.8-38-14.1-9.4-27.7-18.4-44.2-18.4-16.5 0-30.1 9-44.2 18.4-24.7 16.5-51.9 38-98.8 38-69.3 0-106.9-98.6-108.9-149.3v-7.4c-2.3-81.1-3.2-101.7 44.8-122.5 0 0 0-51.7 46.3-86 0 0 55.4 12.7 113.7 74.7 0 0 1.5.4 2.6.4zM140.4 316.5c-35.1 0-63.5 28.4-63.5 63.5s28.4 63.5 63.5 63.5c35.1 0 63.5-28.4 63.5-63.5s-28.4-63.5-63.5-63.5zm167.2 0c-35.1 0-63.5 28.4-63.5 63.5s28.4 63.5 63.5 63.5c35.1 0 63.5-28.4 63.5-63.5s-28.4-63.5-63.5-63.5z"/></svg> Linux</a>
                     </div>
             </div>
 

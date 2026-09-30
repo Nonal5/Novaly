@@ -100,7 +100,7 @@ exports.creerSessionAchat = onRequest(
           "https://novaly-a80f7.web.app/paiement-reussi.html";
         const urlAnnulation = depuisSite ?
           "https://www.novaly-store.fr/#magasin" :
-          "https://novaly.games/paiement-annule";
+          "https://novaly-a80f7.web.app/paiement-annule.html";
 
         const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],

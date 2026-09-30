@@ -159,30 +159,6 @@
                     if(document.getElementById('profile-zip')) document.getElementById('profile-zip').value = data.zip || "";
                     if(document.getElementById('profile-country')) document.getElementById('profile-country').value = data.country || "";
 
-                    if (data.paymentCardLast4) {
-                        document.getElementById('add-card-btn').style.display = 'none';
-                        document.getElementById('saved-cards-list').style.display = 'block';
-                        document.getElementById('card-last4').innerText = data.paymentCardLast4;
-                    }
-
-                    if (data.a2f_app) {
-                        const btn = document.getElementById('btn-a2f-app');
-                        if(btn) {
-                            btn.innerText = "Désactiver";
-                            btn.style.background = "transparent";
-                            btn.style.color = "#ff4757";
-                            btn.style.border = "1px solid #ff4757";
-                        }
-                    }
-                    if (data.a2f_email) {
-                        const btn = document.getElementById('btn-a2f-email');
-                        if(btn) {
-                            btn.innerText = "Désactiver";
-                            btn.style.background = "transparent";
-                            btn.style.color = "#ff4757";
-                            btn.style.border = "1px solid #ff4757";
-                        }
-                    }
                 }
             });
             } catch(error) {
@@ -579,84 +555,9 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
             }
         };
 
-        window.toggleA2F = async function(type) {
-            const btnId = type === 'app' ? 'btn-a2f-app' : 'btn-a2f-email';
-            const btn = document.getElementById(btnId);
-            const msg = document.getElementById('a2f-msg');
-            const userDocRef = privateDocRef(auth.currentUser.uid);
 
-            if (btn.innerText === "Activer") {
-                btn.innerText = "Désactiver";
-                btn.style.background = "transparent";
-                btn.style.color = "#ff4757";
-                btn.style.border = "1px solid #ff4757";
-                msg.innerText = "Sécurité A2F activée avec succès !";
-                await setDoc(userDocRef, { ["a2f_" + type]: true }, { merge: true });
-            } else {
-                btn.innerText = "Activer";
-                btn.style.background = "#4cd137";
-                btn.style.color = "black";
-                btn.style.border = "none";
-                msg.innerText = "Sécurité A2F désactivée.";
-                await setDoc(userDocRef, { ["a2f_" + type]: false }, { merge: true });
-            }
-            msg.style.display = "block";
-            setTimeout(() => msg.style.display = "none", 3000);
-        };
 
-        window.saveFakeCard = async function() {
-            const cardNum = document.getElementById('fake-card-num').value;
-            if (cardNum.length < 16) {
-                afficherAlerte("Veuillez entrer une fausse carte à 16 chiffres.");
-                return;
-            }
-            const last4 = cardNum.substring(12, 16);
 
-            document.getElementById('stripe-modal').style.display = 'none';
-            document.getElementById('add-card-btn').style.display = 'none';
-            document.getElementById('saved-cards-list').style.display = 'block';
-            document.getElementById('card-last4').innerText = last4;
-
-            await setDoc(privateDocRef(auth.currentUser.uid), { paymentCardLast4: last4 }, { merge: true });
-        };
-
-        window.removeCard = async function() {
-            if (await confirmer("Supprimer ce moyen de paiement ?", { confirmer: "Supprimer", danger: true })) {
-                document.getElementById('saved-cards-list').style.display = 'none';
-                document.getElementById('add-card-btn').style.display = 'block';
-                document.getElementById('fake-card-num').value = "";
-
-                await setDoc(privateDocRef(auth.currentUser.uid), { paymentCardLast4: null }, { merge: true });
-            }
-        };
-
-        window.linkAccount = async function(platform) {
-            const btnId = "link-" + platform + "-btn";
-            const btn = document.getElementById(btnId);
-            const msg = document.getElementById('link-msg');
-            const userDocRef = privateDocRef(auth.currentUser.uid);
-
-            if (btn.innerText === "Associer") {
-                const attente = notifier(`Connexion à ${platform.toUpperCase()} en cours...`, { duree: 0, icone: "refresh-cw" });
-
-                setTimeout(async () => {
-                    attente.fermer();
-                    btn.innerText = "Dissocier";
-                    btn.style.background = "#ff4757";
-                    btn.style.color = "white";
-                    msg.innerText = `Compte ${platform.toUpperCase()} associé avec succès !`;
-                    msg.style.display = "block";
-
-                    await setDoc(userDocRef, { ["linked_" + platform]: true }, { merge: true });
-                    setTimeout(() => msg.style.display = "none", 3000);
-                }, 2000);
-            } else {
-                btn.innerText = "Associer";
-                btn.style.background = "#fff";
-                btn.style.color = "black";
-                await setDoc(userDocRef, { ["linked_" + platform]: false }, { merge: true });
-            }
-        };
 
         window.logout = async function() {
             try {
@@ -1053,6 +954,16 @@ function libelleBoutonAchat(gameData) {
     return `Acheter (${esc(prix.toFixed(2).replace('.', ','))} €)`;
 }
 
+// Système du joueur : 'mac', 'win' ou 'linux'. C'est le suffixe des champs Firestore du jeu
+// (executable_mac, executable_win, executable_linux ; downloadUrl_mac, downloadUrl_win, downloadUrl_linux).
+async function systemeJoueur() {
+    const osName = await window.__TAURI__.os.type();
+    if (osName === "macos" || osName === "Darwin") return 'mac';
+    if (osName === "linux" || osName === "Linux") return 'linux';
+    return 'win';
+}
+const NOMS_SYSTEMES = { mac: 'macOS', win: 'Windows', linux: 'Linux' };
+
 // --- 1. FONCTION AFFICHER PAGE JEU (Gère OS + Version) ---
 window.afficherPageJeu = async function(gameId) {
     navigateTo('#jeu', 'game-detail');
@@ -1078,8 +989,8 @@ window.afficherPageJeu = async function(gameId) {
             const { join } = window.__TAURI__.path;
             const { type } = window.__TAURI__.os;
 
-            const osName = await type(); // "Darwin" (Mac) ou "Windows_NT" (PC)
-            const exeKey = (osName === "macos" || osName === "Darwin") ? "executable_mac" : "executable_win";            
+            const systeme = await systemeJoueur();
+            const exeKey = "executable_" + systeme;
             const savedPath = localStorage.getItem('install_path_' + gameId);
             const savedVersion = localStorage.getItem('version_' + gameId);
 
@@ -1100,7 +1011,11 @@ window.afficherPageJeu = async function(gameId) {
                 console.log("Il manque soit le chemin sauvegardé, soit le champ", exeKey, "dans Firebase.");
             }
 
-            if (!estInstalle) {
+            if (!gameData[exeKey]) {
+                // Pas encore de version de ce jeu pour le système du joueur
+                zoneAction.innerHTML = `<button class="btn" disabled style="background: #333; color: #888; width: 100%; font-size: 16px; padding: 15px; cursor: not-allowed;">Pas encore disponible sur ${NOMS_SYSTEMES[systeme]}</button>`;
+            }
+            else if (!estInstalle) {
                 // TÉLÉCHARGER
                 zoneAction.innerHTML = `<button class="btn" style="background: #0984e3; color: white; width: 100%; font-size: 16px; padding: 15px;" onclick="telechargerJeu(${jsArg(gameId)})">Télécharger</button>`;
             }
@@ -1179,14 +1094,13 @@ window.telechargerJeu = async function(gameId) {
         const { Command } = window.__TAURI__.shell;
         const { type } = window.__TAURI__.os;
 
-        const osName = await type();
-        const isMac = osName === "macos" || osName === "Darwin";
+        const systeme = await systemeJoueur();
         // Les liens de téléchargement sont dans games/{id}/fichiers/telechargement, lisible
         // uniquement par les joueurs qui possèdent le jeu (anciens champs gardés en secours).
         let liens = gameData;
         const fichiersSnap = await getDoc(doc(db, "games", gameId, "fichiers", "telechargement"));
         if (fichiersSnap.exists()) liens = fichiersSnap.data();
-        const dlUrl = isMac ? liens.downloadUrl_mac : liens.downloadUrl_win;
+        const dlUrl = liens['downloadUrl_' + systeme];
         if (!/^https:\/\//.test(dlUrl || "")) throw new Error("Lien de téléchargement invalide");
 
         const dossierDuJeu = await join(selectedFolder, gameId);
@@ -1215,8 +1129,9 @@ window.telechargerJeu = async function(gameId) {
         if (bar) { bar.style.background = "#eccc68"; bar.style.width = "100%"; }
         if (badge) badge.innerText = "EXT";
 
-        const unzipArgs = isMac ? ['-o', cheminZip, '-d', dossierDuJeu] : ['-xf', cheminZip, '-C', dossierDuJeu];
-        const unzipCmdName = isMac ? 'unzip' : 'tar';
+        // Mac et Linux : unzip ; Windows : tar (fourni avec Windows 10+, sait lire les .zip)
+        const unzipArgs = systeme !== 'win' ? ['-o', cheminZip, '-d', dossierDuJeu] : ['-xf', cheminZip, '-C', dossierDuJeu];
+        const unzipCmdName = systeme !== 'win' ? 'unzip' : 'tar';
 
         const unzipCmd = Command.create(unzipCmdName, unzipArgs);
         await unzipCmd.execute();
@@ -1297,12 +1212,15 @@ window.lancerJeuInstalle = async function(cheminExec, gameId, gameTitle) {
     // 3. Lancement physique du jeu sur l'OS
     try {
         const { type } = window.__TAURI__.os;
-        const osName = await type();
+        const systeme = await systemeJoueur();
 
-        if (osName === "macos" || osName === "Darwin") {
+        if (systeme === 'mac') {
             const { Command } = window.__TAURI__.shell;
             const openCmd = Command.create('open', [cheminExec]);
             await openCmd.execute();
+        } else if (systeme === 'linux') {
+            // Commande du launcher (src-tauri/src/lib.rs) : rend le fichier exécutable puis le lance
+            await window.__TAURI__.core.invoke('lancer_jeu', { chemin: cheminExec });
         } else {
             await window.__TAURI__.core.invoke('plugin:opener|open_path', { path: cheminExec });
         }
@@ -1461,3 +1379,26 @@ window.addEventListener('online', () => {
         setDoc(doc(db, "users", auth.currentUser.uid), { isOnline: true }, { merge: true }).catch(()=>{});
     }
 });
+
+// ================= LIENS novaly:// (site web, retour après paiement) =================
+// novaly://game/<id>     -> page du jeu
+// novaly://bibliotheque  -> bibliothèque
+function ouvrirLienNovaly(url) {
+    let lien;
+    try { lien = new URL(url); } catch (e) { return; }
+    if (lien.protocol !== 'novaly:') return;
+    const section = lien.host;
+    const valeur = decodeURIComponent(lien.pathname.replace(/^\/+/, ''));
+    if (section === 'game' && /^[\w-]{1,100}$/.test(valeur)) {
+        window.afficherPageJeu(valeur);
+    } else if (section === 'bibliotheque') {
+        navigateTo('#bibliotheque', 'library');
+    }
+}
+
+if (window.__TAURI__ && window.__TAURI__.deepLink) {
+    const { getCurrent, onOpenUrl } = window.__TAURI__.deepLink;
+    // Lien qui a lancé le launcher, puis liens reçus pendant qu'il est ouvert
+    getCurrent().then(urls => (urls || []).forEach(ouvrirLienNovaly)).catch(() => {});
+    onOpenUrl(urls => urls.forEach(ouvrirLienNovaly)).catch(() => {});
+}

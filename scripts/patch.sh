@@ -1,31 +1,37 @@
 #!/bin/bash
-
-echo "⬆️ Incrémentation de la version..."
+# Publie une nouvelle version de Novaly.
+# Ce script incrémente la version, puis pousse le code et un tag sur GitHub.
+# GitHub Actions (.github/workflows/release.yml) fait ensuite TOUT le reste :
+# compilation Mac / Windows / Linux, signature, mise à jour automatique des launchers
+# (latest.json), publication de la release et annonce Discord.
+set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$ROOT/novaly-launcher" || exit
-npm version patch --no-git-tag-version
-VERSION=$(node -p "require('./package.json').version")
-
-echo "🔨 Compilation de Tauri pour générer le .app..."
-# Le paramètre --bundles app force le Mac à ignorer le DMG sans bloquer GitHub
-npm run tauri build -- --bundles app
-
-echo "📦 Compression manuelle du .app en .tar.gz pour l'updater..."
-cd src-tauri/target/release/bundle/macos/
-tar -czf Novaly_aarch64.app.tar.gz Novaly.app
-cp Novaly_aarch64.app.tar.gz ~/Desktop/
-# Retour à la racine du projet (Novaly)
 cd "$ROOT"
 
-echo "📦 Sauvegarde de TOUT le projet (Site web + Launcher)..."
+echo "🔄 Récupération des dernières modifications (latest.json publié par GitHub)..."
+git pull --rebase --autostash origin main
+
+read -p "📝 Titre de la mise à jour (affiché dans la release et sur Discord) : " TITRE
+[ -z "$TITRE" ] && TITRE="Améliorations et corrections"
+
+echo "⬆️ Incrémentation de la version..."
+cd novaly-launcher
+npm version patch --no-git-tag-version > /dev/null
+VERSION=$(node -p "require('./package.json').version")
+cd "$ROOT"
+
+echo "📦 Sauvegarde de tout le projet (site web + launcher)..."
 git add -A
 git commit -m "Préparation de la v$VERSION"
 
-echo "🏷️ Création du tag officiel v$VERSION..."
-git tag v$VERSION
+echo "🏷️ Création du tag v$VERSION..."
+git tag -a "v$VERSION" -m "$TITRE"
 
-echo "🚀 Envoi du code et des tags vers GitHub..."
-git push origin main --tags
+echo "🚀 Envoi sur GitHub..."
+git push origin main
+git push origin "v$VERSION"
 
-echo "✅ Fichier patch terminé ! L'archive est bien sur ton Bureau."
-echo "👉 Tu peux maintenant lancer ./scripts/maj.sh"
+echo ""
+echo "✅ v$VERSION envoyée ! GitHub compile maintenant Mac, Windows et Linux (environ 40 minutes),"
+echo "   puis publie la mise à jour et l'annonce sur Discord automatiquement."
+echo "👉 Suivre la progression : gh run watch \$(gh run list --workflow=release.yml --limit 1 --json databaseId --jq '.[0].databaseId')"

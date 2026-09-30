@@ -162,30 +162,6 @@
                     if(document.getElementById('profile-zip')) document.getElementById('profile-zip').value = data.zip || "";
                     if(document.getElementById('profile-country')) document.getElementById('profile-country').value = data.country || "";
 
-                    if (data.paymentCardLast4) {
-                        document.getElementById('add-card-btn').style.display = 'none';
-                        document.getElementById('saved-cards-list').style.display = 'block';
-                        document.getElementById('card-last4').innerText = data.paymentCardLast4;
-                    }
-
-                    if (data.a2f_app) {
-                        const btn = document.getElementById('btn-a2f-app');
-                        if(btn) {
-                            btn.innerText = "Désactiver";
-                            btn.style.background = "transparent";
-                            btn.style.color = "#ff4757";
-                            btn.style.border = "1px solid #ff4757";
-                        }
-                    }
-                    if (data.a2f_email) {
-                        const btn = document.getElementById('btn-a2f-email');
-                        if(btn) {
-                            btn.innerText = "Désactiver";
-                            btn.style.background = "transparent";
-                            btn.style.color = "#ff4757";
-                            btn.style.border = "1px solid #ff4757";
-                        }
-                    }
                 }
             });
             } catch(error) {
@@ -530,84 +506,9 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
             }
         };
 
-        window.toggleA2F = async function(type) {
-            const btnId = type === 'app' ? 'btn-a2f-app' : 'btn-a2f-email';
-            const btn = document.getElementById(btnId);
-            const msg = document.getElementById('a2f-msg');
-            const userDocRef = privateDocRef(auth.currentUser.uid);
 
-            if (btn.innerText === "Activer") {
-                btn.innerText = "Désactiver";
-                btn.style.background = "transparent";
-                btn.style.color = "#ff4757";
-                btn.style.border = "1px solid #ff4757";
-                msg.innerText = "Sécurité A2F activée avec succès !";
-                await setDoc(userDocRef, { ["a2f_" + type]: true }, { merge: true });
-            } else {
-                btn.innerText = "Activer";
-                btn.style.background = "#4cd137";
-                btn.style.color = "black";
-                btn.style.border = "none";
-                msg.innerText = "Sécurité A2F désactivée.";
-                await setDoc(userDocRef, { ["a2f_" + type]: false }, { merge: true });
-            }
-            msg.style.display = "block";
-            setTimeout(() => msg.style.display = "none", 3000);
-        };
 
-        window.saveFakeCard = async function() {
-            const cardNum = document.getElementById('fake-card-num').value;
-            if (cardNum.length < 16) {
-                afficherAlerte("Veuillez entrer une fausse carte à 16 chiffres.");
-                return;
-            }
-            const last4 = cardNum.substring(12, 16);
 
-            document.getElementById('stripe-modal').style.display = 'none';
-            document.getElementById('add-card-btn').style.display = 'none';
-            document.getElementById('saved-cards-list').style.display = 'block';
-            document.getElementById('card-last4').innerText = last4;
-
-            await setDoc(privateDocRef(auth.currentUser.uid), { paymentCardLast4: last4 }, { merge: true });
-        };
-
-        window.removeCard = async function() {
-            if (await confirmer("Supprimer ce moyen de paiement ?", { confirmer: "Supprimer", danger: true })) {
-                document.getElementById('saved-cards-list').style.display = 'none';
-                document.getElementById('add-card-btn').style.display = 'block';
-                document.getElementById('fake-card-num').value = "";
-
-                await setDoc(privateDocRef(auth.currentUser.uid), { paymentCardLast4: null }, { merge: true });
-            }
-        };
-
-        window.linkAccount = async function(platform) {
-            const btnId = "link-" + platform + "-btn";
-            const btn = document.getElementById(btnId);
-            const msg = document.getElementById('link-msg');
-            const userDocRef = privateDocRef(auth.currentUser.uid);
-
-            if (btn.innerText === "Associer") {
-                const attente = notifier(`Connexion à ${platform.toUpperCase()} en cours...`, { duree: 0, icone: "refresh-cw" });
-
-                setTimeout(async () => {
-                    attente.fermer();
-                    btn.innerText = "Dissocier";
-                    btn.style.background = "#ff4757";
-                    btn.style.color = "white";
-                    msg.innerText = `Compte ${platform.toUpperCase()} associé avec succès !`;
-                    msg.style.display = "block";
-
-                    await setDoc(userDocRef, { ["linked_" + platform]: true }, { merge: true });
-                    setTimeout(() => msg.style.display = "none", 3000);
-                }, 2000);
-            } else {
-                btn.innerText = "Associer";
-                btn.style.background = "#fff";
-                btn.style.color = "black";
-                await setDoc(userDocRef, { ["linked_" + platform]: false }, { merge: true });
-            }
-        };
 
         window.logout = async function() {
             try {

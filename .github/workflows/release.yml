@@ -1,75 +1,151 @@
 name: Publier Release
 
+# Déclenché par ./scripts/patch.sh (tag vX.Y.Z). Tout est automatique :
+#   1. compilation + signature pour macOS (Apple Silicon et Intel), Windows et Linux
+#   2. mise à jour de novaly-launcher/src-tauri/latest.json (lu par les launchers déjà installés)
+#   3. publication de la release (ce qui déclenche l'annonce Discord)
+#
+# Secrets GitHub nécessaires :
+#   TAURI_SIGNING_PRIVATE_KEY           contenu de la clé privée de signature des mises à jour
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  son mot de passe
+
 on:
   push:
     tags:
       - 'v*'
 
 jobs:
-  publish:
+  compiler:
     permissions:
       contents: write
     strategy:
       fail-fast: false
-      max-parallel: 1 
+      # Une plateforme à la fois : chaque compilation ajoute sa partie au latest.json de la release
+      max-parallel: 1
       matrix:
-        platform: [macos-latest, windows-latest]
+        include:
+          - plateforme: macos-latest
+            args: '--target aarch64-apple-darwin'
+            cible_rust: aarch64-apple-darwin
+          - plateforme: macos-latest
+            args: '--target x86_64-apple-darwin'
+            cible_rust: x86_64-apple-darwin
+          - plateforme: windows-latest
+            args: ''
+            cible_rust: ''
+          - plateforme: ubuntu-22.04
+            args: ''
+            cible_rust: ''
 
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.plateforme }}
 
     steps:
       - name: 1. Récupérer le code
         uses: actions/checkout@v4
 
-      - name: 2. Préparer Node.js
+      - name: 2. Vérifier que le tag correspond à package.json
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./novaly-launcher/package.json').version")
+          if [ "v$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Le tag $GITHUB_REF_NAME ne correspond pas à package.json (v$VERSION)"
+            exit 1
+          fi
+
+      - name: 3. Titre de la mise à jour (message du tag)
+        shell: bash
+        run: |
+          git fetch --force origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+          TITRE=$(git for-each-ref "refs/tags/$GITHUB_REF_NAME" --format='%(contents:subject)')
+          [ -z "$TITRE" ] && TITRE="Mise à jour $GITHUB_REF_NAME"
+          echo "TITRE=$TITRE" >> "$GITHUB_ENV"
+
+      - name: 4. Dépendances système (Linux)
+        if: matrix.plateforme == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: 5. Préparer Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: 3. Préparer le moteur Rust
+      - name: 6. Préparer Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.cible_rust }}
 
-      - name: 4. Extraire le numéro de version
-        id: tag_version
-        shell: bash
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: 5. Injecter la version ET Vérifier le fichier (Le Radar)
-        shell: bash
-        run: |
-          node -e "
-            const fs = require('fs');
-            const path = './novaly-launcher/src-tauri/tauri.conf.json';
-            const tauri = JSON.parse(fs.readFileSync(path, 'utf8'));
-            tauri.version = process.env.VERSION;
-            fs.writeFileSync(path, JSON.stringify(tauri, null, 2));
-            
-            console.log('\n=============================================');
-            console.log('🔍 RADAR : Voici ce que GitHub voit dans tauri.conf.json :');
-            if (tauri.plugins && tauri.plugins.updater) {
-               console.log('✅ UPDATER TROUVÉ ! Pubkey :', tauri.plugins.updater.pubkey);
-            } else {
-               console.log('❌ ERREUR FATALE : AUCUN UPDATER TROUVÉ DANS CE FICHIER !');
-            }
-            console.log('=============================================\n');
-          "
-
-      - name: 6. Installer les dépendances
+      - name: 7. Installer les dépendances
         run: npm install
         working-directory: ./novaly-launcher
 
-      - name: 7. Compiler et Publier (Robot Tauri)
+      - name: 8. Compiler, signer et ajouter à la release (brouillon)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          # ❌ LA LIGNE DU MOT DE PASSE EST TOTALEMENT SUPPRIMÉE ICI
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          projectPath: "./novaly-launcher"
+          projectPath: ./novaly-launcher
           tagName: ${{ github.ref_name }}
-          releaseName: "Novaly ${{ github.ref_name }}"
-          releaseDraft: false
+          releaseName: "Novaly ${{ github.ref_name }} — ${{ env.TITRE }}"
+          releaseBody: ${{ env.TITRE }}
+          # Brouillon tant que toutes les plateformes ne sont pas prêtes
+          releaseDraft: true
           prerelease: false
           includeUpdaterJson: true
+          updaterJsonPreferNsis: true
+          args: ${{ matrix.args }}
+
+  publier:
+    needs: compiler
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 1. Récupérer le code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: 2. Vérifier le latest.json produit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download "$GITHUB_REF_NAME" --pattern latest.json --dir /tmp/maj
+          echo "Plateformes :"; jq -r '.platforms | keys[]' /tmp/maj/latest.json
+          for p in darwin-aarch64 darwin-x86_64 windows-x86_64 linux-x86_64; do
+            SIG=$(jq -r --arg p "$p" '.platforms[$p].signature // empty' /tmp/maj/latest.json)
+            if [ -z "$SIG" ]; then echo "::error::Signature manquante pour $p"; exit 1; fi
+          done
+
+      - name: 3. Publier latest.json pour les launchers installés
+        run: |
+          cp /tmp/maj/latest.json novaly-launcher/src-tauri/latest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add novaly-launcher/src-tauri/latest.json
+          git commit -m "Déploiement du patch auto-updater $GITHUB_REF_NAME"
+          git push origin main
+
+      - name: 4. Publier la release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "$GITHUB_REF_NAME" --draft=false --latest
+
+      # Une release publiée par GITHUB_TOKEN ne déclenche pas discord.yml : on annonce ici
+      - name: 5. Annonce Discord
+        env:
+          VERSION: ${{ github.ref_name }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          LOGO_URL: "https://firebasestorage.googleapis.com/v0/b/novaly-a80f7.firebasestorage.app/o/logo1.png?alt=media&token=217eb083-ea50-4c6e-806a-5c6e6b5d429a"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITRE=$(gh release view "$VERSION" --json body --jq .body)
+          payload=$(jq -n \
+            --arg title "Novaly $VERSION est disponible !" \
+            --arg desc "**$TITRE**"$'\n\n'"Mac, Windows et Linux : [télécharger Novaly](https://novaly-store.fr/telecharger.html)" \
+            --arg logo "$LOGO_URL" \
+            '{embeds: [{title: $title, description: $desc, color: 16711680, thumbnail: {url: $logo}}]}')
+          curl -sf -H "Content-Type: application/json" -X POST -d "$payload" "$DISCORD_WEBHOOK"
