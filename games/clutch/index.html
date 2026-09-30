@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="../../assets/css/notifications.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,7 +19,6 @@
 </div>
 
 <!-- ===================== TOAST ===================== -->
-<div id="toast"></div>
 
 <!-- ===================== MENU SCREEN ===================== -->
 <div class="screen active" id="menuScreen">
@@ -31,20 +31,20 @@
   </div>
 
   <div class="menu-cards-preview">
-    <div class="preview-card">🂡</div>
-    <div class="preview-card">🃟</div>
-    <div class="preview-card">🃁</div>
-    <div class="preview-card">🂱</div>
-    <div class="preview-card">🃑</div>
+    <div class="preview-card"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/spade.svg'); mask-image: url('../../assets/icons/spade.svg')"></span></div>
+    <div class="preview-card"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/club.svg'); mask-image: url('../../assets/icons/club.svg')"></span></div>
+    <div class="preview-card"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/diamond.svg'); mask-image: url('../../assets/icons/diamond.svg')"></span></div>
+    <div class="preview-card"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/heart.svg'); mask-image: url('../../assets/icons/heart.svg')"></span></div>
+    <div class="preview-card"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/club.svg'); mask-image: url('../../assets/icons/club.svg')"></span></div>
   </div>
 
   <div class="divider-line"></div>
 
   <div class="menu-btns">
     <button class="btn-main primary" onclick="goScreen('lobbyScreen')">▶ Play Now</button>
-    <button class="btn-main secondary" onclick="goScreen('rankedScreen')">🏆 Ranked Ladder</button>
-    <button class="btn-main secondary" onclick="goScreen('shopScreen')">🛒 Shop</button>
-    <button class="btn-main ghost" onclick="goScreen('profileScreen')">👤 My Profile</button>
+    <button class="btn-main secondary" onclick="goScreen('rankedScreen')"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/trophy.svg'); mask-image: url('../../assets/icons/trophy.svg')"></span> Ranked Ladder</button>
+    <button class="btn-main secondary" onclick="goScreen('shopScreen')"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/shopping-cart.svg'); mask-image: url('../../assets/icons/shopping-cart.svg')"></span> Shop</button>
+    <button class="btn-main ghost" onclick="goScreen('profileScreen')"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user.svg'); mask-image: url('../../assets/icons/user.svg')"></span> My Profile</button>
   </div>
 
   <div class="divider-line"></div>
@@ -56,7 +56,7 @@
   <div class="topnav">
     <div class="topnav-logo">CLUTCH</div>
     <div class="topnav-right">
-      <div class="topnav-coins"><span class="coin-icon">🪙</span><span id="coinsDisplay">2,850</span></div>
+      <div class="topnav-coins"><span class="coin-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/coins.svg'); mask-image: url('../../assets/icons/coins.svg')"></span></span><span id="coinsDisplay">2,850</span></div>
       <div class="xp-bar-wrap">
         <span class="xp-label">LVL 24</span>
         <div class="xp-bar"><div class="xp-fill"></div></div>
@@ -71,38 +71,38 @@
       <div class="section-title">Choose Your Game Mode</div>
       <div class="game-modes-grid">
         <div class="game-mode-card selected" style="--mode-color: rgba(245,200,66,0.6)" onclick="selectMode(this,'Poker')" data-mode="Poker">
-          <span class="mode-rank-badge rarity-epic">⭐ CLASSIC</span>
-          <div class="mode-icon">🂱</div>
+          <span class="mode-rank-badge rarity-epic"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/star.svg'); mask-image: url('../../assets/icons/star.svg')"></span> CLASSIC</span>
+          <div class="mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/heart.svg'); mask-image: url('../../assets/icons/heart.svg')"></span></div>
           <div class="mode-name">POKER</div>
           <div class="mode-players">2–6 players</div>
         </div>
         <div class="game-mode-card" style="--mode-color: rgba(155,89,182,0.5)" onclick="selectMode(this,'Loup-Garou')" data-mode="Loup-Garou">
-          <span class="mode-rank-badge rarity-rare">🌕 NIGHT</span>
-          <div class="mode-icon">🐺</div>
+          <span class="mode-rank-badge rarity-rare"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/moon.svg'); mask-image: url('../../assets/icons/moon.svg')"></span> NIGHT</span>
+          <div class="mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/paw-print.svg'); mask-image: url('../../assets/icons/paw-print.svg')"></span></div>
           <div class="mode-name">LOUP-GAROU</div>
           <div class="mode-players">6–18 players</div>
         </div>
         <div class="game-mode-card" style="--mode-color: rgba(26,188,156,0.5)" onclick="selectMode(this,'Undercover')" data-mode="Undercover">
-          <span class="mode-rank-badge rarity-rare">🕵️ DEDUCTION</span>
-          <div class="mode-icon">🕵️</div>
+          <span class="mode-rank-badge rarity-rare"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user-search.svg'); mask-image: url('../../assets/icons/user-search.svg')"></span> DEDUCTION</span>
+          <div class="mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user-search.svg'); mask-image: url('../../assets/icons/user-search.svg')"></span></div>
           <div class="mode-name">UNDERCOVER</div>
           <div class="mode-players">3–10 players</div>
         </div>
         <div class="game-mode-card" style="--mode-color: rgba(231,76,60,0.5)" onclick="selectMode(this,'UNO')" data-mode="UNO">
-          <span class="mode-rank-badge rarity-common">🎮 FAST</span>
-          <div class="mode-icon">🃟</div>
+          <span class="mode-rank-badge rarity-common"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/gamepad-2.svg'); mask-image: url('../../assets/icons/gamepad-2.svg')"></span> FAST</span>
+          <div class="mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/club.svg'); mask-image: url('../../assets/icons/club.svg')"></span></div>
           <div class="mode-name">UNO</div>
           <div class="mode-players">2–4 players</div>
         </div>
         <div class="game-mode-card" style="--mode-color: rgba(230,126,34,0.5)" onclick="selectMode(this,'Bluff')" data-mode="Bluff">
-          <span class="mode-rank-badge rarity-rare">🎭 BLUFF</span>
-          <div class="mode-icon">🤥</div>
+          <span class="mode-rank-badge rarity-rare"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/venetian-mask.svg'); mask-image: url('../../assets/icons/venetian-mask.svg')"></span> BLUFF</span>
+          <div class="mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/drama.svg'); mask-image: url('../../assets/icons/drama.svg')"></span></div>
           <div class="mode-name">BLUFF</div>
           <div class="mode-players">3–8 players</div>
         </div>
         <div class="game-mode-card" style="--mode-color: rgba(52,152,219,0.5)" onclick="selectMode(this,'Menteur')" data-mode="Menteur">
-          <span class="mode-rank-badge rarity-legendary">💀 BRUTAL</span>
-          <div class="mode-icon">🎲</div>
+          <span class="mode-rank-badge rarity-legendary"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/skull.svg'); mask-image: url('../../assets/icons/skull.svg')"></span> BRUTAL</span>
+          <div class="mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/dice-5.svg'); mask-image: url('../../assets/icons/dice-5.svg')"></span></div>
           <div class="mode-name">MENTEUR</div>
           <div class="mode-players">2–8 players</div>
         </div>
@@ -145,12 +145,12 @@
         <div class="player-slot you filled">
           <div class="player-avatar" style="background: linear-gradient(135deg, #9B59B6, #4A6FFF);">V</div>
           <div class="player-name">Valhalla_X</div>
-          <div class="player-rank">🥇 Gold II</div>
+          <div class="player-rank"><span class="ico ico-or" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span> Gold II</div>
         </div>
         <div class="player-slot filled">
           <div class="player-avatar" style="background: linear-gradient(135deg, #C0392B, #E74C3C);">K</div>
           <div class="player-name">KingBluff</div>
-          <div class="player-rank">🏆 Plat IV</div>
+          <div class="player-rank"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/trophy.svg'); mask-image: url('../../assets/icons/trophy.svg')"></span> Plat IV</div>
         </div>
         <div class="player-slot">
           <div class="slot-empty">+</div>
@@ -165,17 +165,17 @@
 
     <div class="find-match-section">
       <button class="btn-find-match" onclick="startMatching()" id="findMatchBtn">
-        ⚡ FIND MATCH
+        <span class="ico" style="-webkit-mask-image: url('../../assets/icons/zap.svg'); mask-image: url('../../assets/icons/zap.svg')"></span> FIND MATCH
       </button>
     </div>
   </div>
 
   <div class="bottomnav">
-    <div class="bnav-item active" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon">🎮</span>Play</div>
-    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon">🏆</span>Ranked</div>
-    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon">🛒</span>Shop</div>
-    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon">👤</span>Profile</div>
-    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon">🏠</span>Menu</div>
+    <div class="bnav-item active" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/gamepad-2.svg'); mask-image: url('../../assets/icons/gamepad-2.svg')"></span></span>Play</div>
+    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/trophy.svg'); mask-image: url('../../assets/icons/trophy.svg')"></span></span>Ranked</div>
+    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/shopping-cart.svg'); mask-image: url('../../assets/icons/shopping-cart.svg')"></span></span>Shop</div>
+    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user.svg'); mask-image: url('../../assets/icons/user.svg')"></span></span>Profile</div>
+    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/house.svg'); mask-image: url('../../assets/icons/house.svg')"></span></span>Menu</div>
   </div>
 </div>
 
@@ -184,7 +184,7 @@
   <div class="topnav">
     <div class="topnav-logo">SHOP</div>
     <div class="topnav-right">
-      <div class="topnav-coins"><span class="coin-icon">🪙</span><span id="coinsShop">2,850</span></div>
+      <div class="topnav-coins"><span class="coin-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/coins.svg'); mask-image: url('../../assets/icons/coins.svg')"></span></span><span id="coinsShop">2,850</span></div>
     </div>
   </div>
 
@@ -200,11 +200,11 @@
   </div>
 
   <div class="bottomnav">
-    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon">🎮</span>Play</div>
-    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon">🏆</span>Ranked</div>
-    <div class="bnav-item active" onclick="navTo('shopScreen',this)"><span class="bnav-icon">🛒</span>Shop</div>
-    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon">👤</span>Profile</div>
-    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon">🏠</span>Menu</div>
+    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/gamepad-2.svg'); mask-image: url('../../assets/icons/gamepad-2.svg')"></span></span>Play</div>
+    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/trophy.svg'); mask-image: url('../../assets/icons/trophy.svg')"></span></span>Ranked</div>
+    <div class="bnav-item active" onclick="navTo('shopScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/shopping-cart.svg'); mask-image: url('../../assets/icons/shopping-cart.svg')"></span></span>Shop</div>
+    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user.svg'); mask-image: url('../../assets/icons/user.svg')"></span></span>Profile</div>
+    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/house.svg'); mask-image: url('../../assets/icons/house.svg')"></span></span>Menu</div>
   </div>
 </div>
 
@@ -214,13 +214,13 @@
     <div class="topnav-logo">RANKED</div>
     <div class="topnav-right">
       <div class="rank-badge">GOLD II</div>
-      <div class="topnav-coins"><span class="coin-icon">⭐</span><span>1,240 RP</span></div>
+      <div class="topnav-coins"><span class="coin-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/star.svg'); mask-image: url('../../assets/icons/star.svg')"></span></span><span>1,240 RP</span></div>
     </div>
   </div>
 
   <div class="ranked-content">
     <div class="rank-display">
-      <span class="current-rank-icon">🥇</span>
+      <span class="current-rank-icon"><span class="ico ico-or" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span></span>
       <div class="current-rank-name">GOLD II</div>
       <div class="rank-points">1,240 / 1,500 Ranked Points</div>
       <div class="rank-progress"><div class="rank-progress-fill"></div></div>
@@ -232,13 +232,13 @@
     <div>
       <div class="section-title">Season 1 — Rank Ladder</div>
       <div class="rank-tiers-row">
-        <div class="tier-pill completed"><span class="tier-icon">🥉</span>Bronze</div>
-        <div class="tier-pill completed"><span class="tier-icon">🪨</span>Silver</div>
-        <div class="tier-pill current"><span class="tier-icon">🥇</span>Gold</div>
-        <div class="tier-pill"><span class="tier-icon">💎</span>Plat</div>
-        <div class="tier-pill"><span class="tier-icon">💠</span>Diamond</div>
-        <div class="tier-pill"><span class="tier-icon">👑</span>Master</div>
-        <div class="tier-pill"><span class="tier-icon">🔥</span>Clutch</div>
+        <div class="tier-pill completed"><span class="tier-icon"><span class="ico ico-bronze" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span></span>Bronze</div>
+        <div class="tier-pill completed"><span class="tier-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/shield.svg'); mask-image: url('../../assets/icons/shield.svg')"></span></span>Silver</div>
+        <div class="tier-pill current"><span class="tier-icon"><span class="ico ico-or" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span></span>Gold</div>
+        <div class="tier-pill"><span class="tier-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/gem.svg'); mask-image: url('../../assets/icons/gem.svg')"></span></span>Plat</div>
+        <div class="tier-pill"><span class="tier-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/diamond.svg'); mask-image: url('../../assets/icons/diamond.svg')"></span></span>Diamond</div>
+        <div class="tier-pill"><span class="tier-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/crown.svg'); mask-image: url('../../assets/icons/crown.svg')"></span></span>Master</div>
+        <div class="tier-pill"><span class="tier-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/flame.svg'); mask-image: url('../../assets/icons/flame.svg')"></span></span>Clutch</div>
       </div>
     </div>
 
@@ -255,46 +255,46 @@
     </div>
 
     <div class="leaderboard">
-      <div class="leaderboard-header">🌍 Global Leaderboard — Top Players</div>
+      <div class="leaderboard-header"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/globe.svg'); mask-image: url('../../assets/icons/globe.svg')"></span> Global Leaderboard — Top Players</div>
       <div class="leaderboard-row">
-        <div class="lb-rank gold">🥇</div>
+        <div class="lb-rank gold"><span class="ico ico-or" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span></div>
         <div class="lb-avatar" style="background:linear-gradient(135deg,#C0392B,#E74C3C)">Z</div>
-        <div class="lb-info"><div class="lb-name">ZeroBluff</div><div class="lb-mode">Poker · 🔥 Clutch I</div></div>
+        <div class="lb-info"><div class="lb-name">ZeroBluff</div><div class="lb-mode">Poker · <span class="ico" style="-webkit-mask-image: url('../../assets/icons/flame.svg'); mask-image: url('../../assets/icons/flame.svg')"></span> Clutch I</div></div>
         <div class="lb-points">4,280 RP</div>
       </div>
       <div class="leaderboard-row">
-        <div class="lb-rank silver">🥈</div>
+        <div class="lb-rank silver"><span class="ico ico-argent" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span></div>
         <div class="lb-avatar" style="background:linear-gradient(135deg,#27AE60,#1E8449)">N</div>
-        <div class="lb-info"><div class="lb-name">NightWolf</div><div class="lb-mode">Loup-Garou · 🔥 Clutch II</div></div>
+        <div class="lb-info"><div class="lb-name">NightWolf</div><div class="lb-mode">Loup-Garou · <span class="ico" style="-webkit-mask-image: url('../../assets/icons/flame.svg'); mask-image: url('../../assets/icons/flame.svg')"></span> Clutch II</div></div>
         <div class="lb-points">3,950 RP</div>
       </div>
       <div class="leaderboard-row">
-        <div class="lb-rank bronze">🥉</div>
+        <div class="lb-rank bronze"><span class="ico ico-bronze" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span></div>
         <div class="lb-avatar" style="background:linear-gradient(135deg,#F39C12,#E67E22)">S</div>
-        <div class="lb-info"><div class="lb-name">ShadowAce</div><div class="lb-mode">Undercover · 👑 Master</div></div>
+        <div class="lb-info"><div class="lb-name">ShadowAce</div><div class="lb-mode">Undercover · <span class="ico" style="-webkit-mask-image: url('../../assets/icons/crown.svg'); mask-image: url('../../assets/icons/crown.svg')"></span> Master</div></div>
         <div class="lb-points">3,710 RP</div>
       </div>
       <div class="leaderboard-row">
         <div class="lb-rank">4</div>
         <div class="lb-avatar" style="background:linear-gradient(135deg,#3498DB,#2E86C1)">P</div>
-        <div class="lb-info"><div class="lb-name">PsychBlader</div><div class="lb-mode">Bluff · 👑 Master</div></div>
+        <div class="lb-info"><div class="lb-name">PsychBlader</div><div class="lb-mode">Bluff · <span class="ico" style="-webkit-mask-image: url('../../assets/icons/crown.svg'); mask-image: url('../../assets/icons/crown.svg')"></span> Master</div></div>
         <div class="lb-points">3,580 RP</div>
       </div>
       <div class="leaderboard-row me">
         <div class="lb-rank" style="color:var(--gold)">247</div>
         <div class="lb-avatar" style="background:linear-gradient(135deg,#9B59B6,#4A6FFF)">V</div>
-        <div class="lb-info"><div class="lb-name">Valhalla_X <span style="font-size:10px;color:var(--gold)">(You)</span></div><div class="lb-mode">Poker · 🥇 Gold II</div></div>
+        <div class="lb-info"><div class="lb-name">Valhalla_X <span style="font-size:10px;color:var(--gold)">(You)</span></div><div class="lb-mode">Poker · <span class="ico ico-or" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span> Gold II</div></div>
         <div class="lb-points">1,240 RP</div>
       </div>
     </div>
   </div>
 
   <div class="bottomnav">
-    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon">🎮</span>Play</div>
-    <div class="bnav-item active" onclick="navTo('rankedScreen',this)"><span class="bnav-icon">🏆</span>Ranked</div>
-    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon">🛒</span>Shop</div>
-    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon">👤</span>Profile</div>
-    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon">🏠</span>Menu</div>
+    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/gamepad-2.svg'); mask-image: url('../../assets/icons/gamepad-2.svg')"></span></span>Play</div>
+    <div class="bnav-item active" onclick="navTo('rankedScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/trophy.svg'); mask-image: url('../../assets/icons/trophy.svg')"></span></span>Ranked</div>
+    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/shopping-cart.svg'); mask-image: url('../../assets/icons/shopping-cart.svg')"></span></span>Shop</div>
+    <div class="bnav-item" onclick="navTo('profileScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user.svg'); mask-image: url('../../assets/icons/user.svg')"></span></span>Profile</div>
+    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/house.svg'); mask-image: url('../../assets/icons/house.svg')"></span></span>Menu</div>
   </div>
 </div>
 
@@ -303,7 +303,7 @@
   <div class="topnav">
     <div class="topnav-logo">PROFILE</div>
     <div class="topnav-right">
-      <div class="topnav-coins"><span class="coin-icon">🪙</span><span>2,850</span></div>
+      <div class="topnav-coins"><span class="coin-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/coins.svg'); mask-image: url('../../assets/icons/coins.svg')"></span></span><span>2,850</span></div>
     </div>
   </div>
 
@@ -314,9 +314,9 @@
         <div class="profile-name">VALHALLA_X</div>
         <div class="profile-handle">#2847 · Joined Season 1</div>
         <div class="profile-badges">
-          <span class="profile-badge badge-rank">🥇 Gold II</span>
-          <span class="profile-badge badge-win">💪 67% WR</span>
-          <span class="profile-badge badge-season">🌟 S1 Player</span>
+          <span class="profile-badge badge-rank"><span class="ico ico-or" style="-webkit-mask-image: url('../../assets/icons/medal.svg'); mask-image: url('../../assets/icons/medal.svg')"></span> Gold II</span>
+          <span class="profile-badge badge-win"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/trending-up.svg'); mask-image: url('../../assets/icons/trending-up.svg')"></span> 67% WR</span>
+          <span class="profile-badge badge-season"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/sparkles.svg'); mask-image: url('../../assets/icons/sparkles.svg')"></span> S1 Player</span>
         </div>
       </div>
     </div>
@@ -324,16 +324,16 @@
     <div>
       <div class="section-title">Best Game Modes</div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-number gold">🂱</div><div class="stat-label">Poker · Main</div></div>
-        <div class="stat-card"><div class="stat-number">🐺</div><div class="stat-label">Loup-Garou</div></div>
-        <div class="stat-card"><div class="stat-number">🕵️</div><div class="stat-label">Undercover</div></div>
+        <div class="stat-card"><div class="stat-number gold"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/heart.svg'); mask-image: url('../../assets/icons/heart.svg')"></span></div><div class="stat-label">Poker · Main</div></div>
+        <div class="stat-card"><div class="stat-number"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/paw-print.svg'); mask-image: url('../../assets/icons/paw-print.svg')"></span></div><div class="stat-label">Loup-Garou</div></div>
+        <div class="stat-card"><div class="stat-number"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user-search.svg'); mask-image: url('../../assets/icons/user-search.svg')"></span></div><div class="stat-label">Undercover</div></div>
       </div>
     </div>
 
     <div class="games-history">
-      <div class="leaderboard-header">🕒 Recent Games</div>
+      <div class="leaderboard-header"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/clock.svg'); mask-image: url('../../assets/icons/clock.svg')"></span> Recent Games</div>
       <div class="history-row">
-        <div class="history-mode-icon">🂱</div>
+        <div class="history-mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/heart.svg'); mask-image: url('../../assets/icons/heart.svg')"></span></div>
         <div class="history-info">
           <div class="history-mode">Poker — Ranked</div>
           <div class="history-details">5 players · 24 min · 3 eliminations</div>
@@ -342,7 +342,7 @@
         <div class="history-rp">+28 RP</div>
       </div>
       <div class="history-row">
-        <div class="history-mode-icon">🐺</div>
+        <div class="history-mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/paw-print.svg'); mask-image: url('../../assets/icons/paw-print.svg')"></span></div>
         <div class="history-info">
           <div class="history-mode">Loup-Garou — Ranked</div>
           <div class="history-details">12 players · 41 min · Survived</div>
@@ -351,7 +351,7 @@
         <div class="history-rp">+35 RP</div>
       </div>
       <div class="history-row">
-        <div class="history-mode-icon">🕵️</div>
+        <div class="history-mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user-search.svg'); mask-image: url('../../assets/icons/user-search.svg')"></span></div>
         <div class="history-info">
           <div class="history-mode">Undercover — Ranked</div>
           <div class="history-details">6 players · 18 min · Caught early</div>
@@ -360,7 +360,7 @@
         <div class="history-rp" style="color:var(--red)">−12 RP</div>
       </div>
       <div class="history-row">
-        <div class="history-mode-icon">🃟</div>
+        <div class="history-mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/club.svg'); mask-image: url('../../assets/icons/club.svg')"></span></div>
         <div class="history-info">
           <div class="history-mode">UNO — Ranked</div>
           <div class="history-details">3 players · 9 min · +4 card streak</div>
@@ -369,7 +369,7 @@
         <div class="history-rp">+18 RP</div>
       </div>
       <div class="history-row">
-        <div class="history-mode-icon">🤥</div>
+        <div class="history-mode-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/drama.svg'); mask-image: url('../../assets/icons/drama.svg')"></span></div>
         <div class="history-info">
           <div class="history-mode">Bluff — Ranked</div>
           <div class="history-details">4 players · 15 min · Last standing</div>
@@ -381,14 +381,15 @@
   </div>
 
   <div class="bottomnav">
-    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon">🎮</span>Play</div>
-    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon">🏆</span>Ranked</div>
-    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon">🛒</span>Shop</div>
-    <div class="bnav-item active" onclick="navTo('profileScreen',this)"><span class="bnav-icon">👤</span>Profile</div>
-    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon">🏠</span>Menu</div>
+    <div class="bnav-item" onclick="navTo('lobbyScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/gamepad-2.svg'); mask-image: url('../../assets/icons/gamepad-2.svg')"></span></span>Play</div>
+    <div class="bnav-item" onclick="navTo('rankedScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/trophy.svg'); mask-image: url('../../assets/icons/trophy.svg')"></span></span>Ranked</div>
+    <div class="bnav-item" onclick="navTo('shopScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/shopping-cart.svg'); mask-image: url('../../assets/icons/shopping-cart.svg')"></span></span>Shop</div>
+    <div class="bnav-item active" onclick="navTo('profileScreen',this)"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/user.svg'); mask-image: url('../../assets/icons/user.svg')"></span></span>Profile</div>
+    <div class="bnav-item" onclick="goScreen('menuScreen')"><span class="bnav-icon"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/house.svg'); mask-image: url('../../assets/icons/house.svg')"></span></span>Menu</div>
   </div>
 </div>
 
+<script src="../../assets/js/notifications.js" data-icones="../../assets/icons/"></script>
 <script src="script.js"></script>
 </body>
 </html>

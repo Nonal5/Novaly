@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/notifications.css">
 </head>
 <body>
     <div class="app-wrapper">
@@ -24,7 +25,7 @@
 <header class="main-header">
         <div class="header-left">
             <div class="logo-img" onclick="navigateTo('#magasin', 'store')">NOVALY</div>
-            <div class="menu-toggle" onclick="toggleMobileMenu()">☰</div>
+            <div class="menu-toggle" onclick="toggleMobileMenu()"><span class="ico" style="-webkit-mask-image: url('assets/icons/menu.svg'); mask-image: url('assets/icons/menu.svg')"></span></div>
             <nav class="nav-links">
                 <div class="nav-item active" id="nav-store" data-i18n="navStore" onclick="navigateTo('#magasin', 'store')">Magasin</div>
                 <div class="nav-item" id="nav-online" data-i18n="navOnline" onclick="navigateTo('#jeuxonline', 'online')">Jeux rapide</div>
@@ -260,23 +261,23 @@
                 <p data-i18n="communityDesc" style="margin-bottom: 30px;">Rejoignez la discussion, partagez vos créations et trouvez des coéquipiers.</p>
                 <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
                     <div class="news-card">
-                        <h4 data-i18n="commNews1Title">
+                        <h4>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-                            Mise à jour v1.2 : Patch Notes
+                            <span data-i18n="commNews1Title">Mise à jour v1.2 : Patch Notes</span>
                         </h4>
                         <p data-i18n="commNews1Desc">Découvrez toutes les nouveautés, corrections de bugs et équilibrages apportés par la dernière mise à jour.</p>
                     </div>
                     <div class="news-card">
-                        <h4 data-i18n="commNews2Title">
+                        <h4>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-                            Tournoi Galactic Warfare
+                            <span data-i18n="commNews2Title">Tournoi Galactic Warfare</span>
                         </h4>
                         <p data-i18n="commNews2Desc">Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.</p>
                     </div>
                     <div class="news-card">
-                        <h4 data-i18n="commNews3Title">
+                        <h4>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="5.5" r="1.5"/><circle cx="18.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
-                            Créations de la semaine
+                            <span data-i18n="commNews3Title">Créations de la semaine</span>
                         </h4>
                         <p data-i18n="commNews3Desc">Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.</p>
                     </div>
@@ -292,7 +293,7 @@
                     <p style="margin: 0; font-size: 14px; color: var(--text-main); font-weight: 600;" data-i18n="aboutVersion" id="version-text">Version du Launcher : Chargement...</p>                    <p style="margin: 5px 0 0 0; font-size: 13px;" data-i18n="aboutStatus">Tous les systèmes sont opérationnels.</p>
                 </div>
                 <button class="btn" id="btn-verifier-maj" data-i18n="aboutBtn">Vérifier les mises à jour</button>
-                <button class="btn" style="background: #f1c40f; color: black; margin-top: 15px;" onclick="debloquerSucces('succes_test_1', 'Mon Premier Test !', 'Le système de succès fonctionne à merveille.')">🏆 Tester le pop-up</button>
+                <button class="btn" style="background: #f1c40f; color: black; margin-top: 15px;" onclick="debloquerSucces('succes_test_1', 'Mon Premier Test !', 'Le système de succès fonctionne à merveille.')"><span class="ico" style="-webkit-mask-image: url('assets/icons/trophy.svg'); mask-image: url('assets/icons/trophy.svg')"></span> Tester une notification de succès</button>
             </div>
         </div>
 
@@ -562,7 +563,7 @@
         <div id="chat-box" style="display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px 8px 0 0; z-index: 1500; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
     <div style="padding: 12px 15px; background: #0a0a0a; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0;">
         <span id="chat-title" style="font-weight: bold; font-size: 13px; color: white;">Chat</span>
-        <span style="cursor: pointer; color: #888; font-weight: bold;" onclick="document.getElementById('chat-box').style.display='none'">✕</span>
+        <span style="cursor: pointer; color: #888; font-weight: bold;" onclick="document.getElementById('chat-box').style.display='none'"><span class="ico" style="-webkit-mask-image: url('assets/icons/x.svg'); mask-image: url('assets/icons/x.svg')"></span></span>
     </div>
     <div id="chat-messages" style="height: 250px; overflow-y: auto; padding: 15px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
         <!-- Les messages apparaitront ici -->
@@ -573,32 +574,10 @@
     </div>
 </div>
 <!-- POP-UP D'ALERTE PERSONNALISÉ MODERNE -->
-<div id="novaly-alert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
-    <div style="background: rgba(25, 25, 30, 0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; text-align: center; max-width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-        
-        <div style="width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-        </div>
-        
-        <h3 style="margin: 0 0 10px; color: #fff; font-size: 16px; font-weight: 600;">Information</h3>
-        <p id="novaly-alert-text" style="color: #aaa; font-size: 13px; margin-bottom: 25px; line-height: 1.5;"></p>
-        
-        <button style="background: white; color: black; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#ddd'" onmouseout="this.style.background='white'" onclick="document.getElementById('novaly-alert').style.display='none'">Compris</button>
-    </div>
-</div>
-<!-- POP-UP SUCCÈS DÉBLOQUÉ -->
-<div id="achievement-toast" style="display: none; position: fixed; top: 50px; right: 20px; background: #1a1a1a; border: 1px solid #f1c40f; border-radius: 8px; padding: 15px; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); animation: slideUpFade 0.4s ease;">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 24px;">🏆</span>
-        <div>
-            <div style="font-size: 10px; font-weight: 800; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px;">Succès Débloqué !</div>
-            <div id="toast-title" style="font-size: 13px; font-weight: bold; color: white;">Titre</div>
-            <div id="toast-desc" style="font-size: 11px; color: #aaa;">Description</div>
-        </div>
-    </div>
-</div>
+
     </main>
 </div>
+    <script src="js/notifications.js" data-icones="assets/icons/"></script>
     <script src="js/index.ui.js"></script>
 
     <script type="module" src="js/index.app.js"></script>

@@ -621,7 +621,7 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
         };
 
         window.removeCard = async function() {
-            if(confirm("Supprimer ce moyen de paiement ?")) {
+            if (await confirmer("Supprimer ce moyen de paiement ?", { confirmer: "Supprimer", danger: true })) {
                 document.getElementById('saved-cards-list').style.display = 'none';
                 document.getElementById('add-card-btn').style.display = 'block';
                 document.getElementById('fake-card-num').value = "";
@@ -637,11 +637,10 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
             const userDocRef = privateDocRef(auth.currentUser.uid);
 
             if (btn.innerText === "Associer") {
-                let popup = window.open("", "Connexion", "width=500,height=600");
-                popup.document.write(`<div style="font-family:sans-serif;text-align:center;margin-top:50px;"><h2>Connexion à ${platform.toUpperCase()}</h2><p>Veuillez patienter pendant l'autorisation sécurisée...</p></div>`);
+                const attente = notifier(`Connexion à ${platform.toUpperCase()} en cours...`, { duree: 0, icone: "refresh-cw" });
 
                 setTimeout(async () => {
-                    popup.close();
+                    attente.fermer();
                     btn.innerText = "Dissocier";
                     btn.style.background = "#ff4757";
                     btn.style.color = "white";
@@ -708,8 +707,8 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
         window.joinPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
         window.createPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
 
-        window.quitterJeu = function() {
-            if(confirm("Êtes-vous sûr de vouloir quitter le jeu en cours ?")) {
+        window.quitterJeu = async function() {
+            if (await confirmer("Quitter la partie en cours ?", { confirmer: "Quitter", danger: true })) {
                 document.getElementById('game-container').style.display = 'none';
                 document.getElementById('game-frame').src = '';
                 navigateTo('#magasin', 'store');
@@ -718,7 +717,7 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
 
         window.ajouterALaBibliotheque = async function(gameId, btnElement) {
             if (!auth.currentUser) {
-                afficherAlerte("Vous devez être connecté !");
+                notifier("Vous devez être connecté !", { type: 'erreur' });
                 return;
             }
             if (window.mesJeux.includes(gameId)) {
@@ -947,9 +946,9 @@ window.actualiserBibliotheque = async function() {
                     let statusHtml = '';
                     if (isMe) {
                         if (msg.status === 'read') {
-                            statusHtml = `<span style="color: #4cd137; font-size: 10px; margin-left: 4px; font-weight: bold;">✓✓</span>`;
+                            statusHtml = `<span style="color: #4cd137; font-size: 10px; margin-left: 4px; font-weight: bold;">${icone('check-check')}</span>`;
                         } else {
-                            statusHtml = `<span style="color: #888; font-size: 10px; margin-left: 4px; font-weight: bold;">✓</span>`;
+                            statusHtml = `<span style="color: #888; font-size: 10px; margin-left: 4px; font-weight: bold;">${icone('check')}</span>`;
                         }
                     }
 
@@ -997,7 +996,7 @@ window.actualiserBibliotheque = async function() {
 window.acheterJeu = async function(gameId) {
     const user = auth.currentUser;
     if (!user) {
-        afficherAlerte("Veuillez vous connecter pour acheter ce jeu.");
+        notifier("Veuillez vous connecter pour acheter ce jeu.", { type: 'erreur' });
         return;
     }
 
@@ -1022,7 +1021,7 @@ window.acheterJeu = async function(gameId) {
 
         if (data.owned) {
             // Jeu gratuit : ajouté directement par le serveur
-            afficherAlerte("Jeu ajouté à votre bibliothèque !");
+            notifier("Jeu ajouté à votre bibliothèque !", { type: 'succes' });
             zoneAction.innerHTML = boutonOriginal;
         } else if (data.url) {
             // Ouverture sécurisée du lien Stripe via le plugin opener (universel V2)
@@ -1037,12 +1036,12 @@ window.acheterJeu = async function(gameId) {
             setTimeout(() => { zoneAction.innerHTML = boutonOriginal; }, 5000);
 
         } else {
-            afficherAlerte(data.error || "Impossible d'initialiser le paiement Stripe.");
+            notifier(data.error || "Impossible d'initialiser le paiement Stripe.", { type: 'erreur' });
             zoneAction.innerHTML = boutonOriginal;
         }
     } catch (e) {
         console.error("Erreur Stripe :", e);
-        afficherAlerte("Erreur réseau lors de la connexion à la banque.");
+        notifier("Erreur réseau lors de la connexion à la banque.", { type: 'erreur' });
         zoneAction.innerHTML = boutonOriginal;
     }
 };
@@ -1131,7 +1130,7 @@ window.activeDownloads = {};
 
 window.telechargerJeu = async function(gameId) {
     if (window.activeDownloads[gameId]) {
-        afficherAlerte("Ce jeu est déjà en cours de téléchargement !");
+        notifier("Ce jeu est déjà en cours de téléchargement !", { type: 'erreur' });
         return;
     }
 
@@ -1237,7 +1236,7 @@ window.telechargerJeu = async function(gameId) {
             badge.style.display = 'none';
         }
 
-        afficherAlerte(`🚀 ${gameData.titre} est installé et prêt à jouer !`);
+        notifier(`${gameData.titre} est installé et prêt à jouer !`, { type: 'succes', icone: 'rocket' });
 
         const currentTitle = document.getElementById('detail-title').innerText;
         if (window.currentViewId === 'game-detail' && currentTitle === gameData.titre) {
@@ -1247,7 +1246,7 @@ window.telechargerJeu = async function(gameId) {
     } catch (err) {
         console.error("Erreur de téléchargement :", err);
         delete window.activeDownloads[gameId];
-        afficherAlerte(`⏸ Téléchargement interrompu. Cliquez sur Télécharger pour reprendre.`);
+        notifier("Téléchargement interrompu. Cliquez sur Télécharger pour reprendre.", { type: 'erreur', icone: 'pause' });
 
         // NOUVEAU : Nettoyage uniquement du dossier corrompu, on garde le .zip
         try {
@@ -1289,7 +1288,7 @@ window.lancerJeuInstalle = async function(cheminExec, gameId, gameTitle) {
     if (actionZone) {
         actionZone.innerHTML = `
             <button class="btn" style="background: #ff4757; color: white; border: none; padding: 12px 25px; font-weight: bold; border-radius: 6px;" onclick="signalerFinDeJeu(${jsArg(gameId)})">
-                ⏹ Terminer la session
+                ${icone('square')} Terminer la session
             </button>
             <p style="color: #aaa; font-size: 11px; margin-top: 10px;">Le jeu tourne en arrière-plan. Cliquez ici quand vous avez fini pour sauvegarder votre temps.</p>
         `;
@@ -1324,7 +1323,7 @@ window.signalerFinDeJeu = async function(gameId) {
 };
 
 window.desinstallerJeu = async function(gameId) {
-    if (!confirm("Voulez-vous vraiment désinstaller ce jeu et supprimer tous ses fichiers ?")) return;
+    if (!(await confirmer("Désinstaller ce jeu et supprimer tous ses fichiers ?", { confirmer: "Désinstaller", danger: true }))) return;
 
     const zoneAction = document.getElementById('detail-action-zone');
     zoneAction.innerHTML = `<button class="btn" disabled style="background: #333; color: #aaa; width: 100%; padding: 15px; font-size: 16px;">Désinstallation en cours...</button>`;
@@ -1340,7 +1339,7 @@ window.desinstallerJeu = async function(gameId) {
 
     } catch (err) {
         console.error("Erreur de désinstallation:", err);
-        afficherAlerte("Impossible de supprimer certains fichiers.");
+        notifier("Impossible de supprimer certains fichiers.", { type: 'erreur' });
         window.afficherPageJeu(gameId); 
     }
 };
@@ -1377,7 +1376,7 @@ window.choisirDossierDefaut = async function() {
     if (selectedFolder) {
         localStorage.setItem('novaly_default_install_path', selectedFolder);
         document.getElementById('settings-install-path').innerText = selectedFolder;
-        afficherAlerte("Dossier principal mis à jour !");
+        notifier("Dossier principal mis à jour !", { type: 'succes' });
     }
 };
 // ================= SYSTÈME DE SUCCÈS =================
@@ -1403,17 +1402,8 @@ window.debloquerSucces = async function(succesId, titre, description) {
         })
     }, { merge: true });
 
-    // Affichage de la notification toast
-    const toast = document.getElementById('achievement-toast');
-    document.getElementById('toast-title').innerText = titre;
-    document.getElementById('toast-desc').innerText = description;
-
-    if (toast) {
-        toast.style.display = 'block';
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 4000);
-    }
+    // Notification en haut de l'écran
+    notifier(description, { type: 'trophee', titre: `Succès débloqué : ${titre}` });
 };
 // ================= GESTION DE LA CONNEXION INTERNET (HORS-LIGNE) =================
 window.addEventListener('offline', () => {

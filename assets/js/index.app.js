@@ -572,7 +572,7 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
         };
 
         window.removeCard = async function() {
-            if(confirm("Supprimer ce moyen de paiement ?")) {
+            if (await confirmer("Supprimer ce moyen de paiement ?", { confirmer: "Supprimer", danger: true })) {
                 document.getElementById('saved-cards-list').style.display = 'none';
                 document.getElementById('add-card-btn').style.display = 'block';
                 document.getElementById('fake-card-num').value = "";
@@ -588,11 +588,10 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
             const userDocRef = privateDocRef(auth.currentUser.uid);
 
             if (btn.innerText === "Associer") {
-                let popup = window.open("", "Connexion", "width=500,height=600");
-                popup.document.write(`<div style="font-family:sans-serif;text-align:center;margin-top:50px;"><h2>Connexion à ${platform.toUpperCase()}</h2><p>Veuillez patienter pendant l'autorisation sécurisée...</p></div>`);
+                const attente = notifier(`Connexion à ${platform.toUpperCase()} en cours...`, { duree: 0, icone: "refresh-cw" });
 
                 setTimeout(async () => {
-                    popup.close();
+                    attente.fermer();
                     btn.innerText = "Dissocier";
                     btn.style.background = "#ff4757";
                     btn.style.color = "white";
@@ -659,8 +658,8 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
         window.joinPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
         window.createPrivateMatch = function() { chargerLeJeuEnPleinEcran(); };
 
-        window.quitterJeu = function() {
-            if(confirm("Êtes-vous sûr de vouloir quitter le jeu en cours ?")) {
+        window.quitterJeu = async function() {
+            if (await confirmer("Quitter la partie en cours ?", { confirmer: "Quitter", danger: true })) {
                 document.getElementById('game-container').style.display = 'none';
                 document.getElementById('game-frame').src = '';
                 navigateTo('#magasin', 'store');
@@ -669,7 +668,7 @@ if(onlineList) onlineList.innerHTML = onlineCount > 0 ? onlineHtml : '<p style="
 
         window.ajouterALaBibliotheque = async function(gameId, btnElement) {
             if (!auth.currentUser) {
-                afficherAlerte("Vous devez être connecté !");
+                notifier("Vous devez être connecté !", { type: 'erreur' });
                 return;
             }
             if (window.mesJeux.includes(gameId)) {
@@ -894,9 +893,9 @@ window.actualiserBibliotheque = async function() {
                     let statusHtml = '';
                     if (isMe) {
                         if (msg.status === 'read') {
-                            statusHtml = `<span style="color: #4cd137; font-size: 10px; margin-left: 4px; font-weight: bold;">✓✓</span>`;
+                            statusHtml = `<span style="color: #4cd137; font-size: 10px; margin-left: 4px; font-weight: bold;">${icone('check-check')}</span>`;
                         } else {
-                            statusHtml = `<span style="color: #888; font-size: 10px; margin-left: 4px; font-weight: bold;">✓</span>`;
+                            statusHtml = `<span style="color: #888; font-size: 10px; margin-left: 4px; font-weight: bold;">${icone('check')}</span>`;
                         }
                     }
 
@@ -944,7 +943,7 @@ window.actualiserBibliotheque = async function() {
 window.acheterJeu = async function(gameId) {
     const user = auth.currentUser;
     if (!user) {
-        afficherAlerte("Veuillez vous connecter pour acheter ce jeu.");
+        notifier("Veuillez vous connecter pour acheter ce jeu.", { type: 'erreur' });
         return;
     }
 
@@ -969,19 +968,19 @@ window.acheterJeu = async function(gameId) {
 
         if (data.owned) {
             // Jeu gratuit : ajouté directement par le serveur
-            afficherAlerte("Jeu ajouté à votre bibliothèque !");
+            notifier("Jeu ajouté à votre bibliothèque !", { type: 'succes' });
             zoneAction.innerHTML = boutonOriginal;
         } else if (data.url) {
             // Redirection vers la page de paiement Stripe (retour sur le site ensuite)
             window.location.href = data.url;
 
         } else {
-            afficherAlerte(data.error || "Impossible d'initialiser le paiement Stripe.");
+            notifier(data.error || "Impossible d'initialiser le paiement Stripe.", { type: 'erreur' });
             zoneAction.innerHTML = boutonOriginal;
         }
     } catch (e) {
         console.error("Erreur Stripe :", e);
-        afficherAlerte("Erreur réseau lors de la connexion à la banque.");
+        notifier("Erreur réseau lors de la connexion à la banque.", { type: 'erreur' });
         zoneAction.innerHTML = boutonOriginal;
     }
 };
@@ -1048,17 +1047,8 @@ window.debloquerSucces = async function(succesId, titre, description) {
         })
     }, { merge: true });
 
-    // Affichage de la notification toast
-    const toast = document.getElementById('achievement-toast');
-    document.getElementById('toast-title').innerText = titre;
-    document.getElementById('toast-desc').innerText = description;
-
-    if (toast) {
-        toast.style.display = 'block';
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 4000);
-    }
+    // Notification en haut de l'écran
+    notifier(description, { type: 'trophee', titre: `Succès débloqué : ${titre}` });
 };
 // ================= GESTION DE LA CONNEXION INTERNET (HORS-LIGNE) =================
 window.addEventListener('offline', () => {

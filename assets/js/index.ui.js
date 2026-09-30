@@ -64,9 +64,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Découvrez la nouvelle extension majeure. Explorez de nouveaux territoires et forgez votre propre destin.", bannerBtn: "Acheter Maintenant",
                 storeSubtitle: "Nouveautés et Tendances", searchResults: "Résultats de recherche...", readyToPlay: "Prêt à jouer",
                 communityTitle: "Communauté Novaly", communityDesc: "Rejoignez la discussion, partagez vos créations et trouvez des coéquipiers.",
-                commNews1Title: "📢 Mise à jour v1.2 : Patch Notes", commNews1Desc: "Découvrez toutes les nouveautés, corrections de bugs et équilibrages apportés par la dernière mise à jour.",
-                commNews2Title: "🏆 Tournoi Galactic Warfare", commNews2Desc: "Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.",
-                commNews3Title: "🎨 Créations de la semaine", commNews3Desc: "Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.",
+                commNews1Title: "Mise à jour v1.2 : Patch Notes", commNews1Desc: "Découvrez toutes les nouveautés, corrections de bugs et équilibrages apportés par la dernière mise à jour.",
+                commNews2Title: "Tournoi Galactic Warfare", commNews2Desc: "Les inscriptions pour le tournoi d'été sont ouvertes ! Constituez votre équipe et tentez de remporter le grand prix.",
+                commNews3Title: "Créations de la semaine", commNews3Desc: "Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.",
                 aboutTitle: "À propos de Novaly", aboutDesc1: "Novaly est votre plateforme de jeu de nouvelle génération, conçue pour offrir des performances optimales, une bibliothèque unifiée et une expérience utilisateur fluide sans distraction.",
                 aboutVersion: "Version du Launcher :", aboutStatus: "Tous les systèmes sont opérationnels.", aboutBtn: "Vérifier les mises à jour", aboutBtnWeb: "Télécharger la dernière version",
                 cartEmpty: "Votre panier est vide", cartDesc: "Découvrez nos nouveautés dans le magasin.", goStore: "Aller au magasin",
@@ -82,9 +82,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Discover the new major expansion. Explore new territories and forge your own destiny.", bannerBtn: "Buy Now",
                 storeSubtitle: "New & Trending", searchResults: "Search Results...", readyToPlay: "Ready to Play",
                 communityTitle: "Novaly Community", communityDesc: "Join the discussion, share your creations, and find teammates.",
-                commNews1Title: "📢 Update v1.2 : Patch Notes", commNews1Desc: "Discover all the new features, bug fixes, and balancing brought by the latest update.",
-                commNews2Title: "🏆 Galactic Warfare Tournament", commNews2Desc: "Registrations for the summer tournament are open! Form your team and try to win the grand prize.",
-                commNews3Title: "🎨 Creations of the week", commNews3Desc: "Check out the most popular mods and fan-arts voted by players this week.",
+                commNews1Title: "Update v1.2 : Patch Notes", commNews1Desc: "Discover all the new features, bug fixes, and balancing brought by the latest update.",
+                commNews2Title: "Galactic Warfare Tournament", commNews2Desc: "Registrations for the summer tournament are open! Form your team and try to win the grand prize.",
+                commNews3Title: "Creations of the week", commNews3Desc: "Check out the most popular mods and fan-arts voted by players this week.",
                 aboutTitle: "About Novaly", aboutDesc1: "Novaly is your next-generation gaming platform, designed to offer optimal performance, a unified library, and a seamless distraction-free user experience.",
                 aboutVersion: "Launcher Version:", aboutStatus: "All systems operational.", aboutBtn: "Check for updates", aboutBtnWeb: "Download the latest version",
                 cartEmpty: "Your cart is empty", cartDesc: "Check out our new releases in the store.", goStore: "Go to Store",
@@ -100,9 +100,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Descubre la nueva expansión mayor. Explora nuevos territorios y forja tu propio destino.", bannerBtn: "Comprar Ahora",
                 storeSubtitle: "Novedades y Tendencias", searchResults: "Resultados de búsqueda...", readyToPlay: "Listo para jugar",
                 communityTitle: "Comunidad Novaly", communityDesc: "Únete a la discusión, comparte tus creaciones y encuentra compañeros de equipo.",
-                commNews1Title: "📢 Actualización v1.2 : Notas del Parche", commNews1Desc: "Descubre todas las novedades, correcciones de errores y ajustes de equilibrio de la última actualización.",
-                commNews2Title: "🏆 Torneo Galactic Warfare", commNews2Desc: "¡Las inscripciones para el torneo de verano están abiertas! Forma tu equipo y compite por el gran premio.",
-                commNews3Title: "🎨 Creaciones de la semana", commNews3Desc: "Descubre los mods y fan-arts más populares votados por los jugadores esta semana.",
+                commNews1Title: "Actualización v1.2 : Notas del Parche", commNews1Desc: "Descubre todas las novedades, correcciones de errores y ajustes de equilibrio de la última actualización.",
+                commNews2Title: "Torneo Galactic Warfare", commNews2Desc: "¡Las inscripciones para el torneo de verano están abiertas! Forma tu equipo y compite por el gran premio.",
+                commNews3Title: "Creaciones de la semana", commNews3Desc: "Descubre los mods y fan-arts más populares votados por los jugadores esta semana.",
                 aboutTitle: "Acerca de Novaly", aboutDesc1: "Novaly es tu plataforma de juegos de próxima generación, diseñada para ofrecer un rendimiento óptimo y una experiencia fluida sin distracciones.",
                 aboutVersion: "Versión del Launcher:", aboutStatus: "Todos los sistemas operativos.", aboutBtn: "Buscar actualizaciones", aboutBtnWeb: "Descargar la última versión",
                 cartEmpty: "Tu carrito está vacío", cartDesc: "Descubre nuestras novedades en la tienda.", goStore: "Ir a la tienda",
@@ -118,9 +118,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Entdecken Sie die neue große Erweiterung. Erkunden Sie neue Gebiete und schmieden Sie Ihr eigenes Schicksal.", bannerBtn: "Jetzt Kaufen",
                 storeSubtitle: "Neu & im Trend", searchResults: "Suchergebnisse...", readyToPlay: "Bereit zum Spielen",
                 communityTitle: "Novaly Gemeinschaft", communityDesc: "Tritt der Diskussion bei, teile deine Kreationen und finde Teamkollegen.",
-                commNews1Title: "📢 Update v1.2 : Patchnotes", commNews1Desc: "Entdecken Sie alle neuen Funktionen, Fehlerbehebungen und Anpassungen des neuesten Updates.",
-                commNews2Title: "🏆 Galactic Warfare Turnier", commNews2Desc: "Die Anmeldungen für das Sommerturnier sind eröffnet! Bilde dein Team und gewinne den Hauptpreis.",
-                commNews3Title: "🎨 Kreationen der Woche", commNews3Desc: "Sieh dir die beliebtesten Mods und Fan-Arts an, die diese Woche von den Spielern gewählt wurden.",
+                commNews1Title: "Update v1.2 : Patchnotes", commNews1Desc: "Entdecken Sie alle neuen Funktionen, Fehlerbehebungen und Anpassungen des neuesten Updates.",
+                commNews2Title: "Galactic Warfare Turnier", commNews2Desc: "Die Anmeldungen für das Sommerturnier sind eröffnet! Bilde dein Team und gewinne den Hauptpreis.",
+                commNews3Title: "Kreationen der Woche", commNews3Desc: "Sieh dir die beliebtesten Mods und Fan-Arts an, die diese Woche von den Spielern gewählt wurden.",
                 aboutTitle: "Über Novaly", aboutDesc1: "Novaly ist Ihre Gaming-Plattform der nächsten Generation, entwickelt für optimale Leistung und ein nahtloses Benutzererlebnis.",
                 aboutVersion: "Launcher-Version:", aboutStatus: "Alle Systeme sind betriebsbereit.", aboutBtn: "Nach Updates suchen", aboutBtnWeb: "Neueste Version herunterladen",
                 cartEmpty: "Dein Warenkorb ist leer", cartDesc: "Entdecke unsere Neuheiten im Shop.", goStore: "Zum Shop",
@@ -136,9 +136,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 bannerTitle: "Cyberpunk Adventures", bannerDesc: "Scopri la nuova grande espansione. Esplora nuovi territori e forgia il tuo destino.", bannerBtn: "Acquista Ora",
                 storeSubtitle: "Novità e Tendenze", searchResults: "Risultati della ricerca...", readyToPlay: "Pronto per giocare",
                 communityTitle: "Comunità Novaly", communityDesc: "Unisciti alla discussione, condividi le tue creazioni e trova compagni di squadra.",
-                commNews1Title: "📢 Aggiornamento v1.2: Note sulla patch", commNews1Desc: "Scopri tutte le novità, le correzioni di bug e i bilanciamenti apportati dall'ultimo aggiornamento.",
-                commNews2Title: "🏆 Torneo Galactic Warfare", commNews2Desc: "Le iscrizioni per il torneo estivo sono aperte! Forma la tua squadra e prova a vincere il primo premio.",
-                commNews3Title: "🎨 Creazioni della settimana", commNews3Desc: "Scopri le mod e le fan-art più popolari votate dai giocatori questa settimana.",
+                commNews1Title: "Aggiornamento v1.2: Note sulla patch", commNews1Desc: "Scopri tutte le novità, le correzioni di bug e i bilanciamenti apportati dall'ultimo aggiornamento.",
+                commNews2Title: "Torneo Galactic Warfare", commNews2Desc: "Le iscrizioni per il torneo estivo sono aperte! Forma la tua squadra e prova a vincere il primo premio.",
+                commNews3Title: "Creazioni della settimana", commNews3Desc: "Scopri le mod e le fan-art più popolari votate dai giocatori questa settimana.",
                 aboutTitle: "Informazioni su Novaly", aboutDesc1: "Novaly è la tua piattaforma di gioco di nuova generazione, progettata per offrire prestazioni ottimali e un'esperienza fluida.",
                 aboutVersion: "Versione Launcher:", aboutStatus: "Tutti i sistemi sono operativi.", aboutBtn: "Verifica aggiornamenti", aboutBtnWeb: "Scarica l'ultima versione",
                 cartEmpty: "Il tuo carrello è vuoto", cartDesc: "Scopri le nostre novità nel negozio.", goStore: "Vai al negozio",
@@ -323,10 +323,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 renderView('store'); // Vue par défaut
         }
         });
-        window.afficherAlerte = function(message) {
-    document.getElementById('novaly-alert-text').innerText = message;
-    document.getElementById('novaly-alert').style.display = 'flex';
-};
 
 // ================= OUVERTURE DIRECTE D'UNE SECTION (liens du plan du site, retour de paiement) =================
 const VUES_PAR_ANCRE = {

@@ -40,6 +40,7 @@
     },
     "opener:default",
     "opener:allow-open-path",
+    "process:allow-restart",
     "shell:default",
     {
       "identifier": "shell:allow-execute",

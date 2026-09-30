@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nolimite</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/notifications.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,7 +26,7 @@
 
     <!-- RECONNEXION BANNER -->
     <div class="reconnect-banner" id="reconnect-banner">
-        ⚠️ Connexion perdue — Tentative de reconnexion...
+        <span class="ico" style="-webkit-mask-image: url('../../assets/icons/triangle-alert.svg'); mask-image: url('../../assets/icons/triangle-alert.svg')"></span> Connexion perdue — Tentative de reconnexion...
     </div>
 
     <!-- =================== SETUP SCREEN =================== -->
@@ -42,7 +43,7 @@
         <div class="form-group">
             <label>Photo de profil (optionnel)</label>
             <div class="file-input-wrapper">
-                📷 Prendre une photo / Galerie
+                <span class="ico" style="-webkit-mask-image: url('../../assets/icons/camera.svg'); mask-image: url('../../assets/icons/camera.svg')"></span> Prendre une photo / Galerie
                 <input type="file" accept="image/*" id="avatar-file-input">
             </div>
         </div>
@@ -112,7 +113,7 @@
             </div>
 
             <button class="btn-primary" id="confirm-btn" style="display: none; border-radius: 30px; margin-top: 8px; max-width: 240px;" onclick="window.validerCarteFirebase()">
-                ✓ Confirmer mon choix
+                <span class="ico" style="-webkit-mask-image: url('../../assets/icons/check.svg'); mask-image: url('../../assets/icons/check.svg')"></span> Confirmer mon choix
             </button>
 
             <div id="judge-area" class="submitted-cards-container" style="display: none;"></div>
@@ -120,11 +121,11 @@
 
         <!-- REACTIONS -->
         <div class="reaction-bar" id="reaction-bar">
-            <button class="reaction-btn" onclick="sendReaction('😂')">😂</button>
-            <button class="reaction-btn" onclick="sendReaction('🔥')">🔥</button>
-            <button class="reaction-btn" onclick="sendReaction('💀')">💀</button>
-            <button class="reaction-btn" onclick="sendReaction('👑')">👑</button>
-            <button class="reaction-btn" onclick="sendReaction('🤮')">🤮</button>
+            <button class="reaction-btn" onclick="sendReaction('rire')" title="rire"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/laugh.svg'); mask-image: url('../../assets/icons/laugh.svg')"></span></button>
+            <button class="reaction-btn" onclick="sendReaction('feu')" title="feu"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/flame.svg'); mask-image: url('../../assets/icons/flame.svg')"></span></button>
+            <button class="reaction-btn" onclick="sendReaction('crane')" title="crane"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/skull.svg'); mask-image: url('../../assets/icons/skull.svg')"></span></button>
+            <button class="reaction-btn" onclick="sendReaction('couronne')" title="couronne"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/crown.svg'); mask-image: url('../../assets/icons/crown.svg')"></span></button>
+            <button class="reaction-btn" onclick="sendReaction('beurk')" title="beurk"><span class="ico" style="-webkit-mask-image: url('../../assets/icons/thumbs-down.svg'); mask-image: url('../../assets/icons/thumbs-down.svg')"></span></button>
         </div>
 
         <div class="player-hand" id="hand-area"></div>
@@ -132,7 +133,7 @@
 
     <!-- =================== END SCREEN =================== -->
     <div id="end-screen">
-        <div style="font-size: 36px; margin-bottom: 5px;">🏆</div>
+        <div style="font-size: 36px; margin-bottom: 5px;"><span class="ico ico-or" style="-webkit-mask-image: url('../../assets/icons/trophy.svg'); mask-image: url('../../assets/icons/trophy.svg')"></span></div>
         <h2 style="font-size: 24px; font-weight: 900; margin: 0;" id="winner-name">—</h2>
         <p style="color: #aaa; font-size: 14px; margin-top: 5px;">a remporté la partie !</p>
         <div class="podium" id="podium"></div>
@@ -140,15 +141,9 @@
         <button class="btn-primary" style="max-width: 280px; margin-top: 10px;" onclick="window.relancerPartie()">Rejouer</button>
     </div>
 
-    <!-- NOTIFICATION -->
-    <div id="custom-notification">
-        <div class="notification-content">
-            <h3 id="notification-title">Titre</h3>
-            <p id="notification-text">Texte</p>
-            <button onclick="window.fermerNotification()">OK</button>
-        </div>
     </div>
 </div>
+    <script src="../../js/notifications.js" data-icones="../../assets/icons/"></script>
     <script type="module" src="script.js"></script>
 </body>
 </html>

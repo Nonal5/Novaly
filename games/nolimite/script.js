@@ -94,7 +94,7 @@ window.copyRoomCode = function() {
     const code = document.getElementById('display-room-code').innerText;
     navigator.clipboard?.writeText(code).then(() => {
         const el = document.querySelector('.copy-hint');
-        if (el) { el.innerText = '✓ Copié !'; setTimeout(() => el.innerText = 'Appuyez pour copier', 1500); }
+        if (el) { el.innerHTML = icone('check') + ' Copié !'; setTimeout(() => el.innerText = 'Appuyez pour copier', 1500); }
     });
 };
 
@@ -234,7 +234,7 @@ function renderWaiting(data) {
         const p = data.players[uid];
         if (!p) return;
         const avatarStyle = p.avatar ? `background-image:url(${cssUrl(p.avatar)});background-size:cover;font-size:0;` : '';
-        const kickBtn = (isHost && uid !== myUid) ? `<button class="kick-btn" onclick="kickPlayer(${jsArg(uid)})" title="Expulser">✕</button>` : '';
+        const kickBtn = (isHost && uid !== myUid) ? `<button class="kick-btn" onclick="kickPlayer(${jsArg(uid)})" title="Expulser">${icone('x')}</button>` : '';
         listEl.innerHTML += `
             <div class="waiting-player">
                 ${kickBtn}
@@ -317,7 +317,7 @@ function renderJudgeView(data, allSubmitted, expectedSubs, currentSubs, judgePse
         document.getElementById('timer-wrap').style.display = 'none';
         document.getElementById('judge-area').innerHTML = `
             <div style="text-align:center; color:#666; padding: 20px;">
-                <div style="font-size: 28px; margin-bottom: 10px;">⏳</div>
+                <div style="font-size: 28px; margin-bottom: 10px;">${icone('hourglass')}</div>
                 <p style="margin:0; font-size:13px;">Les joueurs choisissent leurs cartes...</p>
                 <p style="margin:8px 0 0; font-size:11px; color:#555;">${currentSubs}/${expectedSubs} réponse(s) reçue(s)</p>
             </div>`;
@@ -384,7 +384,7 @@ function renderScoreboard(data) {
         const isMe = uid === myUid;
         const pct = Math.min(100, Math.round((p.score / scoreLimit) * 100));
         const avatarStyle = p.avatar ? `background-image:url(${cssUrl(p.avatar)});background-size:cover;font-size:0;` : '';
-        const crownHtml = isJudge ? '<div class="crown">👑</div>' : '';
+        const crownHtml = isJudge ? `<div class="crown">${icone('crown', 'ico-or')}</div>` : '';
         sb.innerHTML += `
             <div class="player-score-box active-player ${isJudge ? 'is-judge' : ''} ${isMe ? 'is-me' : ''}">
                 ${crownHtml}
@@ -478,7 +478,7 @@ async function terminerManche(gagnantUid, winningText, data) {
     stopTimer();
 
     const gagnantPseudo = data.players[gagnantUid]?.pseudo || "Quelqu'un";
-    window.afficherNotification("🏆 Manche terminée !", `La carte de ${gagnantPseudo} a été choisie :\n\n"${winningText}"`);
+    window.afficherNotification("Manche terminée !", `La carte de ${gagnantPseudo} a été choisie :\n\n"${winningText}"`);
 
     // Update scores
     const players = JSON.parse(JSON.stringify(data.players));
@@ -532,14 +532,9 @@ function renderEndScreen(data) {
     // Podium
     const podium = document.getElementById('podium');
     podium.innerHTML = '';
-    const medals = [
-        { class: 'gold', emoji: '🥇', rank: 1, h: 90 },
-        { class: 'silver', emoji: '🥈', rank: 2, h: 65 },
-        { class: 'bronze', emoji: '🥉', rank: 3, h: 45 }
-    ];
     const order = [sorted[1], sorted[0], sorted[2]]; // silver, gold, bronze visual order
     const classOrder = ['silver', 'gold', 'bronze'];
-    const emojiOrder = ['🥈', '🥇', '🥉'];
+    const medailles = [icone('medal'), icone('medal'), icone('medal')]; // blanches sur les blocs colorés du podium
 
     order.forEach((p, i) => {
         if (!p) return;
@@ -549,7 +544,7 @@ function renderEndScreen(data) {
             <div class="avatar" style="width:50px;height:50px;${p.avatar ? `background-image:url(${cssUrl(p.avatar)});background-size:cover;font-size:0;` : ''}">${p.avatar ? '' : esc(p.pseudo?.charAt(0).toUpperCase())}</div>
             <div style="font-size:11px;font-weight:900;">${esc(p.pseudo)}</div>
             <div style="font-size:11px;color:#aaa;">${esc(p.score)} pts</div>
-            <div class="podium-block ${classOrder[i]}">${emojiOrder[i]}</div>`;
+            <div class="podium-block ${classOrder[i]}">${medailles[i]}</div>`;
         podium.appendChild(step);
     });
 
@@ -626,10 +621,15 @@ window.sendReaction = async function(emoji) {
     await updateDoc(roomRef, { reactions });
 };
 
+const ICONES_REACTIONS = { rire: 'laugh', feu: 'flame', crane: 'skull', couronne: 'crown', beurk: 'thumbs-down' };
+const ANCIENNES_REACTIONS = { '😂': 'rire', '🔥': 'feu', '💀': 'crane', '👑': 'couronne', '🤮': 'beurk' };
+
 function showFloatingReaction(emoji, xPct, yPct) {
+    const nom = ANCIENNES_REACTIONS[emoji] || emoji;
+    if (!ICONES_REACTIONS[nom]) return; // réaction inconnue : ignorée
     const el = document.createElement('div');
     el.className = 'floating-reaction';
-    el.innerText = emoji;
+    el.innerHTML = icone(ICONES_REACTIONS[nom]);
     el.style.left = (xPct || 50) + '%';
     el.style.top = (yPct || 70) + '%';
     document.body.appendChild(el);
@@ -638,13 +638,7 @@ function showFloatingReaction(emoji, xPct, yPct) {
 
 // ── NOTIFICATIONS ──────────────────────────────────────────────
 window.afficherNotification = function(titre, texte) {
-    document.getElementById('notification-title').innerText = titre;
-    document.getElementById('notification-text').innerText = texte;
-    document.getElementById('custom-notification').style.display = 'flex';
-};
-
-window.fermerNotification = function() {
-    document.getElementById('custom-notification').style.display = 'none';
+    notifier(texte, { type: 'trophee', titre });
 };
 
 // ── START GAME (HOST) ──────────────────────────────────────────
