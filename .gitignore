@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Dépendances & builds
+node_modules/
+target/
+
+# Logs
+*.log
+
+# Secrets
+*.key
+secret.txt
+.env
+
+# Fichiers de secrets
+*.env
+secrets*
+
+# Cache Firebase CLI
+.firebase/

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Imposteur</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="header">
+        <span>Imposteur</span>
+        <div class="timer">05:00</div>
+    </div>
+
+    <div class="game-board">
+        <p style="font-size: 13px; color: #bdc3c7; margin-bottom: 20px;">Maintenez enfoncé pour voir votre rôle discrètement</p>
+        
+        <div class="role-card" id="card" onmousedown="showRole()" onmouseup="hideRole()" ontouchstart="showRole()" ontouchend="hideRole()">
+            
+            <!-- État caché -->
+            <div class="role-hidden" id="hidden-state">
+                <svg viewBox="0 0 24 24" style="width: 48px; height: 48px; fill: none; stroke: currentColor; stroke-width: 2; margin-bottom: 15px;">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <div style="font-weight: bold; font-size: 18px;">RÉVÉLER</div>
+            </div>
+
+            <!-- État révélé -->
+            <div class="role-revealed" id="revealed-state">
+                <div id="role-name" class="role-title innocent-text">Innocent</div>
+                <div class="location-info">Lieu : <span id="secret-location">Base Spatiale</span></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="location-list-container">
+        <div class="list-header">Lieux possibles (Cliquez pour rayer)</div>
+        <div class="locations" id="locations-list">
+            <!-- Rempli par le JS -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

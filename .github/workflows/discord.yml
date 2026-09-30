@@ -9,31 +9,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send embed message with logo to Discord
+        # Les valeurs de la release passent par des variables d'environnement (et non
+        # directement dans le script) pour empêcher toute injection de commande.
+        env:
+          VERSION: ${{ github.event.release.tag_name }}
+          COMMENTAIRE: ${{ github.event.release.name }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          LOGO_URL: "https://firebasestorage.googleapis.com/v0/b/novaly-a80f7.firebasestorage.app/o/logo1.png?alt=media&token=217eb083-ea50-4c6e-806a-5c6e6b5d429a"
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
-          COMMENTAIRE="${{ github.event.release.name }}"
-          
-          # Remplace l'URL ci-dessous par le lien direct de ton logo (lien Raw GitHub ou autre)
-          LOGO_URL="https://firebasestorage.googleapis.com/v0/b/novaly-a80f7.firebasestorage.app/o/logo1.png?alt=media&token=217eb083-ea50-4c6e-806a-5c6e6b5d429a"
-
-          # Construction du message en JSON (Embed Discord)
-          payload=$(cat <<EOF
-          {
-            "embeds": [
-              {
-                "title": "🚀 Novaly $VERSION is available !",
-                "description": "**$COMMENTAIRE**\n\n👉 [Joue dès maintenant sur le site](https://novaly-store.fr)",
-                "color": 16711680,
-                "thumbnail": {
-                  "url": "$LOGO_URL"
-                }
-              }
-            ]
-          }
-          EOF
-          )
+          # Construction du message en JSON (Embed Discord), échappé proprement par jq
+          payload=$(jq -n \
+            --arg title "🚀 Novaly $VERSION is available !" \
+            --arg desc "**$COMMENTAIRE**"$'\n\n'"👉 [Joue dès maintenant sur le site](https://novaly-store.fr)" \
+            --arg logo "$LOGO_URL" \
+            '{embeds: [{title: $title, description: $desc, color: 16711680, thumbnail: {url: $logo}}]}')
 
           curl -H "Content-Type: application/json" \
           -X POST \
           -d "$payload" \
-          ${{ secrets.DISCORD_WEBHOOK }}
+          "$DISCORD_WEBHOOK"

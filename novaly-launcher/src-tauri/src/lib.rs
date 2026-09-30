@@ -1,6 +1,10 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // L'écouteur du lien "novaly://" (retour après paiement)
+        .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())

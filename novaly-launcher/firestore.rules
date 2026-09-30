@@ -1,0 +1,165 @@
+rules_version = '2';
+
+// Règles de sécurité Firestore de Novaly.
+// Déploiement : firebase deploy --only firestore:rules   (depuis novaly-launcher/)
+//
+// Principe : tout est refusé par défaut, puis chaque collection ouvre uniquement ce dont
+// le launcher et le site ont besoin. Le serveur (Cloud Functions / Admin SDK) n'est pas
+// concerné par ces règles : c'est lui qui ajoute les jeux payants après paiement.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Fonctions utilitaires ----------
+    function connecte() {
+      return request.auth != null;
+    }
+
+    function estMoi(uid) {
+      return connecte() && request.auth.uid == uid;
+    }
+
+    // Jeux que les joueurs peuvent s'ajouter eux-mêmes (gratuits).
+    // ⚠️ Ajouter ici l'ID de tout nouveau jeu gratuit.
+    function jeuxGratuits() {
+      return ['imposteur', 'nolimite'];
+    }
+
+    // Données personnelles : interdites dans le profil public, elles vont dans users/{uid}/private/profil
+    function champsPrives() {
+      return ['prenom', 'nom', 'adresse1', 'adresse2', 'ville', 'region', 'zip', 'country',
+              'paymentCardLast4', 'a2f_app', 'a2f_email', 'linked_steam', 'linked_discord'];
+    }
+
+    function demandeAmiExiste(expediteur, destinataire) {
+      return exists(/databases/$(database)/documents/friend_requests/$(expediteur + '_' + destinataire));
+    }
+
+    function sontAmis(uid, ami) {
+      return exists(/databases/$(database)/documents/users/$(uid)/friends/$(ami));
+    }
+
+    // ---------- Profils publics ----------
+    match /users/{uid} {
+      // Visible par les joueurs connectés (recherche d'amis, statut en ligne)
+      allow read: if connecte();
+
+      allow create: if estMoi(uid)
+        && !request.resource.data.keys().hasAny(champsPrives())
+        && request.resource.data.get('jeuxPossedes', []) is list
+        && request.resource.data.get('jeuxPossedes', []).toSet().hasOnly(jeuxGratuits());
+
+      allow update: if estMoi(uid)
+        // Bibliothèque : on ne peut s'ajouter que des jeux gratuits (les payants passent par Stripe)
+        && request.resource.data.get('jeuxPossedes', []) is list
+        && request.resource.data.get('jeuxPossedes', []).toSet()
+             .difference(resource.data.get('jeuxPossedes', []).toSet())
+             .hasOnly(jeuxGratuits())
+        // Pas de nouvelles données perso dans le profil public (supprimer les anciennes reste permis)
+        && (!request.resource.data.keys().hasAny(champsPrives())
+            || !request.resource.data.diff(resource.data).affectedKeys().hasAny(champsPrives()));
+
+      allow delete: if estMoi(uid);
+
+      // ---------- Données personnelles (propriétaire uniquement) ----------
+      match /private/{docId} {
+        allow read, write: if estMoi(uid);
+      }
+
+      // ---------- Liste d'amis ----------
+      match /friends/{amiId} {
+        allow read: if estMoi(uid);
+
+        // Création uniquement à l'acceptation d'une vraie demande (dans les deux sens)
+        allow create: if (estMoi(uid) && demandeAmiExiste(amiId, uid))
+                      || (estMoi(amiId) && demandeAmiExiste(uid, amiId));
+
+        // Le propriétaire met à jour son entrée ; l'ami peut seulement signaler un message non lu
+        allow update: if estMoi(uid)
+                      || (estMoi(amiId)
+                          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasUnread', 'pseudo', 'addedAt']));
+
+        // Retirer un ami : possible des deux côtés
+        allow delete: if estMoi(uid) || estMoi(amiId);
+      }
+    }
+
+    // ---------- Demandes d'ami (ID = expediteur_destinataire) ----------
+    match /friend_requests/{demandeId} {
+      allow read: if connecte()
+        && (resource.data.receiverId == request.auth.uid || resource.data.senderId == request.auth.uid);
+
+      allow create: if connecte()
+        && demandeId == request.auth.uid + '_' + request.resource.data.receiverId
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.receiverId != request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.senderPseudo is string
+        && request.resource.data.senderPseudo.size() <= 40
+        && request.resource.data.keys().hasOnly(['senderId', 'senderPseudo', 'receiverId', 'receiverPseudo', 'status', 'timestamp']);
+
+      allow delete: if connecte()
+        && (resource.data.receiverId == request.auth.uid || resource.data.senderId == request.auth.uid);
+    }
+
+    // ---------- Messages privés (chatId = uidA_uidB triés) ----------
+    match /chats/{chatId}/messages/{messageId} {
+      function participants() {
+        return chatId.split('_');
+      }
+      function autreParticipant() {
+        return participants()[0] == request.auth.uid ? participants()[1] : participants()[0];
+      }
+      function participe() {
+        return connecte() && participants().size() == 2 && request.auth.uid in participants();
+      }
+
+      allow read: if participe();
+
+      allow create: if participe()
+        && sontAmis(request.auth.uid, autreParticipant())
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.keys().hasOnly(['text', 'texte', 'senderId', 'timestamp', 'status'])
+        && request.resource.data.get('text', '') is string
+        && request.resource.data.get('texte', '') is string
+        && request.resource.data.get('text', '').size() <= 2000
+        && request.resource.data.get('texte', '').size() <= 2000;
+
+      // Accusé de lecture : seul le destinataire peut passer le statut à "lu"
+      allow update: if participe()
+        && resource.data.senderId != request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'read';
+    }
+
+    // ---------- Catalogue des jeux (modifiable uniquement depuis la console Firebase) ----------
+    match /games/{gameId} {
+      allow read: if connecte();
+      allow write: if false;
+
+      // Liens de téléchargement : réservés aux joueurs qui possèdent le jeu
+      match /fichiers/{docId} {
+        allow read: if connecte()
+          && gameId in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('jeuxPossedes', []);
+        allow write: if false;
+      }
+    }
+
+    // ---------- Salons de Nolimite (joueurs anonymes autorisés) ----------
+    match /nolimite_rooms/{code} {
+      allow read: if connecte();
+
+      allow create: if connecte()
+        && request.resource.data.host == request.auth.uid
+        && request.resource.data.playerList is list
+        && request.resource.data.playerList.size() <= 8;
+
+      // Un joueur ne modifie que les salons dont il fait (ou va faire) partie, sans changer d'hôte
+      allow update: if connecte()
+        && request.resource.data.host == resource.data.host
+        && request.resource.data.playerList.size() <= 8
+        && (request.auth.uid in resource.data.playerList || request.auth.uid in request.resource.data.playerList);
+
+      allow delete: if connecte() && resource.data.host == request.auth.uid;
+    }
+  }
+}

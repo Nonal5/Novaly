@@ -12,15 +12,96 @@
     "core:window:allow-toggle-maximize",
     "core:path:default",
     "dialog:default",
+    "dialog:allow-open",
     "fs:default",
-    "fs:allow-exists",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-remove",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    "opener:default",
+    "opener:allow-open-path",
     "shell:default",
     {
       "identifier": "shell:allow-execute",
       "allow": [
-        { "name": "curl", "cmd": "curl", "args": true },
-        { "name": "unzip", "cmd": "unzip", "args": true },
-        { "name": "open", "cmd": "open", "args": true }
+        {
+          "name": "curl",
+          "cmd": "curl",
+          "args": [
+            "-#",
+            "-L",
+            "--proto",
+            "=https",
+            "--proto-redir",
+            "=https",
+            "-C",
+            "-",
+            "-o",
+            {
+              "validator": "^[^-].*\\.zip$"
+            },
+            {
+              "validator": "^https://\\S+$"
+            }
+          ]
+        },
+        {
+          "name": "unzip",
+          "cmd": "unzip",
+          "args": [
+            "-o",
+            {
+              "validator": "^[^-].*\\.zip$"
+            },
+            "-d",
+            {
+              "validator": "^[^-].*$"
+            }
+          ]
+        },
+        {
+          "name": "tar",
+          "cmd": "tar",
+          "args": [
+            "-xf",
+            {
+              "validator": "^[^-].*\\.zip$"
+            },
+            "-C",
+            {
+              "validator": "^[^-].*$"
+            }
+          ]
+        },
+        {
+          "name": "open",
+          "cmd": "open",
+          "args": [
+            {
+              "validator": "^/.+$"
+            }
+          ]
+        }
       ]
     }
   ]
