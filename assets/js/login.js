@@ -1,5 +1,5 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";        
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
@@ -15,6 +15,57 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
         const db = getFirestore(app);
+
+        const ENDPOINT_ENVOYER_CODE_2FA = "https://us-central1-novaly-a80f7.cloudfunctions.net/envoyerCode2FA";
+        const ENDPOINT_VERIFIER_CODE_2FA = "https://us-central1-novaly-a80f7.cloudfunctions.net/verifierCode2FA";
+
+        // État de l'A2F pour la session courante : 'aucune' | 'validee' | 'requise'.
+        // La session est identifiée par auth_time (date de connexion signée par
+        // Firebase) ; Firestore et les Cloud Functions appliquent le même verrou.
+        async function etatA2F(user) {
+            const actif = await getDoc(doc(db, "a2f_actif", user.uid));
+            if (!actif.exists()) return 'aucune';
+            const { claims } = await user.getIdTokenResult();
+            const ok = await getDoc(doc(db, "a2f_sessions", user.uid, "ok", String(claims.auth_time)));
+            return ok.exists() ? 'validee' : 'requise';
+        }
+
+        async function envoyerCode2FA(user) {
+            const idToken = await user.getIdToken();
+            const r = await fetch(ENDPOINT_ENVOYER_CODE_2FA, {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${idToken}` }
+            });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok && r.status !== 429) throw new Error(d.error || "Envoi impossible.");
+            return d;
+        }
+
+        // Affiche l'écran du code et envoie un code par e-mail.
+        async function demanderCode2FA(user) {
+            afficher2faSection();
+            document.getElementById('twofa-error').style.display = "none";
+            try {
+                const d = await envoyerCode2FA(user);
+                if (d.error) showError('twofa-error', d.error);
+            } catch (e) {
+                showError('twofa-error', "Impossible d'envoyer le code. Réessayez avec « Renvoyer le code ».");
+            }
+        }
+
+        function entrer(user) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('username', user.displayName || "Joueur");
+            localStorage.setItem('email', user.email);
+            window.location.href = 'index.html';
+        }
+
+        function afficher2faSection() {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('register-section').style.display = 'none';
+            document.getElementById('google-pseudo-section').style.display = 'none';
+            document.getElementById('twofa-section').style.display = 'block';
+        }
 
         function showError(elementId, message) {
             const errorDiv = document.getElementById(elementId);
@@ -92,17 +143,81 @@
             const originalText = btn.innerText;
             btn.innerText = "Connexion...";
 
+            let userCredential;
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('username', userCredential.user.displayName || "Joueur");
-                localStorage.setItem('email', userCredential.user.email);
-                window.location.href = 'index.html';
+                userCredential = await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
                 showError('login-error', "Adresse e-mail ou mot de passe incorrect.");
                 btn.innerText = originalText;
+                return;
+            }
+
+            try {
+                // Vérification en deux étapes (e-mail) si activée sur ce compte
+                if (await etatA2F(userCredential.user) === 'requise') {
+                    btn.innerText = originalText;
+                    await demanderCode2FA(userCredential.user);
+                    return;
+                }
+                entrer(userCredential.user);
+            } catch (error) {
+                showError('login-error', "Erreur réseau, réessayez.");
+                btn.innerText = originalText;
             }
         };
+
+        window.verifier2fa = async function() {
+            const code = document.getElementById('twofa-code').value.trim();
+            const user = auth.currentUser;
+            if (!user) {
+                showError('twofa-error', "Session expirée, reconnectez-vous.");
+                return;
+            }
+            try {
+                const idToken = await user.getIdToken();
+                const r = await fetch(ENDPOINT_VERIFIER_CODE_2FA, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
+                    body: JSON.stringify({ code, action: 'login' })
+                });
+                const d = await r.json();
+                if (d.success) {
+                    entrer(user);
+                } else {
+                    showError('twofa-error', d.error || "Code incorrect.");
+                }
+            } catch (e) {
+                showError('twofa-error', "Erreur réseau.");
+            }
+        };
+
+        window.renvoyer2fa = async function() {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                const d = await envoyerCode2FA(user);
+                showError('twofa-error', d.error || "Un nouveau code a été envoyé.");
+            } catch (e) {
+                showError('twofa-error', "Impossible de renvoyer le code.");
+            }
+        };
+
+        // Abandon : on ferme la session non validée et on revient au formulaire.
+        window.annuler2fa = async function() {
+            await signOut(auth);
+            document.getElementById('twofa-section').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+        };
+
+        // Session déjà ouverte mais pas encore validée (ex. redirigé depuis
+        // index.html, ou après un changement de mot de passe) : on demande le code.
+        auth.authStateReady().then(async () => {
+            const user = auth.currentUser;
+            if (!user || user.isAnonymous) return;
+            try {
+                if (await etatA2F(user) === 'requise') await demanderCode2FA(user);
+            } catch (e) { /* hors ligne : le formulaire normal reste affiché */ }
+        });
 
 window.tempGoogleUser = null; // Stocke l'utilisateur temporairement
 
@@ -110,6 +225,10 @@ window.loginWithGoogle = async function() {
     hideErrors();
     try {
         const result = await signInWithPopup(auth, provider);
+        if (await etatA2F(result.user) === 'requise') {
+            await demanderCode2FA(result.user);
+            return;
+        }
         const userDocRef = doc(db, "users", result.user.uid);
 
         // On vérifie si ce compte Google a déjà un profil Novaly

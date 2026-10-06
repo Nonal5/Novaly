@@ -63,6 +63,21 @@
             const friendsMenuContainer = document.getElementById('friends-menu-container');
 
             if (user) {
+                // Verrou A2F : si activée et que CETTE connexion n'a pas été validée par
+                // le code e-mail, la page de connexion demande le code (Firestore et les
+                // Cloud Functions refusent de toute façon une session non validée).
+                try {
+                    const actif = await getDoc(doc(db, "a2f_actif", user.uid));
+                    if (actif.exists()) {
+                        const { claims } = await user.getIdTokenResult();
+                        const ok = await getDoc(doc(db, "a2f_sessions", user.uid, "ok", String(claims.auth_time)));
+                        if (!ok.exists()) {
+                            window.location.href = 'login.html';
+                            return;
+                        }
+                    }
+                } catch (e) { /* hors ligne : les règles Firestore restent le vrai verrou */ }
+
                 if (loggedOutView) loggedOutView.style.display = 'none';
                 if (loggedInView) loggedInView.style.display = 'flex';
                 if (friendsMenuContainer) friendsMenuContainer.style.display = 'flex'; 
@@ -137,7 +152,8 @@
                     const suppression = {};
                     CHAMPS_PRIVES.forEach(champ => {
                         if (champ in data) {
-                            anciennesDonneesPrivees[champ] = data[champ];
+                            // Les anciens drapeaux a2f_* sont obsolètes (référence : a2f_actif)
+                            if (!champ.startsWith('a2f_')) anciennesDonneesPrivees[champ] = data[champ];
                             suppression[champ] = deleteField();
                         }
                     });

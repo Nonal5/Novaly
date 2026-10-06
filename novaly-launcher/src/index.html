@@ -404,8 +404,17 @@
                     </div>
 
                     <div id="tab-security" class="profile-tab-content">
+                        <h3>Changer le mot de passe</h3>
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; margin-bottom: 30px; display: flex; flex-direction: column; gap: 12px; max-width: 420px;">
+                            <input type="password" id="pwd-current" placeholder="Mot de passe actuel" style="padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                            <input type="password" id="pwd-new" placeholder="Nouveau mot de passe (6 caractères min.)" style="padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                            <input type="password" id="pwd-confirm" placeholder="Confirmer le nouveau mot de passe" style="padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                            <button class="btn" onclick="changerMotDePasse()" style="background: #0984e3; color: white; border: none;">Mettre à jour le mot de passe</button>
+                            <p id="pwd-msg" style="font-size: 12px; margin: 0; display: none;"></p>
+                        </div>
+
                         <h3>Authentification à deux facteurs (A2F)</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés. Cette fonctionnalité arrive bientôt.</p>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés : à chaque nouvelle connexion, un code vous sera demandé.</p>
                         
                         <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
                             <div>
@@ -419,7 +428,13 @@
                                 <strong>Authentification par E-mail</strong>
                                 <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Recevez un code à votre e-mail.</p>
                             </div>
-                            <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
+                            <button class="btn" id="btn-2fa-email" onclick="toggle2faEmail()" style="background: #0984e3; color: white; border: none; width: 120px;">Activer</button>
+                            <div id="twofa-email-box" style="display: none; width: 100%; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <p style="margin: 0; width: 100%; font-size: 12px; color: #aaa;">Saisissez le code à 6 chiffres envoyé à votre adresse e-mail.</p>
+                                <input type="text" id="twofa-email-code" inputmode="numeric" maxlength="6" placeholder="000000" style="padding: 10px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; outline: none; width: 120px; text-align: center; letter-spacing: 4px;">
+                                <button class="btn" onclick="valider2faEmail()" style="background: #0984e3; color: white; border: none;">Valider</button>
+                                <button class="btn" onclick="fermer2faEmailBox()" style="background: #333; color: #ccc; border: none;">Annuler</button>
+                            </div>
                         </div>
                     </div>
 
@@ -432,8 +447,12 @@
                         </div>
 
                         <h3>Moyens de paiement</h3>
-                        <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 20px; color: #aaa; font-size: 13px; line-height: 1.6;">
-                            Vos achats sont réglés sur la page de paiement sécurisée de <strong style="color: #fff;">Stripe</strong>.
+                        <div id="payment-methods-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                            <p style="color: #888; font-size: 13px;">Chargement…</p>
+                        </div>
+                        <button class="btn" onclick="ajouterCarte()" style="background: #0984e3; color: white; border: none;">+ Ajouter une carte</button>
+                        <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 20px; color: #aaa; font-size: 13px; line-height: 1.6; margin-top: 20px;">
+                            Vos cartes sont enregistrées en toute sécurité par <strong style="color: #fff;">Stripe</strong>.
                             Novaly ne voit ni ne conserve jamais votre numéro de carte.
                         </div>
                     </div>
@@ -464,11 +483,11 @@
 
                     <div id="tab-code" class="profile-tab-content">
                         <h3>Utiliser un code</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Saisissez un code pour débloquer des cosmétiques ou des crédits Novaly.</p>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Saisissez un code pour débloquer un jeu dans votre bibliothèque.</p>
                         <div class="form-group">
-                            <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
+                            <input type="text" id="code-input" maxlength="25" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
                         </div>
-                        <button class="btn" disabled style="width: 100%; background: #333; color: #888; cursor: not-allowed;">Bientôt disponible</button>
+                        <button class="btn" onclick="utiliserCode()" style="width: 100%; background: #0984e3; color: white; border: none;">Valider le code</button>
                     </div>
 
                     <div id="tab-parental" class="profile-tab-content">

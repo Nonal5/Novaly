@@ -10,8 +10,16 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ---------- Fonctions utilitaires ----------
+    // Connecté ET, si l'A2F est activée, session validée par le code e-mail.
+    // auth_time = date de connexion signée par Firebase : une connexion avec un
+    // mot de passe volé n'a pas de session validée (écrite par verifierCode2FA).
     function connecte() {
-      return request.auth != null;
+      return request.auth != null && a2fValide();
+    }
+
+    function a2fValide() {
+      return !exists(/databases/$(database)/documents/a2f_actif/$(request.auth.uid))
+        || exists(/databases/$(database)/documents/a2f_sessions/$(request.auth.uid)/ok/$(string(request.auth.token.auth_time)));
     }
 
     function estMoi(uid) {
@@ -62,7 +70,12 @@ service cloud.firestore {
 
       // ---------- Données personnelles (propriétaire uniquement) ----------
       match /private/{docId} {
-        allow read, write: if estMoi(uid);
+        allow read, delete: if estMoi(uid);
+        // L'état de l'A2F ne se change que via verifierCode2FA (code e-mail)
+        allow create: if estMoi(uid)
+          && !request.resource.data.keys().hasAny(['a2f_email', 'a2f_app']);
+        allow update: if estMoi(uid)
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['a2f_email', 'a2f_app']);
       }
 
       // ---------- Liste d'amis ----------
@@ -81,6 +94,16 @@ service cloud.firestore {
         // Retirer un ami : possible des deux côtés
         allow delete: if estMoi(uid) || estMoi(amiId);
       }
+    }
+
+    // ---------- A2F (écrit uniquement par les Cloud Functions) ----------
+    // Lisible par le joueur AVANT validation : la page de connexion doit savoir
+    // s'il faut demander le code (d'où request.auth.uid et non connecte()).
+    match /a2f_actif/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+    }
+    match /a2f_sessions/{uid}/ok/{authTime} {
+      allow read: if request.auth != null && request.auth.uid == uid;
     }
 
     // ---------- Demandes d'ami (ID = expediteur_destinataire) ----------
