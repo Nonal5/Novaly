@@ -42,6 +42,13 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/friend_requests/$(expediteur + '_' + destinataire));
     }
 
+    // Contrôle parental : chat coupé (réglage écrit uniquement par la fonction controleParental)
+    function chatBloqueParParent() {
+      return exists(/databases/$(database)/documents/parental/$(request.auth.uid))
+        && get(/databases/$(database)/documents/parental/$(request.auth.uid)).data.get('actif', false) == true
+        && get(/databases/$(database)/documents/parental/$(request.auth.uid)).data.get('chatBloque', false) == true;
+    }
+
     function sontAmis(uid, ami) {
       return exists(/databases/$(database)/documents/users/$(uid)/friends/$(ami));
     }
@@ -57,6 +64,9 @@ service cloud.firestore {
         && request.resource.data.get('jeuxPossedes', []).toSet().hasOnly(jeuxGratuits());
 
       allow update: if estMoi(uid)
+        // Liste de souhaits : une liste de 200 jeux maximum
+        && request.resource.data.get('souhaits', []) is list
+        && request.resource.data.get('souhaits', []).size() <= 200
         // Bibliothèque : on ne peut s'ajouter que des jeux gratuits (les payants passent par Stripe)
         && request.resource.data.get('jeuxPossedes', []) is list
         && request.resource.data.get('jeuxPossedes', []).toSet()
@@ -78,6 +88,14 @@ service cloud.firestore {
           && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['a2f_email', 'a2f_app']);
       }
 
+      // ---------- Cadeaux reçus (créés par le serveur) : on peut seulement les marquer « vus » ----------
+      match /cadeaux/{cadeauId} {
+        allow read: if estMoi(uid);
+        allow update: if estMoi(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['vu'])
+          && request.resource.data.vu == true;
+      }
+
       // ---------- Liste d'amis ----------
       match /friends/{amiId} {
         allow read: if estMoi(uid);
@@ -94,6 +112,26 @@ service cloud.firestore {
         // Retirer un ami : possible des deux côtés
         allow delete: if estMoi(uid) || estMoi(amiId);
       }
+    }
+
+    // ---------- Fil des derniers avis (page Communauté) ----------
+    match /{chemin=**}/avis/{auteur} {
+      allow read: if true;
+    }
+
+    // ---------- Portefeuille, contrôle parental, comptes associés (écrits par le serveur) ----------
+    match /portefeuilles/{uid} {
+      allow read: if estMoi(uid);
+      match /mouvements/{mvt} {
+        allow read: if estMoi(uid);
+      }
+    }
+    match /parental/{uid} {
+      // Lu sans le verrou A2F : le launcher doit pouvoir appliquer les restrictions partout
+      allow read: if request.auth != null && request.auth.uid == uid;
+    }
+    match /comptes_lies/{uid} {
+      allow read: if estMoi(uid);
     }
 
     // ---------- A2F (écrit uniquement par les Cloud Functions) ----------
@@ -139,6 +177,7 @@ service cloud.firestore {
       allow read: if participe();
 
       allow create: if participe()
+        && !chatBloqueParParent()
         && sontAmis(request.auth.uid, autreParticipant())
         && request.resource.data.senderId == request.auth.uid
         && request.resource.data.keys().hasOnly(['text', 'texte', 'senderId', 'timestamp', 'status'])
@@ -160,6 +199,22 @@ service cloud.firestore {
     match /games/{gameId} {
       allow read: if true;
       allow write: if false;
+
+      // Avis : lisibles par tous, un avis par joueur (ID = son UID), réservé à ceux qui possèdent le jeu
+      match /avis/{auteur} {
+        allow read: if true;
+        allow create, update: if estMoi(auteur)
+          && gameId in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('jeuxPossedes', [])
+          && request.resource.data.keys().hasOnly(['note', 'texte', 'pseudo', 'date'])
+          && request.resource.data.note is int
+          && request.resource.data.note >= 1 && request.resource.data.note <= 5
+          && request.resource.data.get('texte', '') is string
+          && request.resource.data.get('texte', '').size() <= 1000
+          && request.resource.data.get('pseudo', '') is string
+          && request.resource.data.get('pseudo', '').size() <= 40
+          && request.resource.data.date == request.time;
+        allow delete: if estMoi(auteur);
+      }
 
       // Liens de téléchargement : réservés aux joueurs qui possèdent le jeu
       match /fichiers/{docId} {

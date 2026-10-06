@@ -6,6 +6,7 @@ const admin = require("firebase-admin");
 const Stripe = require("stripe");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const QRCode = require("qrcode");
 
 admin.initializeApp();
 
@@ -152,6 +153,281 @@ demande, changez votre mot de passe : quelqu'un le connaît.</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
+// ---------- A2F : méthodes (e-mail, application TOTP, codes de secours) ----
+// a2f_actif/{uid} = {email: bool, app: bool} ; le document n'existe que si au
+// moins une méthode est active (c'est ce que testent les règles Firestore).
+// a2f_totp/{uid} (serveur uniquement) : secret TOTP, secret en attente,
+// dernier pas utilisé (anti-rejeu), échecs récents et codes de secours hachés.
+
+/**
+ * Méthodes A2F actives d'un joueur (gère l'ancien format {methode: "email"}).
+ * @param {object} db Firestore.
+ * @param {string} uid UID du joueur.
+ * @return {Promise<{email: boolean, app: boolean}>} Les méthodes actives.
+ */
+async function methodesA2F(db, uid) {
+  const snap = await db.collection("a2f_actif").doc(uid).get();
+  if (!snap.exists) return {email: false, app: false};
+  const d = snap.data();
+  return {
+    email: d.email === true || d.methode === "email",
+    app: d.app === true,
+  };
+}
+
+/**
+ * Active / désactive une méthode et met à jour la session courante :
+ * toutes les autres sessions devront de nouveau saisir un code.
+ * @param {object} db Firestore.
+ * @param {object} jeton Jeton Firebase décodé (uid + auth_time).
+ * @param {object} changements Ex. {app: true}.
+ * @return {Promise<object>} Les méthodes après changement.
+ */
+async function changerMethodesA2F(db, jeton, changements) {
+  const m = {...(await methodesA2F(db, jeton.uid)), ...changements};
+  const actifRef = db.collection("a2f_actif").doc(jeton.uid);
+  const sessions = db.collection("a2f_sessions").doc(jeton.uid);
+  await db.recursiveDelete(sessions);
+  if (m.email || m.app) {
+    await actifRef.set({email: m.email, app: m.app, depuis: Date.now()});
+    await sessions.collection("ok").doc(String(jeton.auth_time))
+        .set({validatedAt: Date.now()});
+  } else {
+    await actifRef.delete();
+  }
+  // Copie pour l'affichage uniquement ; la référence est a2f_actif.
+  await db.collection("users").doc(jeton.uid).collection("private")
+      .doc("profil").set({a2f_email: m.email, a2f_app: m.app}, {merge: true});
+  return m;
+}
+
+const BASE32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+/**
+ * Encode en base32 (RFC 4648, sans « = »), format des secrets TOTP.
+ * @param {Buffer} buf Octets.
+ * @return {string} Texte base32.
+ */
+function base32(buf) {
+  let bits = "";
+  for (const o of buf) bits += o.toString(2).padStart(8, "0");
+  let out = "";
+  for (let i = 0; i < bits.length; i += 5) {
+    out += BASE32[parseInt(bits.slice(i, i + 5).padEnd(5, "0"), 2)];
+  }
+  return out;
+}
+
+/**
+ * Décode un secret base32.
+ * @param {string} txt Texte base32.
+ * @return {Buffer} Octets.
+ */
+function deBase32(txt) {
+  let bits = "";
+  for (const c of txt.replace(/=+$/, "").toUpperCase()) {
+    bits += BASE32.indexOf(c).toString(2).padStart(5, "0");
+  }
+  const out = [];
+  for (let i = 0; i + 8 <= bits.length; i += 8) {
+    out.push(parseInt(bits.slice(i, i + 8), 2));
+  }
+  return Buffer.from(out);
+}
+
+/**
+ * Code TOTP (RFC 6238 : HMAC-SHA1, 6 chiffres, pas de 30 s).
+ * @param {string} secret Secret base32.
+ * @param {number} pas Numéro du pas de 30 s.
+ * @return {string} Le code à 6 chiffres.
+ */
+function codeTOTP(secret, pas) {
+  const b = Buffer.alloc(8);
+  b.writeUInt32BE(Math.floor(pas / 0x100000000), 0);
+  b.writeUInt32BE(pas >>> 0, 4);
+  const h = crypto.createHmac("sha1", deBase32(secret)).update(b).digest();
+  const o = h[h.length - 1] & 0xf;
+  const n = (((h[o] & 0x7f) << 24) | (h[o + 1] << 16) |
+    (h[o + 2] << 8) | h[o + 3]) % 1000000;
+  return String(n).padStart(6, "0");
+}
+
+/**
+ * Vérifie un code TOTP (±30 s de décalage d'horloge toléré).
+ * @param {string} secret Secret base32.
+ * @param {string} code Code saisi.
+ * @param {number} dernierPas Dernier pas accepté (un code ne sert qu'une fois).
+ * @return {number|null} Le pas accepté, ou null.
+ */
+function verifierTOTP(secret, code, dernierPas) {
+  const maintenant = Math.floor(Date.now() / 30000);
+  for (const d of [-1, 0, 1]) {
+    const pas = maintenant + d;
+    if (pas <= (dernierPas || 0)) continue;
+    const attendu = Buffer.from(codeTOTP(secret, pas));
+    const recu = Buffer.from(String(code));
+    if (recu.length === attendu.length &&
+        crypto.timingSafeEqual(recu, attendu)) return pas;
+  }
+  return null;
+}
+
+/**
+ * Vérifie un code d'application ou de secours, avec limite d'échecs
+ * (5 par tranche de 10 min) et usage unique, dans une transaction.
+ * @param {object} db Firestore.
+ * @param {string} uid UID du joueur.
+ * @param {string} code Code saisi.
+ * @param {string} methode "app" ou "secours".
+ * @return {Promise<Array|null>} [statut, message] si refusé, sinon null.
+ */
+async function verifierCodeApp(db, uid, code, methode) {
+  const ref = db.collection("a2f_totp").doc(uid);
+  return db.runTransaction(async (t) => {
+    const snap = await t.get(ref);
+    if (!snap.exists || !snap.data().secret) {
+      return [400, "Application d'authentification non configurée."];
+    }
+    const d = snap.data();
+    const echecs = (d.echecs || []).filter((x) => Date.now() - x < 600000);
+    if (echecs.length >= 5) {
+      return [429, "Trop de tentatives. Réessayez dans 10 minutes."];
+    }
+    if (methode === "secours") {
+      const h = hashCode2FA(code.toUpperCase().replace(/[^A-Z0-9]/g, ""), uid);
+      if ((d.secours || []).includes(h)) {
+        t.update(ref, {secours: d.secours.filter((x) => x !== h), echecs: []});
+        return null;
+      }
+    } else {
+      const pas = verifierTOTP(d.secret, code, d.dernierPas);
+      if (pas !== null) {
+        t.update(ref, {dernierPas: pas, echecs: []});
+        return null;
+      }
+    }
+    t.update(ref, {echecs: [...echecs, Date.now()]});
+    return [400, "Code incorrect."];
+  });
+}
+
+/**
+ * 8 codes de secours à usage unique (affichés une fois, stockés hachés).
+ * @param {string} uid UID du joueur.
+ * @return {{codes: string[], hashes: string[]}} Codes et empreintes.
+ */
+function nouveauxCodesSecours(uid) {
+  const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sans 0/O ni 1/I
+  const codes = [];
+  for (let i = 0; i < 8; i++) {
+    let c = "";
+    for (let j = 0; j < 8; j++) c += alpha[crypto.randomInt(alpha.length)];
+    codes.push(c.slice(0, 4) + "-" + c.slice(4));
+  }
+  const hashes = codes.map((c) => hashCode2FA(c.replace("-", ""), uid));
+  return {codes, hashes};
+}
+
+// ---------- Boutique : prix, contrôle parental, livraison des commandes ------
+
+/**
+ * Convertit une date Firestore (Timestamp), un texte ISO ou un nombre en ms.
+ * @param {*} v La valeur.
+ * @return {number|null} Millisecondes, ou null si absente / illisible.
+ */
+function enMillis(v) {
+  if (v == null || v === "") return null;
+  if (typeof v.toMillis === "function") return v.toMillis();
+  const n = typeof v === "number" ? v : Date.parse(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Prix réellement facturé d'un jeu. Promotion : champs « promoPrix » (euros)
+ * et facultativement « promoDebut » / « promoFin » sur le document du jeu.
+ * Même règle que l'affichage (boutique.js).
+ * @param {object} jeu Données du jeu (Firestore).
+ * @return {{prix: number, base: number, promo: boolean}|null} null : pas
+ *   en vente.
+ */
+function prixJeu(jeu) {
+  const base = Number(jeu.prix);
+  if (!Number.isFinite(base) || base < 0) return null;
+  const promo = Number(jeu.promoPrix);
+  const debut = enMillis(jeu.promoDebut);
+  const fin = enMillis(jeu.promoFin);
+  const maintenant = Date.now();
+  const enPromo = jeu.promoPrix != null && Number.isFinite(promo) &&
+    promo >= 0 && promo < base &&
+    (debut === null || maintenant >= debut) &&
+    (fin === null || maintenant < fin);
+  return {prix: enPromo ? promo : base, base, promo: enPromo};
+}
+
+/**
+ * Réglages du contrôle parental (parental/{uid}, écrit par le serveur).
+ * @param {object} db Firestore.
+ * @param {string} uid UID du joueur.
+ * @return {Promise<object>} {actif, achatsBloques, chatBloque, ageMax}.
+ */
+async function parentalDe(db, uid) {
+  const snap = await db.collection("parental").doc(uid).get();
+  const d = snap.exists ? snap.data() : {};
+  return d.actif ? d : {actif: false};
+}
+
+/**
+ * Raison pour laquelle le contrôle parental refuse ce jeu, ou null.
+ * @param {object} parental Réglages (parentalDe).
+ * @param {object} jeu Données du jeu (champ « age » = classification PEGI).
+ * @return {string|null} Message d'erreur, ou null si autorisé.
+ */
+function refusParental(parental, jeu) {
+  if (!parental.actif) return null;
+  if (parental.achatsBloques) {
+    return "Les achats sont bloqués par le contrôle parental.";
+  }
+  const age = Number(jeu.age);
+  if (parental.ageMax && Number.isFinite(age) && age > parental.ageMax) {
+    return `« ${jeu.titre || "Ce jeu"} » est classé ${age}+ : bloqué par ` +
+      "le contrôle parental.";
+  }
+  return null;
+}
+
+/**
+ * Livre une commande payée (une seule fois, même si Stripe renvoie
+ * l'événement) : ajoute les jeux au destinataire et prévient s'il s'agit
+ * d'un cadeau.
+ * @param {object} db Firestore.
+ * @param {string} commandeId ID du document commandes/{id}.
+ * @param {string} moyen « carte » ou « solde ».
+ * @return {Promise<void>}
+ */
+async function livrerCommande(db, commandeId, moyen) {
+  const ref = db.collection("commandes").doc(commandeId);
+  const c = await db.runTransaction(async (t) => {
+    const snap = await t.get(ref);
+    if (!snap.exists || snap.data().statut === "livree") return null;
+    t.update(ref, {statut: "livree", moyen, livreeLe: Date.now()});
+    return snap.data();
+  });
+  if (!c) return;
+  await db.collection("users").doc(c.pourUid).set({
+    jeuxPossedes: admin.firestore.FieldValue.arrayUnion(...c.gameIds),
+  }, {merge: true});
+  if (c.pourUid !== c.userId) {
+    await db.collection("users").doc(c.pourUid).collection("cadeaux").add({
+      de: c.userId, dePseudo: c.pseudo || "Un ami", gameIds: c.gameIds,
+      titres: c.titres || [], message: c.message || "", vu: false,
+      recuLe: Date.now(),
+    });
+  }
+  logger.info(`Commande ${commandeId} livrée à ${c.pourUid}`, {
+    jeux: c.gameIds, moyen,
+  });
+}
+
 // 1. Générer la page de paiement pour le jeu
 exports.creerSessionAchat = onRequest(
     {secrets: [stripeSecretKey]},
@@ -195,12 +471,15 @@ exports.creerSessionAchat = onRequest(
         // Le prix vient TOUJOURS de Firestore (champ "prix", en euros),
         // jamais du launcher.
         const jeu = jeuSnap.data();
-        const prix = Number(jeu.prix);
-        if (!Number.isFinite(prix) || prix < 0) {
+        const tarif = prixJeu(jeu);
+        if (!tarif) {
           logger.error(`Prix manquant ou invalide pour le jeu ${gameId}`);
           return res.status(500)
               .json({error: "Ce jeu n'est pas encore en vente."});
         }
+        const prix = tarif.prix;
+        const refus = refusParental(await parentalDe(db, userId), jeu);
+        if (refus) return res.status(403).json({error: refus});
 
         // Jeu gratuit : ajouté directement, sans passer par Stripe
         if (prix === 0) {
@@ -279,7 +558,17 @@ exports.stripeWebhook = onRequest(
       // Si le paiement est un succès validé par la banque :
       if (event.type === "checkout.session.completed") {
         const session = event.data.object;
-        const {userId, gameId} = session.metadata || {};
+        const {userId, gameId, commandeId, type} = session.metadata || {};
+
+        if (session.payment_status === "paid" && commandeId) {
+          await livrerCommande(admin.firestore(), commandeId, "carte");
+          return res.json({received: true});
+        }
+        if (session.payment_status === "paid" && type === "recharge") {
+          await crediterPortefeuille(admin.firestore(), userId,
+              Number(session.metadata.centimes), session.id);
+          return res.json({received: true});
+        }
 
         if (session.payment_status !== "paid" || !userId || !gameId) {
           logger.warn("Session Stripe ignorée", {
@@ -524,10 +813,11 @@ exports.envoyerCode2FA = onRequest(
       }
     });
 
-// 6. Vérification d'un code 2FA. action : login | enable | disable.
-//   login   : valide la session courante (franchit le verrou A2F).
-//   enable  : active l'A2F ; seule la session courante reste validée.
-//   disable : désactive l'A2F (exige une session déjà validée).
+// 6. Vérification d'un code 2FA.
+//   methode : email (défaut) | app (application TOTP) | secours (code unique).
+//   action  : login   → valide la session courante (franchit le verrou A2F) ;
+//             enable / disable → active / désactive l'A2F par E-MAIL
+//             (l'application se gère avec la fonction a2fApp).
 exports.verifierCode2FA = onRequest(
     async (req, res) => {
       res.set("Access-Control-Allow-Origin", "*");
@@ -543,11 +833,18 @@ exports.verifierCode2FA = onRequest(
 
       const code = ((req.body && req.body.code) || "").toString().trim();
       const action = (req.body && req.body.action) || "login";
-      if (!["login", "enable", "disable"].includes(action)) {
+      const methode = (req.body && req.body.methode) || "email";
+      if (!["login", "enable", "disable"].includes(action) ||
+          !["email", "app", "secours"].includes(methode) ||
+          (action !== "login" && methode !== "email")) {
         return res.status(400).json({error: "Action inconnue."});
       }
-      if (!/^\d{6}$/.test(code)) {
-        return res.status(400).json({error: "Code à 6 chiffres attendu."});
+      const formatOk = methode === "secours" ?
+        /^[A-Za-z0-9]{4}-?[A-Za-z0-9]{4}$/.test(code) : /^\d{6}$/.test(code);
+      if (!formatOk) {
+        return res.status(400).json({error: methode === "secours" ?
+          "Code de secours attendu (ex. ABCD-EF23)." :
+          "Code à 6 chiffres attendu."});
       }
 
       try {
@@ -556,59 +853,767 @@ exports.verifierCode2FA = onRequest(
           return res.status(401).json({error: "Veuillez vous reconnecter."});
         }
 
-        // Transaction : deux essais simultanés ne contournent pas la limite.
-        const ref = db.collection("a2f_codes").doc(userId);
-        const erreur = await db.runTransaction(async (t) => {
-          const snap = await t.get(ref);
-          if (!snap.exists) {
-            return [400, "Aucun code en attente. Renvoyez un code."];
-          }
-          const data = snap.data();
-          if (Date.now() > data.expiresAt) {
+        let erreur;
+        if (methode === "email") {
+          // Transaction : deux essais simultanés ne contournent pas la limite.
+          const ref = db.collection("a2f_codes").doc(userId);
+          erreur = await db.runTransaction(async (t) => {
+            const snap = await t.get(ref);
+            if (!snap.exists) {
+              return [400, "Aucun code en attente. Renvoyez un code."];
+            }
+            const data = snap.data();
+            if (Date.now() > data.expiresAt) {
+              t.delete(ref);
+              return [400, "Code expiré. Renvoyez un code."];
+            }
+            if ((data.attempts || 0) >= 5) {
+              t.delete(ref);
+              return [429, "Trop de tentatives. Renvoyez un code."];
+            }
+            if (hashCode2FA(code, userId) !== data.codeHash) {
+              t.update(ref, {attempts: (data.attempts || 0) + 1});
+              return [400, "Code incorrect."];
+            }
             t.delete(ref);
-            return [400, "Code expiré. Renvoyez un code."];
-          }
-          if ((data.attempts || 0) >= 5) {
-            t.delete(ref);
-            return [429, "Trop de tentatives. Renvoyez un code."];
-          }
-          if (hashCode2FA(code, userId) !== data.codeHash) {
-            t.update(ref, {attempts: (data.attempts || 0) + 1});
-            return [400, "Code incorrect."];
-          }
-          t.delete(ref);
-          return null;
-        });
+            return null;
+          });
+        } else {
+          erreur = await verifierCodeApp(db, userId, code, methode);
+        }
         if (erreur) return res.status(erreur[0]).json({error: erreur[1]});
 
-        const sessions = db.collection("a2f_sessions").doc(userId);
-        const sessionCourante = sessions.collection("ok")
-            .doc(String(jeton.auth_time));
-        const profil = db.collection("users").doc(userId)
-            .collection("private").doc("profil");
-
-        if (action === "enable" || action === "disable") {
-          // Repart de zéro : les autres appareils devront saisir un code.
-          await db.recursiveDelete(sessions);
+        if (action === "login") {
+          await db.collection("a2f_sessions").doc(userId).collection("ok")
+              .doc(String(jeton.auth_time)).set({validatedAt: Date.now()});
+          let restants;
+          if (methode === "secours") {
+            const t = await db.collection("a2f_totp").doc(userId).get();
+            restants = ((t.exists && t.data().secours) || []).length;
+          }
+          return res.json({success: true, codesSecoursRestants: restants});
         }
-        if (action === "disable") {
-          await db.collection("a2f_actif").doc(userId).delete();
-        } else {
-          await sessionCourante.set({validatedAt: Date.now()});
-        }
-        if (action === "enable") {
-          await db.collection("a2f_actif").doc(userId)
-              .set({methode: "email", depuis: Date.now()});
-        }
-        if (action !== "login") {
-          // Copie pour l'affichage uniquement ; la référence est a2f_actif.
-          await profil.set({a2f_email: action === "enable"}, {merge: true});
-        }
-
+        await changerMethodesA2F(db, jeton, {email: action === "enable"});
         return res.json({success: true});
       } catch (err) {
         logger.error("Erreur verifierCode2FA", err);
         return res.status(500)
             .json({error: "Erreur lors de la vérification du code."});
+      }
+    });
+
+// 6 bis. A2F par application (Google Authenticator, Authy, 1Password…).
+//   setup   → nouveau secret en attente + QR code (session déjà validée) ;
+//   enable  → vérifie un code du secret en attente, active, renvoie 8 codes
+//             de secours (affichés une seule fois) ;
+//   disable → code de l'application ou de secours, puis désactive.
+exports.a2fApp = onRequest(
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      if (req.method === "OPTIONS") return res.status(204).send("");
+
+      // Verrou A2F appliqué : il faut une session déjà validée.
+      const jeton = await verifierJeton(req);
+      if (!jeton) {
+        return res.status(401).json({error: "Veuillez vous reconnecter."});
+      }
+      const uid = jeton.uid;
+      const action = (req.body && req.body.action) || "";
+      const code = ((req.body && req.body.code) || "").toString().trim();
+
+      try {
+        const db = admin.firestore();
+        const ref = db.collection("a2f_totp").doc(uid);
+
+        if (action === "setup") {
+          const secret = base32(crypto.randomBytes(20));
+          await ref.set({attente: secret, attenteDepuis: Date.now()},
+              {merge: true});
+          const compte = jeton.email || uid;
+          const uri = "otpauth://totp/" +
+            encodeURIComponent("Novaly:" + compte) +
+            "?secret=" + secret + "&issuer=Novaly&digits=6&period=30";
+          const qr = await QRCode.toDataURL(uri, {margin: 1, width: 240});
+          return res.json({success: true, secret, uri, qr});
+        }
+
+        if (action === "enable") {
+          if (!/^\d{6}$/.test(code)) {
+            return res.status(400).json({error: "Code à 6 chiffres attendu."});
+          }
+          const snap = await ref.get();
+          const d = snap.exists ? snap.data() : {};
+          if (!d.attente || Date.now() - d.attenteDepuis > 15 * 60000) {
+            return res.status(400)
+                .json({error: "Configuration expirée. Recommencez."});
+          }
+          const pas = verifierTOTP(d.attente, code, 0);
+          if (pas === null) {
+            return res.status(400).json({
+              error: "Code incorrect. Vérifiez l'heure de votre téléphone.",
+            });
+          }
+          const secours = nouveauxCodesSecours(uid);
+          await ref.set({
+            secret: d.attente, dernierPas: pas, echecs: [],
+            secours: secours.hashes, depuis: Date.now(),
+          });
+          await changerMethodesA2F(db, jeton, {app: true});
+          return res.json({success: true, codesSecours: secours.codes});
+        }
+
+        if (action === "disable") {
+          const methode = /^\d{6}$/.test(code) ? "app" : "secours";
+          const erreur = await verifierCodeApp(db, uid, code, methode);
+          if (erreur) return res.status(erreur[0]).json({error: erreur[1]});
+          await ref.delete();
+          await changerMethodesA2F(db, jeton, {app: false});
+          return res.json({success: true});
+        }
+
+        return res.status(400).json({error: "Action inconnue."});
+      } catch (err) {
+        logger.error("Erreur a2fApp", err);
+        return res.status(500).json({error: "Erreur A2F application."});
+      }
+    });
+
+// 7. Formulaire « Nous contacter » (launcher et site) → contact@.
+// Connecté : l'e-mail vient du jeton Firebase.
+// Sinon : e-mail saisi + limites anti-spam.
+const CONTACT_TO = "contact@novaly-store.fr";
+exports.envoyerContact = onRequest(
+    {secrets: [smtpUser, smtpPass]},
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      if (req.method === "OPTIONS") return res.status(204).send("");
+      if (req.method !== "POST") {
+        return res.status(405).json({error: "Méthode non autorisée."});
+      }
+
+      const body = req.body || {};
+      // Champ piège invisible : seul un robot le remplit. On fait semblant.
+      if (body.site) return res.json({success: true});
+
+      const sujet = String(body.sujet || "").trim().slice(0, 150);
+      const message = String(body.message || "").trim().slice(0, 5000);
+      if (!sujet || message.length < 10) {
+        return res.status(400).json({
+          error: "Indiquez un sujet et un message (10 caractères minimum).",
+        });
+      }
+
+      const jeton = await verifierJeton(req, {ignorerA2F: true});
+      const email = jeton ? jeton.email :
+        String(body.email || "").trim().slice(0, 200);
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({error: "Adresse e-mail invalide."});
+      }
+
+      try {
+        const db = admin.firestore();
+        // Limite : 5 messages par heure par compte (ou par adresse IP).
+        const ip = String(req.get("x-forwarded-for") || req.ip || "")
+            .split(",")[0].trim();
+        const cle = jeton ? "uid_" + jeton.uid : "ip_" +
+          crypto.createHash("sha256").update(ip).digest("hex").slice(0, 32);
+        const limiteRef = db.collection("contact_limites").doc(cle);
+        const bloque = await db.runTransaction(async (t) => {
+          const snap = await t.get(limiteRef);
+          const recents = ((snap.exists && snap.data().envois) || [])
+              .filter((d) => Date.now() - d < 60 * 60 * 1000);
+          if (recents.length >= 5) return true;
+          t.set(limiteRef, {envois: [...recents, Date.now()]});
+          return false;
+        });
+        if (bloque) {
+          return res.status(429).json({
+            error: "Trop de messages envoyés. Réessayez dans une heure.",
+          });
+        }
+
+        // Copie de sauvegarde (lisible uniquement depuis la console).
+        await db.collection("contact_messages").add({
+          sujet, message, email,
+          uid: jeton ? jeton.uid : null,
+          pseudo: jeton ? (jeton.name || null) : null,
+          creeLe: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        const transporter = nodemailer.createTransport({
+          host: SMTP_HOST,
+          port: SMTP_PORT,
+          secure: SMTP_PORT === 465,
+          auth: {user: smtpUser.value(), pass: smtpPass.value()},
+        });
+        await transporter.sendMail({
+          from: `Formulaire Novaly <${SMTP_FROM}>`,
+          to: CONTACT_TO,
+          replyTo: email,
+          subject: `[Contact] ${sujet}`,
+          text: `De : ${email}` +
+            (jeton ? ` (compte ${jeton.name || ""} — uid ${jeton.uid})` :
+              " (non connecté)") +
+            `\n\n${message}`,
+        });
+        return res.json({success: true});
+      } catch (err) {
+        logger.error("Erreur envoyerContact", err);
+        return res.status(500)
+            .json({error: "Impossible d'envoyer le message pour le moment."});
+      }
+    });
+
+// 8. Commande : un ou plusieurs jeux (panier), pour soi ou offerts à un ami,
+// payés par carte (Stripe) ou avec le solde du portefeuille.
+// Corps : {gameIds: [...], pourUid?, message?, payerAvec: "carte"|"solde",
+// retour?: "site"}.
+exports.creerCommande = onRequest(
+    {secrets: [stripeSecretKey]},
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      if (req.method === "OPTIONS") return res.status(204).send("");
+      const jeton = await verifierJeton(req);
+      if (!jeton) {
+        return res.status(401).json({error: "Veuillez vous reconnecter."});
+      }
+      const b = req.body || {};
+      const ids = [...new Set(Array.isArray(b.gameIds) ? b.gameIds : [])];
+      if (!ids.length || ids.length > 20 ||
+          !ids.every((g) => typeof g === "string" &&
+            /^[\w-]{1,100}$/.test(g))) {
+        return res.status(400).json({error: "Panier invalide."});
+      }
+      const userId = jeton.uid;
+      const pourUid = typeof b.pourUid === "string" && b.pourUid ?
+        b.pourUid : userId;
+      const message = String(b.message || "").slice(0, 300);
+
+      try {
+        const db = admin.firestore();
+        if (pourUid !== userId) {
+          // On n'offre qu'à un ami (évite les envois à des inconnus).
+          const ami = await db.collection("users").doc(userId)
+              .collection("friends").doc(pourUid).get();
+          if (!ami.exists) {
+            return res.status(403)
+                .json({error: "Tu ne peux offrir un jeu qu'à un ami."});
+          }
+        }
+        const [jeux, dest, parental, moi] = await Promise.all([
+          Promise.all(ids.map((g) => db.collection("games").doc(g).get())),
+          db.collection("users").doc(pourUid).get(),
+          parentalDe(db, userId),
+          db.collection("users").doc(userId).get(),
+        ]);
+        const possedes = (dest.exists && dest.data().jeuxPossedes) || [];
+        let total = 0;
+        const lignes = [];
+        for (const snap of jeux) {
+          if (!snap.exists) {
+            return res.status(404).json({error: "Un jeu n'existe plus."});
+          }
+          const jeu = snap.data();
+          const tarif = prixJeu(jeu);
+          if (!tarif) {
+            return res.status(400).json({
+              error: `« ${jeu.titre || snap.id} » n'est pas en vente.`});
+          }
+          if (possedes.includes(snap.id)) {
+            return res.status(409).json({error: pourUid === userId ?
+              `Tu possèdes déjà « ${jeu.titre || snap.id} ».` :
+              `Ton ami possède déjà « ${jeu.titre || snap.id} ».`});
+          }
+          const refus = refusParental(parental, jeu);
+          if (refus) return res.status(403).json({error: refus});
+          total += Math.round(tarif.prix * 100);
+          lignes.push({id: snap.id, titre: jeu.titre || snap.id,
+            centimes: Math.round(tarif.prix * 100)});
+        }
+
+        const commandeRef = db.collection("commandes").doc();
+        await commandeRef.set({
+          userId, pourUid, gameIds: ids, titres: lignes.map((l) => l.titre),
+          centimes: total, message,
+          pseudo: (moi.exists && moi.data().pseudo) || jeton.name || "",
+          statut: "en_attente", creeLe: Date.now(),
+        });
+
+        // Gratuit : livré tout de suite.
+        if (total === 0) {
+          await livrerCommande(db, commandeRef.id, "gratuit");
+          return res.json({livree: true});
+        }
+
+        if (b.payerAvec === "solde") {
+          const ok = await debiterPortefeuille(db, userId, total,
+              commandeRef.id);
+          if (!ok) {
+            await commandeRef.update({statut: "refusee"});
+            return res.status(402).json({error: "Solde insuffisant."});
+          }
+          await livrerCommande(db, commandeRef.id, "solde");
+          return res.json({livree: true});
+        }
+
+        const stripe = new Stripe(stripeSecretKey.value());
+        const customerId = await getOrCreateStripeCustomer(
+            db, userId, jeton.email, stripe);
+        const depuisSite = b.retour === "site";
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          mode: "payment",
+          customer: customerId,
+          payment_intent_data: {setup_future_usage: "on_session"},
+          line_items: lignes.map((l) => ({
+            price_data: {
+              currency: "eur",
+              product_data: {
+                name: (pourUid === userId ? "" : "Cadeau : ") + l.titre,
+                description: "Clé numérique ajoutée directement à la " +
+                  "bibliothèque Novaly.",
+              },
+              unit_amount: l.centimes,
+            },
+            quantity: 1,
+          })),
+          metadata: {commandeId: commandeRef.id, userId},
+          success_url: depuisSite ?
+            "https://www.novaly-store.fr/#bibliotheque" :
+            "https://novaly-a80f7.web.app/paiement-reussi.html",
+          cancel_url: depuisSite ?
+            "https://www.novaly-store.fr/#panier" :
+            "https://novaly-a80f7.web.app/paiement-annule.html",
+        });
+        await commandeRef.update({stripeSession: session.id});
+        return res.json({url: session.url});
+      } catch (err) {
+        logger.error("Erreur creerCommande", err);
+        return res.status(500)
+            .json({error: "Impossible de créer la commande."});
+      }
+    });
+
+// ---------- Portefeuille (solde Novaly, en centimes) ----------
+// portefeuilles/{uid} = {solde} ; historique dans .../mouvements/{id}.
+// Écrit uniquement par le serveur ; le joueur peut le lire (règles).
+
+/**
+ * Crédite le portefeuille une seule fois par paiement Stripe.
+ * @param {object} db Firestore.
+ * @param {string} uid UID du joueur.
+ * @param {number} centimes Montant.
+ * @param {string} sessionId Session Stripe (sert d'identifiant unique).
+ * @return {Promise<void>}
+ */
+async function crediterPortefeuille(db, uid, centimes, sessionId) {
+  if (!uid || !Number.isInteger(centimes) || centimes <= 0) return;
+  const ref = db.collection("portefeuilles").doc(uid);
+  const mvt = ref.collection("mouvements").doc(sessionId);
+  await db.runTransaction(async (t) => {
+    const [deja, porte] = await Promise.all([t.get(mvt), t.get(ref)]);
+    if (deja.exists) return;
+    const solde = (porte.exists && porte.data().solde) || 0;
+    t.set(ref, {solde: solde + centimes}, {merge: true});
+    t.set(mvt, {type: "recharge", centimes, le: Date.now()});
+  });
+  logger.info(`Portefeuille de ${uid} crédité de ${centimes} centimes.`);
+}
+
+/**
+ * Débite le portefeuille si le solde suffit (transaction).
+ * @param {object} db Firestore.
+ * @param {string} uid UID du joueur.
+ * @param {number} centimes Montant.
+ * @param {string} commandeId Commande payée.
+ * @return {Promise<boolean>} false si solde insuffisant.
+ */
+async function debiterPortefeuille(db, uid, centimes, commandeId) {
+  const ref = db.collection("portefeuilles").doc(uid);
+  return db.runTransaction(async (t) => {
+    const porte = await t.get(ref);
+    const solde = (porte.exists && porte.data().solde) || 0;
+    if (solde < centimes) return false;
+    t.set(ref, {solde: solde - centimes}, {merge: true});
+    t.set(ref.collection("mouvements").doc("cmd_" + commandeId),
+        {type: "achat", centimes: -centimes, commandeId, le: Date.now()});
+    return true;
+  });
+}
+
+// 9. Recharger le portefeuille (montants fixes, paiement par carte).
+const RECHARGES = [500, 1000, 2000, 5000];
+exports.rechargerPortefeuille = onRequest(
+    {secrets: [stripeSecretKey]},
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      if (req.method === "OPTIONS") return res.status(204).send("");
+      const jeton = await verifierJeton(req);
+      if (!jeton) {
+        return res.status(401).json({error: "Veuillez vous reconnecter."});
+      }
+      const centimes = Number(req.body && req.body.centimes);
+      if (!RECHARGES.includes(centimes)) {
+        return res.status(400).json({error: "Montant non proposé."});
+      }
+      try {
+        const db = admin.firestore();
+        const parental = await parentalDe(db, jeton.uid);
+        if (parental.actif && parental.achatsBloques) {
+          return res.status(403).json({
+            error: "Les achats sont bloqués par le contrôle parental."});
+        }
+        const stripe = new Stripe(stripeSecretKey.value());
+        const customerId = await getOrCreateStripeCustomer(
+            db, jeton.uid, jeton.email, stripe);
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          mode: "payment",
+          customer: customerId,
+          line_items: [{
+            price_data: {
+              currency: "eur",
+              product_data: {
+                name: `Recharge du portefeuille Novaly`,
+                description: "Crédit utilisable pour acheter des jeux sur " +
+                  "Novaly. Non remboursable, non convertible en argent.",
+              },
+              unit_amount: centimes,
+            },
+            quantity: 1,
+          }],
+          metadata: {type: "recharge", userId: jeton.uid,
+            centimes: String(centimes)},
+          success_url: "https://novaly-a80f7.web.app/paiement-reussi.html",
+          cancel_url: "https://novaly-a80f7.web.app/paiement-annule.html",
+        });
+        return res.json({url: session.url});
+      } catch (err) {
+        logger.error("Erreur rechargerPortefeuille", err);
+        return res.status(500)
+            .json({error: "Impossible d'initialiser la recharge."});
+      }
+    });
+
+
+// 10. Contrôle parental, protégé par un code PIN.
+// parental/{uid} = réglages (lisibles par le joueur, écrits ici seulement) ;
+// parental_pins/{uid} = empreinte scrypt du PIN + échecs (serveur uniquement).
+// Corps : {action: "activer"|"modifier"|"desactiver", pin, nouveauPin?,
+//          achatsBloques?, chatBloque?, ageMax?}
+const AGES_PEGI = [0, 3, 7, 12, 16, 18];
+
+/**
+ * Empreinte d'un PIN (scrypt, sel aléatoire).
+ * @param {string} pin Le code PIN.
+ * @param {string} sel Sel hexadécimal.
+ * @return {string} Empreinte hexadécimale.
+ */
+function empreintePin(pin, sel) {
+  return crypto.scryptSync(String(pin), sel, 32).toString("hex");
+}
+
+exports.controleParental = onRequest(
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      if (req.method === "OPTIONS") return res.status(204).send("");
+      const jeton = await verifierJeton(req);
+      if (!jeton) {
+        return res.status(401).json({error: "Veuillez vous reconnecter."});
+      }
+      const b = req.body || {};
+      const action = b.action;
+      const pin = String(b.pin || "");
+      const reglages = {
+        achatsBloques: b.achatsBloques === true,
+        chatBloque: b.chatBloque === true,
+        ageMax: AGES_PEGI.includes(Number(b.ageMax)) ? Number(b.ageMax) : 0,
+      };
+
+      try {
+        const db = admin.firestore();
+        const refR = db.collection("parental").doc(jeton.uid);
+        const refPin = db.collection("parental_pins").doc(jeton.uid);
+        const snapPin = await refPin.get();
+        const snapR = await refR.get();
+        const actif = snapR.exists && snapR.data().actif === true;
+
+        if (action === "activer") {
+          if (actif) {
+            return res.status(409)
+                .json({error: "Le contrôle parental est déjà actif."});
+          }
+          if (!/^\d{4,6}$/.test(pin)) {
+            return res.status(400)
+                .json({error: "Choisissez un code PIN de 4 à 6 chiffres."});
+          }
+          const sel = crypto.randomBytes(16).toString("hex");
+          await refPin.set({sel, empreinte: empreintePin(pin, sel),
+            echecs: []});
+          await refR.set({actif: true, ...reglages, depuis: Date.now()});
+          return res.json({success: true});
+        }
+
+        if (action !== "modifier" && action !== "desactiver") {
+          return res.status(400).json({error: "Action inconnue."});
+        }
+        if (!actif || !snapPin.exists) {
+          return res.status(400)
+              .json({error: "Le contrôle parental n'est pas actif."});
+        }
+        // Vérification du PIN : 5 essais par quart d'heure.
+        const p = snapPin.data();
+        const echecs = (p.echecs || []).filter((t) => Date.now() - t < 900000);
+        if (echecs.length >= 5) {
+          return res.status(429).json({
+            error: "Trop d'essais. Réessayez dans 15 minutes."});
+        }
+        const attendu = Buffer.from(p.empreinte, "hex");
+        const recu = Buffer.from(empreintePin(pin, p.sel), "hex");
+        if (!crypto.timingSafeEqual(attendu, recu)) {
+          await refPin.update({echecs: [...echecs, Date.now()]});
+          return res.status(403).json({error: "Code PIN incorrect."});
+        }
+
+        if (action === "desactiver") {
+          await Promise.all([refR.delete(), refPin.delete()]);
+          return res.json({success: true});
+        }
+        const maj = {echecs: []};
+        if (b.nouveauPin) {
+          if (!/^\d{4,6}$/.test(String(b.nouveauPin))) {
+            return res.status(400)
+                .json({error: "Le nouveau PIN doit faire 4 à 6 chiffres."});
+          }
+          maj.sel = crypto.randomBytes(16).toString("hex");
+          maj.empreinte = empreintePin(String(b.nouveauPin), maj.sel);
+        }
+        await refPin.update(maj);
+        await refR.set({actif: true, ...reglages}, {merge: true});
+        return res.json({success: true});
+      } catch (err) {
+        logger.error("Erreur controleParental", err);
+        return res.status(500)
+            .json({error: "Erreur du contrôle parental."});
+      }
+    });
+
+// 11. Comptes associés (Steam, Discord). Résultat dans comptes_lies/{uid}
+// (lisible par le joueur, écrit ici seulement).
+// Flux : lierCompte {action: "debut", service} → URL à ouvrir dans le
+// navigateur → le service renvoie vers retourSteam / retourDiscord, qui
+// vérifient l'identité puis enregistrent le compte. Le « state » est un jeton
+// à usage unique (10 min) qui relie le retour au bon joueur.
+// Discord : créer une application sur https://discord.com/developers,
+// URI de redirection = DISCORD_REDIRECT ci-dessous, puis
+//   firebase functions:secrets:set DISCORD_CLIENT_SECRET
+const FN_BASE = "https://us-central1-novaly-a80f7.cloudfunctions.net/";
+const DISCORD_CLIENT_ID = 1557027740039913473; // ⚠️ à remplir (ID public de l'application)
+const DISCORD_REDIRECT = FN_BASE + "retourDiscord";
+const discordSecret = defineSecret("DISCORD_CLIENT_SECRET");
+
+/**
+ * Page HTML de fin de liaison (affichée dans le navigateur).
+ * @param {boolean} ok Succès ou échec.
+ * @param {string} message Texte à afficher (sans HTML).
+ * @return {string} La page.
+ */
+function pageLiaison(ok, message) {
+  const texte = String(message).replace(/[<>&"]/g, "");
+  return `<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Novaly</title></head><body style="margin:0;background:#0b0b0c;
+color:#fff;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+display:grid;place-items:center;min-height:100vh"><div style="text-align:center;
+padding:30px;max-width:420px"><div style="font-size:28px;font-weight:800;
+letter-spacing:2px">NOVALY</div><p style="font-size:40px;margin:20px 0 6px">
+${ok ? "✅" : "⚠️"}</p><p style="color:#ccc">${texte}</p>
+<a href="novaly://profile" style="display:inline-block;margin-top:16px;
+background:#fff;color:#000;padding:10px 18px;border-radius:8px;
+text-decoration:none;font-weight:700">Retourner dans Novaly</a></div>
+</body></html>`;
+}
+
+/**
+ * Consomme un jeton « state » (usage unique, 10 min).
+ * @param {object} db Firestore.
+ * @param {string} state Le jeton reçu.
+ * @param {string} service « steam » ou « discord ».
+ * @return {Promise<string|null>} L'UID du joueur, ou null.
+ */
+async function consommerEtat(db, state, service) {
+  if (!/^[a-f0-9]{48}$/.test(String(state || ""))) return null;
+  const ref = db.collection("liens_etats").doc(state);
+  return db.runTransaction(async (t) => {
+    const snap = await t.get(ref);
+    if (!snap.exists) return null;
+    t.delete(ref);
+    const d = snap.data();
+    if (d.service !== service || Date.now() - d.cree > 600000) return null;
+    return d.uid;
+  });
+}
+
+exports.lierCompte = onRequest(
+    async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+      if (req.method === "OPTIONS") return res.status(204).send("");
+      const jeton = await verifierJeton(req);
+      if (!jeton) {
+        return res.status(401).json({error: "Veuillez vous reconnecter."});
+      }
+      const {action, service} = req.body || {};
+      if (!["steam", "discord"].includes(service)) {
+        return res.status(400).json({error: "Service inconnu."});
+      }
+      const db = admin.firestore();
+      try {
+        if (action === "delier") {
+          await db.collection("comptes_lies").doc(jeton.uid).set({
+            [service]: admin.firestore.FieldValue.delete(),
+          }, {merge: true});
+          return res.json({success: true});
+        }
+        if (action !== "debut") {
+          return res.status(400).json({error: "Action inconnue."});
+        }
+        if (service === "discord" && !DISCORD_CLIENT_ID) {
+          return res.status(503).json({
+            error: "La liaison Discord n'est pas encore configurée."});
+        }
+        const state = crypto.randomBytes(24).toString("hex");
+        await db.collection("liens_etats").doc(state)
+            .set({uid: jeton.uid, service, cree: Date.now()});
+        let url;
+        if (service === "steam") {
+          const retour = FN_BASE + "retourSteam?state=" + state;
+          url = "https://steamcommunity.com/openid/login?" +
+            new URLSearchParams({
+              "openid.ns": "http://specs.openid.net/auth/2.0",
+              "openid.mode": "checkid_setup",
+              "openid.return_to": retour,
+              "openid.realm": FN_BASE,
+              "openid.identity":
+                "http://specs.openid.net/auth/2.0/identifier_select",
+              "openid.claimed_id":
+                "http://specs.openid.net/auth/2.0/identifier_select",
+            });
+        } else {
+          url = "https://discord.com/oauth2/authorize?" +
+            new URLSearchParams({
+              client_id: DISCORD_CLIENT_ID, response_type: "code",
+              redirect_uri: DISCORD_REDIRECT, scope: "identify",
+              state,
+            });
+        }
+        return res.json({url});
+      } catch (err) {
+        logger.error("Erreur lierCompte", err);
+        return res.status(500).json({error: "Liaison impossible."});
+      }
+    });
+
+// Retour de Steam (OpenID 2.0) : on fait confirmer la réponse par Steam
+// lui-même (check_authentication) avant de croire l'identifiant.
+exports.retourSteam = onRequest(async (req, res) => {
+  const db = admin.firestore();
+  try {
+    const q = req.query || {};
+    const attendu = FN_BASE + "retourSteam?state=" + q.state;
+    if (q["openid.mode"] !== "id_res" || q["openid.return_to"] !== attendu) {
+      return res.status(400).send(pageLiaison(false, "Liaison annulée."));
+    }
+    const verif = new URLSearchParams();
+    for (const [k, v] of Object.entries(q)) {
+      if (k.startsWith("openid.")) verif.set(k, String(v));
+    }
+    verif.set("openid.mode", "check_authentication");
+    const r = await fetch("https://steamcommunity.com/openid/login", {
+      method: "POST", body: verif,
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    });
+    const corps = await r.text();
+    const m = String(q["openid.claimed_id"] || "")
+        .match(/^https:\/\/steamcommunity\.com\/openid\/id\/(\d{17})$/);
+    if (!/is_valid\s*:\s*true/.test(corps) || !m) {
+      return res.status(400)
+          .send(pageLiaison(false, "Steam n'a pas confirmé la connexion."));
+    }
+    const uid = await consommerEtat(db, q.state, "steam");
+    if (!uid) {
+      return res.status(400).send(pageLiaison(false,
+          "Lien expiré : recommencez depuis Novaly."));
+    }
+    // Pseudo Steam public (facultatif : sans clé d'API).
+    let nom = "";
+    try {
+      const xml = await (await fetch(
+          `https://steamcommunity.com/profiles/${m[1]}?xml=1`)).text();
+      const n = xml.match(/<steamID><!\[CDATA\[([^\]]{0,64})\]\]><\/steamID>/);
+      if (n) nom = n[1];
+    } catch (e) {/* pseudo facultatif */}
+    await db.collection("comptes_lies").doc(uid).set({
+      steam: {id: m[1], nom, le: Date.now()},
+    }, {merge: true});
+    return res.send(pageLiaison(true,
+        `Compte Steam ${nom || m[1]} lié à Novaly.`));
+  } catch (err) {
+    logger.error("Erreur retourSteam", err);
+    return res.status(500).send(pageLiaison(false, "Erreur de liaison."));
+  }
+});
+
+// Retour de Discord (OAuth2) : échange du code contre un jeton, lecture du
+// profil (scope « identify » : identifiant + pseudo seulement).
+exports.retourDiscord = onRequest(
+    {secrets: [discordSecret]},
+    async (req, res) => {
+      const db = admin.firestore();
+      try {
+        const {code, state} = req.query || {};
+        if (!code) {
+          return res.status(400).send(pageLiaison(false, "Liaison annulée."));
+        }
+        const uid = await consommerEtat(db, state, "discord");
+        if (!uid) {
+          return res.status(400).send(pageLiaison(false,
+              "Lien expiré : recommencez depuis Novaly."));
+        }
+        const tok = await (await fetch("https://discord.com/api/oauth2/token", {
+          method: "POST",
+          headers: {"Content-Type": "application/x-www-form-urlencoded"},
+          body: new URLSearchParams({
+            client_id: DISCORD_CLIENT_ID,
+            client_secret: discordSecret.value(),
+            grant_type: "authorization_code",
+            code: String(code), redirect_uri: DISCORD_REDIRECT,
+          }),
+        })).json();
+        if (!tok.access_token) throw new Error("jeton Discord refusé");
+        const moi = await (await fetch("https://discord.com/api/users/@me", {
+          headers: {Authorization: `Bearer ${tok.access_token}`},
+        })).json();
+        if (!moi.id) throw new Error("profil Discord illisible");
+        await db.collection("comptes_lies").doc(uid).set({
+          discord: {id: moi.id, nom: moi.global_name || moi.username || "",
+            le: Date.now()},
+        }, {merge: true});
+        return res.send(pageLiaison(true,
+            `Compte Discord ${moi.global_name || moi.username} lié à Novaly.`));
+      } catch (err) {
+        logger.error("Erreur retourDiscord", err);
+        return res.status(500).send(pageLiaison(false, "Erreur de liaison."));
       }
     });
