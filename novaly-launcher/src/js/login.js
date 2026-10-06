@@ -1,5 +1,5 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithCredential, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";        
         const firebaseConfig = {
             apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
@@ -60,12 +60,15 @@
             window.location.href = 'index.html';
         }
 
-        function afficher2faSection() {
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('register-section').style.display = 'none';
-            document.getElementById('google-pseudo-section').style.display = 'none';
-            document.getElementById('twofa-section').style.display = 'block';
+        // Affiche une seule section du formulaire (les absentes de la page sont ignorées).
+        const SECTIONS = ['login-section', 'register-section', 'google-pseudo-section', 'twofa-section', 'google-wait-section'];
+        function montrerSection(id) {
+            SECTIONS.forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.style.display = (s === id) ? 'block' : 'none';
+            });
         }
+        function afficher2faSection() { montrerSection('twofa-section'); }
 
         function showError(elementId, message) {
             const errorDiv = document.getElementById(elementId);
@@ -205,8 +208,7 @@
         // Abandon : on ferme la session non validée et on revient au formulaire.
         window.annuler2fa = async function() {
             await signOut(auth);
-            document.getElementById('twofa-section').style.display = 'none';
-            document.getElementById('login-section').style.display = 'block';
+            montrerSection('login-section');
         };
 
         // Session déjà ouverte mais pas encore validée (ex. redirigé depuis
@@ -221,35 +223,104 @@
 
 window.tempGoogleUser = null; // Stocke l'utilisateur temporairement
 
+// ---------- Connexion Google ----------
+// Site : pop-up Google classique.
+// Launcher (Tauri) : le pop-up est bloqué et Google refuse les fenêtres intégrées aux apps.
+// La connexion se fait donc dans le vrai navigateur (novaly-store.fr/connexion-google.html),
+// qui renvoie au launcher novaly://auth-google#n=<jeton unique>&t=<jeton Google>.
+// Le jeton unique (nonce) n'est accepté que s'il a été créé ICI il y a moins de 10 min :
+// un lien reçu d'ailleurs ne peut pas nous connecter au compte de quelqu'un d'autre.
+const PAGE_GOOGLE = "https://novaly-store.fr/connexion-google.html";
+const NONCE_GOOGLE = "google_nonce";
+
+// Suite commune après une connexion Google réussie (pop-up ou navigateur).
+async function apresConnexionGoogle(user) {
+    if (await etatA2F(user) === 'requise') {
+        await demanderCode2FA(user);
+        return;
+    }
+    // On vérifie si ce compte Google a déjà un profil Novaly
+    const docSnap = await getDoc(doc(db, "users", user.uid));
+    if (docSnap.exists()) {
+        localStorage.setItem('isLoggedIn', 'true');
+        window.location.href = 'index.html';
+    } else {
+        // NOUVEAU COMPTE : on demande le pseudo
+        window.tempGoogleUser = user;
+        montrerSection('google-pseudo-section');
+    }
+}
+
+function erreurGoogle(error) {
+    console.error("Connexion Google :", error);
+    montrerSection('login-section');
+    showError('login-error', "Erreur avec Google (" + (error.code || error.message || "inconnue") + ").");
+}
+
 window.loginWithGoogle = async function() {
     hideErrors();
+    if (window.__TAURI__) return demarrerGoogleNavigateur();
     try {
         const result = await signInWithPopup(auth, provider);
-        if (await etatA2F(result.user) === 'requise') {
-            await demanderCode2FA(result.user);
-            return;
-        }
-        const userDocRef = doc(db, "users", result.user.uid);
-
-        // On vérifie si ce compte Google a déjà un profil Novaly
-        const docSnap = await getDoc(userDocRef);
-
-        if (docSnap.exists()) {
-            // Le compte existe déjà, on le connecte direct
-            localStorage.setItem('isLoggedIn', 'true');
-            window.location.href = 'index.html';
-        } else {
-            // NOUVEAU COMPTE : On cache le reste et on demande le pseudo
-            window.tempGoogleUser = result.user;
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('google-pseudo-section').style.display = 'block';
-        }
+        await apresConnexionGoogle(result.user);
     } catch (error) {
-        if (error.code !== 'auth/popup-closed-by-user') {
-            showError('login-error', "Erreur avec Google.");
-        }
+        if (error.code !== 'auth/popup-closed-by-user') erreurGoogle(error);
     }
 };
+
+async function demarrerGoogleNavigateur() {
+    const nonce = crypto.randomUUID();
+    localStorage.setItem(NONCE_GOOGLE, JSON.stringify({ nonce, at: Date.now() }));
+    montrerSection('google-wait-section');
+    document.getElementById('google-wait-error').style.display = 'none';
+    try {
+        await window.__TAURI__.core.invoke("plugin:opener|open_url", { url: PAGE_GOOGLE + "#n=" + nonce });
+    } catch (e) {
+        showError('google-wait-error', "Impossible d'ouvrir le navigateur.");
+    }
+}
+
+async function recevoirLienGoogle(url) {
+    let lien;
+    try { lien = new URL(String(url).trim()); } catch (e) { return false; }
+    if (lien.protocol !== 'novaly:' || lien.host !== 'auth-google') return false;
+    const p = new URLSearchParams(lien.hash.slice(1));
+    let attendu = null;
+    try { attendu = JSON.parse(localStorage.getItem(NONCE_GOOGLE) || 'null'); } catch (e) { /* illisible */ }
+    if (!attendu) return true;   // aucune connexion en attente (ex. lien déjà utilisé) : on ignore
+    if (attendu.nonce !== p.get('n') || Date.now() - attendu.at > 10 * 60 * 1000 || !p.get('t')) {
+        montrerSection('login-section');
+        showError('login-error', "Lien de connexion Google invalide ou expiré. Recommence.");
+        return true;
+    }
+    localStorage.removeItem(NONCE_GOOGLE);   // usage unique
+    try {
+        const cred = await signInWithCredential(auth, GoogleAuthProvider.credential(p.get('t')));
+        await apresConnexionGoogle(cred.user);
+    } catch (error) {
+        erreurGoogle(error);
+    }
+    return true;
+}
+
+// Secours si le navigateur n'a pas pu rouvrir Novaly : on colle le lien affiché par la page.
+window.collerLienGoogle = async function() {
+    const champ = document.getElementById('google-paste');
+    if (!(await recevoirLienGoogle(champ.value))) showError('google-wait-error', "Ce n'est pas un lien de connexion Novaly.");
+};
+window.annulerGoogle = function() {
+    localStorage.removeItem(NONCE_GOOGLE);
+    montrerSection('login-section');
+};
+
+if (window.__TAURI__ && window.__TAURI__.deepLink) {
+    const { getCurrent, onOpenUrl } = window.__TAURI__.deepLink;
+    onOpenUrl(urls => urls.forEach(recevoirLienGoogle)).catch(() => {});
+    // Lien arrivé pendant qu'une autre page était affichée (relayé par index.html)
+    const enAttente = sessionStorage.getItem('lien_google');
+    if (enAttente) { sessionStorage.removeItem('lien_google'); recevoirLienGoogle(enAttente); }
+    else getCurrent().then(urls => (urls || []).forEach(recevoirLienGoogle)).catch(() => {});
+}
 
 window.finalizeGoogleLogin = async function() {
     hideErrors();

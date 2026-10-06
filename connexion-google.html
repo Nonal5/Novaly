@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Connexion Google - NOVALY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body>
+    <!-- Ouverte par le launcher Novaly (bouton « Continuer avec Google ») : Google refuse
+         les connexions dans les fenêtres intégrées aux apps, on passe donc par le navigateur,
+         puis on renvoie au launcher via novaly://auth-google#n=<jeton unique>&t=<jeton Google>. -->
+    <div class="login-box">
+        <div class="logo">NOVALY</div>
+
+        <div id="etape-connexion" class="section-fade">
+            <div class="subtitle">Connexion au launcher</div>
+            <div id="erreur" class="error-message"></div>
+            <p style="font-size: 13px; color: #ccc; margin-bottom: 20px;">Connecte-toi avec Google pour continuer dans le launcher Novaly.</p>
+            <button class="btn btn-google" id="btn-google">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+                Continuer avec Google
+            </button>
+        </div>
+
+        <div id="etape-retour" class="section-fade" style="display: none;">
+            <div class="subtitle">C'est bon !</div>
+            <p style="font-size: 13px; color: #ccc; margin-bottom: 20px;">Retourne dans le launcher Novaly : tu y es connecté. Tu peux fermer cet onglet.</p>
+            <a class="btn" id="lien-launcher" href="#" style="display:block; text-decoration:none; box-sizing:border-box;">Ouvrir Novaly</a>
+            <div class="divider">si Novaly ne s'ouvre pas</div>
+            <button class="btn btn-google" id="btn-copier">Copier le lien de connexion</button>
+            <p style="font-size: 12px; color: #888; margin-top: 12px;">Puis colle-le dans le launcher (champ « Lien affiché par la page »). Il expire dans quelques minutes.</p>
+        </div>
+
+        <div id="etape-invalide" class="section-fade" style="display: none;">
+            <div class="subtitle">Lien incomplet</div>
+            <p style="font-size: 13px; color: #ccc;">Cette page s'ouvre depuis le launcher Novaly : clique sur « Continuer avec Google » dans le launcher.</p>
+        </div>
+
+        <a href="index.html" class="back-link">← Retour au magasin</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+        const app = initializeApp({
+            apiKey: "AIzaSyBfM8rodwJivN1vW8Vt9WJRvELIPxozvBg",
+            authDomain: "novaly-a80f7.firebaseapp.com",
+            projectId: "novaly-a80f7",
+            storageBucket: "novaly-a80f7.firebasestorage.app",
+            messagingSenderId: "58102958990",
+            appId: "1:58102958990:web:6bdc2d3f049015fd0672df"
+        });
+        const auth = getAuth(app);
+
+        const montrer = (id) => ["etape-connexion", "etape-retour", "etape-invalide"]
+            .forEach(e => document.getElementById(e).style.display = (e === id) ? "block" : "none");
+
+        // Jeton unique créé par le launcher (UUID) : sans lui, le launcher refuserait le retour.
+        const nonce = new URLSearchParams(location.hash.slice(1)).get("n") || "";
+        if (!/^[0-9a-f-]{36}$/i.test(nonce)) montrer("etape-invalide");
+
+        let lien = "";
+        document.getElementById("btn-google").addEventListener("click", async () => {
+            const erreur = document.getElementById("erreur");
+            erreur.style.display = "none";
+            try {
+                const result = await signInWithPopup(auth, new GoogleAuthProvider());
+                const idToken = GoogleAuthProvider.credentialFromResult(result)?.idToken;
+                if (!idToken) throw new Error("jeton Google absent");
+                lien = "novaly://auth-google#n=" + nonce + "&t=" + encodeURIComponent(idToken);
+                // La session du site n'est pas utile ici : seul le launcher doit être connecté.
+                await signOut(auth);
+                document.getElementById("lien-launcher").href = lien;
+                montrer("etape-retour");
+                window.location.href = lien;   // rouvre le launcher
+            } catch (e) {
+                if (e.code === "auth/popup-closed-by-user") return;
+                erreur.innerText = "Erreur avec Google (" + (e.code || e.message) + ").";
+                erreur.style.display = "block";
+            }
+        });
+
+        document.getElementById("btn-copier").addEventListener("click", async () => {
+            const b = document.getElementById("btn-copier");
+            try { await navigator.clipboard.writeText(lien); b.innerText = "Lien copié ✓"; }
+            catch (e) { prompt("Copie ce lien :", lien); }
+        });
+    </script>
+</body>
+</html>

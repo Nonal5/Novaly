@@ -79,6 +79,21 @@
     <button class="btn" onclick="finalizeGoogleLogin()">Valider et entrer</button>
 </div>
 
+        <!-- Launcher : connexion Google terminée dans le navigateur (voir js/login.js) -->
+        <div id="google-wait-section" class="section-fade" style="display: none;">
+            <div class="subtitle">Connexion avec Google</div>
+            <div id="google-wait-error" class="error-message"></div>
+            <p style="font-size: 13px; color: #ccc; margin-bottom: 20px;">Termine la connexion dans ton navigateur. Novaly s'ouvrira tout seul ensuite.</p>
+            <button class="btn btn-google" onclick="loginWithGoogle()">Rouvrir le navigateur</button>
+            <div class="divider">si Novaly ne s'est pas rouvert</div>
+            <div class="form-group">
+                <label>Lien affiché par la page</label>
+                <input type="text" id="google-paste" placeholder="novaly://auth-google#…" autocomplete="off">
+            </div>
+            <button class="btn" onclick="collerLienGoogle()">Valider le lien</button>
+            <p class="toggle-text"><span onclick="annulerGoogle()">Annuler</span></p>
+        </div>
+
         <div id="twofa-section" class="section-fade" style="display: none;">
             <div class="subtitle">Vérification en deux étapes</div>
             <div id="twofa-error" class="error-message"></div>

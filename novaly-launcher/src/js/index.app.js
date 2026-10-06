@@ -1693,6 +1693,13 @@ function ouvrirLienNovaly(url) {
     try { lien = new URL(url); } catch (e) { return; }
     if (lien.protocol !== 'novaly:') return;
     const section = lien.host;
+    // Retour de la connexion Google : traité par la page de connexion
+    if (section === 'auth-google') {
+        if (!localStorage.getItem('google_nonce')) return;   // déjà traité : pas de boucle
+        sessionStorage.setItem('lien_google', url);
+        window.location.href = 'login.html';
+        return;
+    }
     const valeur = decodeURIComponent(lien.pathname.replace(/^\/+/, ''));
     if (section === 'game' && /^[\w-]{1,100}$/.test(valeur)) {
         window.afficherPageJeu(valeur);
