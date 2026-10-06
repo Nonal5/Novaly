@@ -226,12 +226,25 @@ window.tempGoogleUser = null; // Stocke l'utilisateur temporairement
 // ---------- Connexion Google ----------
 // Site : pop-up Google classique.
 // Launcher (Tauri) : le pop-up est bloqué et Google refuse les fenêtres intégrées aux apps.
-// La connexion se fait donc dans le vrai navigateur (novaly-store.fr/connexion-google.html),
-// qui renvoie au launcher novaly://auth-google#n=<jeton unique>&t=<jeton Google>.
-// Le jeton unique (nonce) n'est accepté que s'il a été créé ICI il y a moins de 10 min :
-// un lien reçu d'ailleurs ne peut pas nous connecter au compte de quelqu'un d'autre.
-const PAGE_GOOGLE = "https://novaly-store.fr/connexion-google.html";
+// On ouvre donc DIRECTEMENT le choix de compte Google dans le navigateur ; Google renvoie
+// le jeton à novaly-store.fr/connexion-google.html, qui rouvre aussitôt le launcher avec
+// novaly://auth-google#n=<jeton unique>&t=<jeton Google>.
+// Le jeton unique (state + nonce OpenID) n'est accepté que s'il a été créé ICI il y a moins
+// de 10 min et qu'il figure dans le jeton Google : un lien reçu d'ailleurs ne peut pas nous
+// connecter au compte de quelqu'un d'autre.
+// ⚠️ L'adresse de retour doit être autorisée dans Google Cloud Console → Identifiants →
+// « Web client (auto created by Google Service) » → URI de redirection autorisés.
+const GOOGLE_CLIENT_ID = "58102958990-mou6q8c77761aqinj5uc9i2uhc3qnr28.apps.googleusercontent.com";
+const RETOUR_GOOGLE = "https://novaly-store.fr/connexion-google.html";
 const NONCE_GOOGLE = "google_nonce";
+
+// Lit le contenu (non vérifié ici : Firebase vérifie la signature) d'un jeton Google.
+function contenuJeton(jwt) {
+    try {
+        const b64 = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(decodeURIComponent(escape(atob(b64))));
+    } catch (e) { return {}; }
+}
 
 // Suite commune après une connexion Google réussie (pop-up ou navigateur).
 async function apresConnexionGoogle(user) {
@@ -273,8 +286,17 @@ async function demarrerGoogleNavigateur() {
     localStorage.setItem(NONCE_GOOGLE, JSON.stringify({ nonce, at: Date.now() }));
     montrerSection('google-wait-section');
     document.getElementById('google-wait-error').style.display = 'none';
+    const url = "https://accounts.google.com/o/oauth2/v2/auth?" + new URLSearchParams({
+        client_id: GOOGLE_CLIENT_ID,
+        redirect_uri: RETOUR_GOOGLE,
+        response_type: "id_token",
+        scope: "openid email profile",
+        prompt: "select_account",
+        state: nonce,
+        nonce: nonce
+    });
     try {
-        await window.__TAURI__.core.invoke("plugin:opener|open_url", { url: PAGE_GOOGLE + "#n=" + nonce });
+        await window.__TAURI__.core.invoke("plugin:opener|open_url", { url });
     } catch (e) {
         showError('google-wait-error', "Impossible d'ouvrir le navigateur.");
     }
@@ -288,7 +310,8 @@ async function recevoirLienGoogle(url) {
     let attendu = null;
     try { attendu = JSON.parse(localStorage.getItem(NONCE_GOOGLE) || 'null'); } catch (e) { /* illisible */ }
     if (!attendu) return true;   // aucune connexion en attente (ex. lien déjà utilisé) : on ignore
-    if (attendu.nonce !== p.get('n') || Date.now() - attendu.at > 10 * 60 * 1000 || !p.get('t')) {
+    if (attendu.nonce !== p.get('n') || Date.now() - attendu.at > 10 * 60 * 1000 || !p.get('t')
+        || contenuJeton(p.get('t')).nonce !== attendu.nonce) {
         montrerSection('login-section');
         showError('login-error', "Lien de connexion Google invalide ou expiré. Recommence.");
         return true;
