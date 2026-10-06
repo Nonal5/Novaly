@@ -1418,7 +1418,9 @@ exports.controleParental = onRequest(
 // URI de redirection = DISCORD_REDIRECT ci-dessous, puis
 //   firebase functions:secrets:set DISCORD_CLIENT_SECRET
 const FN_BASE = "https://us-central1-novaly-a80f7.cloudfunctions.net/";
-const DISCORD_CLIENT_ID = 1557027740039913473; // ⚠️ à remplir (ID public de l'application)
+// ID public de l'application Discord. Entre guillemets : trop grand pour un
+// nombre JavaScript (il serait arrondi et Discord le refuserait).
+const DISCORD_CLIENT_ID = "1557027740039913473";
 const DISCORD_REDIRECT = FN_BASE + "retourDiscord";
 const discordSecret = defineSecret("DISCORD_CLIENT_SECRET");
 
