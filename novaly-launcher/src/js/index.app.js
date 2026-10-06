@@ -721,6 +721,7 @@ window.chargerMagasin = async function() {
                     <div class="game-cover" style="background: url('${cssUrl(g.coverUrl)}') center/cover; background-color: #222;"></div>
                     <div class="game-tags"><span class="tag tag-action">Disponible</span></div>
                     <div class="game-title">${esc(g.titre)}</div>
+                    ${window.prixCarte ? window.prixCarte(g) : ''}
                     <button class="btn" style="width:100%; margin-top:10px; background: #ffffff; color: #000; font-size: 12px;">Voir la page</button>
                 </div>
             `;
@@ -872,7 +873,7 @@ window.actualiserBibliotheque = async function() {
                     box.innerHTML += `
                         <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; max-width: 80%; display: flex; flex-direction: column;">
                             <div style="background: ${isMe ? '#0984e3' : '#2a2a2a'}; padding: 8px 12px; border-radius: 12px; color: white; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-                                ${esc(msg.text ?? msg.texte)}
+                                ${rendreMessageChat(msg.text ?? msg.texte, isMe)}
                             </div>
                             <div style="align-self: ${isMe ? 'flex-end' : 'flex-start'}; font-size: 9px; color: #777; margin-top: 4px; display: flex; align-items: center;">
                                 ${timeStr} ${statusHtml}
@@ -887,10 +888,47 @@ window.actualiserBibliotheque = async function() {
             });
         };
 
+        // Invitation à jouer : un message texte contenant novaly://game/<id>, affiché en carte.
+        function rendreMessageChat(texte, isMe) {
+            const m = String(texte || '').match(/novaly:\/\/game\/([\w-]{1,100})/);
+            if (!m) return esc(texte);
+            const libelle = String(texte).replace(m[0], '').replace(/[\[\]]/g, '').trim();
+            return `<div style="font-weight: 600; margin-bottom: 6px;">${esc(libelle)}</div>
+                <button onclick="afficherPageJeu(${jsArg(m[1])}); document.getElementById('chat-box').style.display='none';"
+                    style="background: ${isMe ? 'rgba(0,0,0,0.25)' : '#4cd137'}; color: ${isMe ? '#fff' : '#000'}; border: none; border-radius: 6px; padding: 6px 10px; font-weight: 700; cursor: pointer; font-size: 11px;">► Voir le jeu</button>`;
+        }
+
+        // Choix d'un jeu de ma bibliothèque à proposer à l'ami du chat ouvert.
+        window.inviterAJouer = async function() {
+            if (!window.activeChatId || !window.currentFriendId) return;
+            const liste = document.getElementById('chat-invite-liste');
+            if (liste.style.display === 'block') { liste.style.display = 'none'; return; }
+            const jeux = await Promise.all((window.mesJeux || []).map(async id => {
+                const s = await getDoc(doc(db, "games", id)).catch(() => null);
+                return s && s.exists() ? { id, titre: s.data().titre || id } : null;
+            }));
+            const dispo = jeux.filter(Boolean);
+            liste.innerHTML = dispo.length
+                ? dispo.map(j => `<div class="dropdown-item" onclick="envoyerInvitation(${jsArg(j.id)}, ${jsArg(j.titre)})">${esc(j.titre)}</div>`).join('')
+                : `<div style="padding: 10px; color: #888; font-size: 12px;">Aucun jeu dans ta bibliothèque.</div>`;
+            liste.style.display = 'block';
+        };
+
+        window.envoyerInvitation = async function(gameId, titre) {
+            document.getElementById('chat-invite-liste').style.display = 'none';
+            const input = document.getElementById('chat-input');
+            input.value = `🎮 Viens jouer à ${titre} avec moi ! [novaly://game/${gameId}]`;
+            await window.envoyerMessage();
+        };
+
         window.envoyerMessage = async function() {
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if (!text || !window.activeChatId || !window.currentFriendId) return;
+            if (window.parental && window.parental.actif && window.parental.chatBloque) {
+                notifier("Le chat est désactivé par le contrôle parental.", { type: 'erreur' });
+                return;
+            }
 
             input.value = ""; 
 
@@ -1165,19 +1203,105 @@ window.changerMotDePasse = async function() {
 const ENDPOINT_ENVOYER_CODE_2FA = "https://us-central1-novaly-a80f7.cloudfunctions.net/envoyerCode2FA";
 const ENDPOINT_VERIFIER_CODE_2FA = "https://us-central1-novaly-a80f7.cloudfunctions.net/verifierCode2FA";
 
-// L'état de référence est a2f_actif/{uid} (écrit seulement par verifierCode2FA).
+// L'état de référence est a2f_actif/{uid} = {email, app} (écrit seulement par le serveur).
 window.charger2faEmailState = async function() {
-    const btn = document.getElementById('btn-2fa-email');
     const user = auth.currentUser;
-    if (!btn || !user) return;
+    if (!user) return;
     try {
         const snap = await getDoc(doc(db, "a2f_actif", user.uid));
-        const on = snap.exists();
-        btn.dataset.state = on ? 'on' : 'off';
-        btn.innerText = on ? 'Désactiver' : 'Activer';
-        btn.style.background = on ? '#ff6b6b' : '#0984e3';
+        const d = snap.exists() ? snap.data() : {};
+        const etat = { 'btn-2fa-email': d.email === true || d.methode === 'email', 'btn-2fa-app': d.app === true };
+        for (const [id, on] of Object.entries(etat)) {
+            const btn = document.getElementById(id);
+            if (!btn) continue;
+            btn.dataset.state = on ? 'on' : 'off';
+            btn.innerText = on ? 'Désactiver' : 'Activer';
+            btn.style.background = on ? '#ff6b6b' : '#0984e3';
+        }
     } catch (e) { /* lecture best-effort */ }
 };
+
+// ================= A2F PAR APPLICATION (TOTP) =================
+const ENDPOINT_A2F_APP = "https://us-central1-novaly-a80f7.cloudfunctions.net/a2fApp";
+
+async function appelA2fApp(corps) {
+    const r = await fetch(ENDPOINT_A2F_APP, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${await auth.currentUser.getIdToken()}` },
+        body: JSON.stringify(corps)
+    });
+    return r.json().catch(() => ({ error: "Réponse invalide du serveur." }));
+}
+
+window.fermer2faAppBox = function() {
+    document.getElementById('twofa-app-box').style.display = 'none';
+    document.getElementById('twofa-app-code').value = '';
+};
+
+// Activer : QR code à scanner. Désactiver : demande un code (application ou secours).
+window.toggle2faApp = async function() {
+    const btn = document.getElementById('btn-2fa-app');
+    const box = document.getElementById('twofa-app-box');
+    if (!auth.currentUser || !btn) return;
+    const enabling = btn.dataset.state !== 'on';
+    box.dataset.action = enabling ? 'enable' : 'disable';
+    document.getElementById('twofa-app-qr-zone').style.display = enabling ? 'block' : 'none';
+    document.getElementById('twofa-app-consigne').innerText = enabling
+        ? "Scannez le QR code avec votre application, puis saisissez le code à 6 chiffres affiché."
+        : "Pour désactiver, saisissez un code de votre application (ou un code de secours).";
+    if (enabling) {
+        btn.disabled = true;
+        try {
+            const d = await appelA2fApp({ action: 'setup' });
+            if (!d.success) { notifier(d.error || "Configuration impossible.", { type: 'erreur' }); return; }
+            document.getElementById('twofa-app-qr').src = d.qr;
+            document.getElementById('twofa-app-secret').innerText = d.secret.replace(/(.{4})/g, '$1 ').trim();
+        } catch (e) {
+            notifier("Erreur réseau.", { type: 'erreur' }); return;
+        } finally { btn.disabled = false; }
+    }
+    box.style.display = 'flex';
+    document.getElementById('twofa-app-code').focus();
+};
+
+window.valider2faApp = async function() {
+    const box = document.getElementById('twofa-app-box');
+    const code = document.getElementById('twofa-app-code').value.trim();
+    const enabling = box.dataset.action === 'enable';
+    if (enabling ? !/^\d{6}$/.test(code) : !/^(\d{6}|[A-Za-z0-9]{4}-?[A-Za-z0-9]{4})$/.test(code)) {
+        notifier(enabling ? "Le code contient 6 chiffres." : "Code de l'application (6 chiffres) ou code de secours attendu.", { type: 'erreur' });
+        return;
+    }
+    try {
+        const d = await appelA2fApp({ action: enabling ? 'enable' : 'disable', code });
+        if (!d.success) { notifier(d.error || "Code incorrect.", { type: 'erreur' }); return; }
+        fermer2faAppBox();
+        if (enabling) {
+            document.getElementById('twofa-app-secours-liste').innerText = d.codesSecours.join('\n');
+            document.getElementById('twofa-app-secours').style.display = 'block';
+            notifier("Application d'authentification activée.", { type: 'succes' });
+        } else {
+            notifier("Application d'authentification désactivée.", { type: 'succes' });
+        }
+    } catch (e) {
+        notifier("Erreur réseau.", { type: 'erreur' });
+    } finally {
+        charger2faEmailState();
+    }
+};
+
+window.copierCodesSecours = async function() {
+    try {
+        await navigator.clipboard.writeText(document.getElementById('twofa-app-secours-liste').innerText);
+        notifier("Codes copiés.", { type: 'succes' });
+    } catch (e) { notifier("Copie impossible : sélectionnez-les à la main.", { type: 'erreur' }); }
+};
+
+// Alerte laissée par la page de connexion (ex. peu de codes de secours restants).
+try {
+    const alerte = localStorage.getItem('a2f_alerte');
+    if (alerte) { localStorage.removeItem('a2f_alerte'); setTimeout(() => notifier(alerte, { duree: 0 }), 1500); }
+} catch (e) { /* stockage indisponible */ }
 
 window.fermer2faEmailBox = function() {
     const box = document.getElementById('twofa-email-box');
@@ -1254,6 +1378,7 @@ window.valider2faEmail = async function() {
 
 // Le prix affiché vient du champ "prix" (en euros) du jeu dans Firestore : c'est le même que celui facturé par le serveur
 function libelleBoutonAchat(gameData) {
+    if (window.libelleAchat) return window.libelleAchat(gameData);
     const prix = Number(gameData.prix);
     if (!prix) return "Obtenir (Gratuit)";
     return `Acheter (${esc(prix.toFixed(2).replace('.', ','))} €)`;
@@ -1340,6 +1465,8 @@ window.afficherPageJeu = async function(gameId) {
                     </div>`;
             }
         }
+        // Boutons boutique, contrôle parental et avis : APRÈS le bouton principal.
+        if (window.boutiqueSurPageJeu) window.boutiqueSurPageJeu(gameId, gameData, possede);
     } catch (error) {
         console.error(error);
     }
@@ -1714,3 +1841,55 @@ if (window.__TAURI__ && window.__TAURI__.deepLink) {
     getCurrent().then(urls => (urls || []).forEach(ouvrirLienNovaly)).catch(() => {});
     onOpenUrl(urls => urls.forEach(ouvrirLienNovaly)).catch(() => {});
 }
+
+// ================= FORMULAIRE « NOUS CONTACTER » =================
+// Envoyé à contact@novaly-store.fr par la Cloud Function envoyerContact.
+const ENDPOINT_CONTACT = "https://us-central1-novaly-a80f7.cloudfunctions.net/envoyerContact";
+
+// Champ e-mail seulement pour les visiteurs non connectés (sinon : e-mail du compte).
+onAuthStateChanged(auth, (u) => {
+    const g = document.getElementById('contact-email-group');
+    if (g) g.style.display = (u && !u.isAnonymous) ? 'none' : 'block';
+});
+
+window.envoyerContact = async function() {
+    const btn = document.getElementById('contact-btn');
+    const msg = document.getElementById('contact-msg');
+    const show = (texte, ok) => {
+        msg.style.display = 'block';
+        msg.style.color = ok ? '#2ecc71' : '#ff6b6b';
+        msg.innerText = texte;
+    };
+    const sujet = document.getElementById('contact-sujet').value.trim();
+    const message = document.getElementById('contact-message').value.trim();
+    const email = document.getElementById('contact-email').value.trim();
+    const user = auth.currentUser && !auth.currentUser.isAnonymous ? auth.currentUser : null;
+
+    if (!sujet || message.length < 10) { show("Indiquez un sujet et un message (10 caractères minimum).", false); return; }
+    if (!user && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { show("Indiquez une adresse e-mail valide pour recevoir la réponse.", false); return; }
+
+    btn.disabled = true;
+    const texteBtn = btn.innerText;
+    btn.innerText = "Envoi…";
+    try {
+        const headers = { "Content-Type": "application/json" };
+        if (user) headers["Authorization"] = `Bearer ${await user.getIdToken()}`;
+        const r = await fetch(ENDPOINT_CONTACT, {
+            method: "POST", headers,
+            body: JSON.stringify({ sujet, message, email, site: document.getElementById('contact-site').value })
+        });
+        const d = await r.json().catch(() => ({}));
+        if (d.success) {
+            show("Message envoyé ✓ Nous vous répondrons par e-mail.", true);
+            document.getElementById('contact-sujet').value = '';
+            document.getElementById('contact-message').value = '';
+        } else {
+            show(d.error || "Envoi impossible pour le moment.", false);
+        }
+    } catch (e) {
+        show("Erreur réseau, réessayez.", false);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = texteBtn;
+    }
+};

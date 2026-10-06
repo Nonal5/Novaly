@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
     <title>Novaly Launcher | Just Play.</title>
 
     <meta name="description" content="Novaly est la plateforme de jeux vidéo indépendants de nouvelle génération. Jouez instantanément sans limites à Clutch, Nolimite et bien d'autres. Just Play.">
@@ -21,6 +24,7 @@
     
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/notifications.css">
+    <link rel="stylesheet" href="assets/css/boutique.css">
 </head>
 <body>
 
@@ -39,6 +43,10 @@
         </div>
 
         <div class="header-right">   
+            <div class="friends-btn btn-panier" title="Panier" onclick="navigateTo('#panier', 'cart')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <span class="compteur-panier" style="display:none;">0</span>
+            </div>
             <input type="text" id="main-search-bar" class="search-bar" data-i18n-ph="searchPh" placeholder="Rechercher un jeu...">
             <a href="telecharger.html" target="_blank" class="btn-telecharger-principal">Télécharger Novaly</a>
             <div id="friends-menu-container" style="position: relative; display: none; align-items: center;">
@@ -124,7 +132,7 @@
                         <div class="dropdown-item" onclick="navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/ticket.svg"> Bons</div>
                         <div class="dropdown-item" onclick="switchProfileTab('general', document.getElementById('tab-btn-general')); navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/user.svg"> Compte</div>
                         <div class="dropdown-item" onclick="switchProfileTab('code', document.getElementById('tab-btn-code')); navigateTo('#profile', 'profile')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/gift.svg"> Utiliser un code</div>
-                        <div class="dropdown-item" onclick="navigateTo('#bibliotheque', 'library')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/bookmark.svg"> Liste de souhaits</div>
+                        <div class="dropdown-item" onclick="navigateTo('#souhaits', 'wishlist')"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/bookmark.svg"> Liste de souhaits</div>
                         <div class="dropdown-divider"></div>
                         <div class="dropdown-item"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/help-circle.svg"> Assistance <span style="float: right; margin-left: auto;">↗</span></div>
                         <div class="dropdown-item logout" onclick="logout()"><img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/log-out.svg"> Se déconnecter</div>
@@ -236,6 +244,7 @@
                 <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); width: 100%; max-width: 500px;">
                     <h1 id="detail-title" style="margin: 0 0 10px; font-size: 32px;">Titre du jeu</h1>
                     <p id="detail-desc" style="font-size: 14px; color: #ccc; margin-bottom: 20px;">Description du jeu ici...</p>
+                    <div id="detail-boutique" style="margin-bottom: 12px;"></div>
                     <div id="detail-action-zone">
                         <!-- Le bouton (Acheter / Télécharger / Jouer) s'affichera ici -->
                     </div>
@@ -247,6 +256,7 @@
                 <div style="height: 200px; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #555;">[ Espace Vidéo Teaser ]</div>
                 <div style="height: 200px; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #555;">[ Espace Capture d'écran ]</div>
             </div>
+            <div id="detail-avis"></div>
         </div>
 
         <div id="view-community" class="view-section">
@@ -276,6 +286,8 @@
                         <p data-i18n="commNews3Desc">Découvrez les mods et les fan-arts les plus populaires votés par les joueurs cette semaine.</p>
                     </div>
                 </div>
+                <h3 style="color: white; margin: 30px 0 12px;">Derniers avis des joueurs</h3>
+                <div id="communaute-avis"></div>
             </div>
         </div>
 
@@ -295,25 +307,32 @@
         </div>
 
         <div id="view-cart" class="view-section">
-            <div class="generic-view-content">
-                <h2 data-i18n="cartEmpty">Votre panier est vide</h2>
-                <p data-i18n="cartDesc">Découvrez nos nouveautés dans le magasin.</p>
-                <button class="btn" style="margin-top: 20px;" onclick="navigateTo('#magasin', 'store')" data-i18n="goStore">Aller au magasin</button>
-            </div>
+            <div id="cart-content" style="max-width: 760px; margin: 0 auto;"></div>
+        </div>
+
+        <div id="view-wishlist" class="view-section">
+            <div id="wishlist-content" style="max-width: 760px; margin: 0 auto;"></div>
         </div>
 
         <div id="view-contact" class="view-section">
-            <div class="generic-view-content" style="max-width: 500px; margin: 0 auto; text-align: left;">
+            <div class="generic-view-content" style="max-width: 500px; margin: 0 auto; text-align: left; position: relative;">
                 <h2 data-i18n="contactTitle">Nous contacter</h2>
+                <div class="form-group" id="contact-email-group">
+                    <label>Votre e-mail</label>
+                    <input type="email" id="contact-email" style="width: 100%;" maxlength="200" autocomplete="email" placeholder="pour que l'on puisse vous répondre">
+                </div>
                 <div class="form-group">
                     <label data-i18n="contactSubject">Sujet</label>
-                    <input type="text" style="width: 100%;">
+                    <input type="text" id="contact-sujet" style="width: 100%;" maxlength="150">
                 </div>
                 <div class="form-group">
                     <label data-i18n="contactMessage">Message</label>
-                    <textarea style="width: 100%; height: 100px;"></textarea>
+                    <textarea id="contact-message" style="width: 100%; height: 140px;" maxlength="5000"></textarea>
                 </div>
-                <button class="btn" data-i18n="contactBtn">Envoyer le message</button>
+                <!-- Champ piège anti-robots : invisible pour les humains -->
+                <input type="text" id="contact-site" name="site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">
+                <button class="btn" id="contact-btn" data-i18n="contactBtn" onclick="envoyerContact()">Envoyer le message</button>
+                <p id="contact-msg" style="font-size: 13px; margin-top: 12px; display: none;"></p>
             </div>
         </div>
 
@@ -426,7 +445,14 @@
                         <div style="background: linear-gradient(135deg, #2a2a35, #1a1a24); border: 1px solid #444; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 30px;">
                             <p style="color: #aaa; margin: 0 0 10px 0; text-transform: uppercase; font-size: 12px;">Solde actuel</p>
                             <h2 style="font-size: 48px; margin: 0; font-weight: 900;" id="wallet-balance">0,00 €</h2>
-                            <button class="btn" disabled style="margin-top: 20px; background: #333; color: #888; cursor: not-allowed;">Ajouter des fonds (bientôt)</button>
+                            <p style="color: #aaa; margin: 20px 0 10px; font-size: 13px;">Ajouter des fonds</p>
+                            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                <button class="btn" onclick="rechargerPortefeuille(500)" style="background: #fff; color: #000;">+5 €</button>
+                                <button class="btn" onclick="rechargerPortefeuille(1000)" style="background: #fff; color: #000;">+10 €</button>
+                                <button class="btn" onclick="rechargerPortefeuille(2000)" style="background: #fff; color: #000;">+20 €</button>
+                                <button class="btn" onclick="rechargerPortefeuille(5000)" style="background: #fff; color: #000;">+50 €</button>
+                            </div>
+                            <p style="color: #777; margin: 12px 0 0; font-size: 11px;">Crédit utilisable pour acheter des jeux sur Novaly, non remboursable.</p>
                         </div>
 
                         <h3>Moyens de paiement</h3>
@@ -444,18 +470,18 @@
                                     <div style="width: 30px; height: 30px; background: #5865F2; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
                                         <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg" style="width: 18px; filter: invert(1);">
                                     </div>
-                                    <strong>Discord</strong>
+                                    <div><strong>Discord</strong><div id="lien-discord-nom" style="font-size: 12px; color: #888;">Non lié</div></div>
                                 </div>
-                                <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
+                                <button class="btn" id="lien-discord-btn" onclick="basculerLien('discord')" style="background: #0984e3; color: white; border: none; width: 100px;">Lier</button>
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 15px;">
                                     <div style="width: 30px; height: 30px; background: #171a21; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
                                         <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/steam.svg" style="width: 18px; filter: invert(1);">
                                     </div>
-                                    <strong>Steam</strong>
+                                    <div><strong>Steam</strong><div id="lien-steam-nom" style="font-size: 12px; color: #888;">Non lié</div></div>
                                 </div>
-                                <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
+                                <button class="btn" id="lien-steam-btn" onclick="basculerLien('steam')" style="background: #0984e3; color: white; border: none; width: 100px;">Lier</button>
                             </div>
                         </div>
                     </div>
@@ -471,11 +497,26 @@
 
                     <div id="tab-parental" class="profile-tab-content">
                         <h3>Contrôle Parental</h3>
-                        <div style="background: #222; padding: 30px; border-radius: 8px; border: 1px solid #444; text-align: center;">
-                            <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/shield-alert.svg" style="width: 40px; height: 40px; filter: invert(1); opacity: 0.8; margin-bottom: 15px;">
-                            <h4>Le Contrôle Parental est désactivé</h4>
-                            <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Activez-le pour restreindre les achats, limiter le chat vocal et filtrer les jeux par classification d'âge.</p>
-                            <button class="btn" style="background: #0984e3; color: white; border: none; width: 100%;">Configurer le contrôle parental</button>
+                        <div style="background: #222; padding: 30px; border-radius: 8px; border: 1px solid #444;" id="parental-zone">
+                            <div style="text-align: center;">
+                                <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/shield-alert.svg" style="width: 40px; height: 40px; filter: invert(1); opacity: 0.8; margin-bottom: 15px;">
+                                <h4 id="parental-titre">Le Contrôle Parental est désactivé</h4>
+                                <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Restreignez les achats, coupez le chat et filtrez les jeux par classification d'âge (PEGI). Un code PIN protège ces réglages.</p>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 12px; max-width: 420px; margin: 0 auto;">
+                                <label style="display: flex; gap: 10px; align-items: center; color: #ddd;"><input type="checkbox" id="parental-achats"> Bloquer tous les achats (et les recharges)</label>
+                                <label style="display: flex; gap: 10px; align-items: center; color: #ddd;"><input type="checkbox" id="parental-chat"> Couper le chat avec les amis</label>
+                                <label style="color: #ddd;">Âge maximum des jeux
+                                    <select id="parental-age" style="margin-left: 8px; padding: 6px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                                        <option value="0">Aucune limite</option><option value="3">PEGI 3</option><option value="7">PEGI 7</option>
+                                        <option value="12">PEGI 12</option><option value="16">PEGI 16</option><option value="18">PEGI 18</option>
+                                    </select>
+                                </label>
+                                <input type="password" id="parental-pin" inputmode="numeric" maxlength="6" placeholder="Code PIN (4 à 6 chiffres)" style="padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                <input type="password" id="parental-nouveau-pin" inputmode="numeric" maxlength="6" placeholder="Nouveau PIN (facultatif)" style="display: none; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                <button class="btn" id="parental-btn" onclick="enregistrerParental()" style="background: #0984e3; color: white; border: none; width: 100%;">Activer le contrôle parental</button>
+                                <button class="btn" id="parental-off" onclick="desactiverParental()" style="display: none; background: transparent; color: #ff6b6b; border: 1px solid #ff6b6b; width: 100%;">Désactiver (code PIN requis)</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -541,8 +582,10 @@
     </div>
     <div style="display: flex; padding: 10px; border-top: 1px solid #333; background: #111;">
         <input type="text" id="chat-input" placeholder="Écrire un message..." style="flex-grow: 1; background: #000; color: white; border: 1px solid #444; padding: 10px; border-radius: 4px; outline: none; font-family: 'Inter', sans-serif;">
+        <button onclick="inviterAJouer()" title="Inviter à jouer" style="background: #2a2a2a; color: white; border: 1px solid #444; padding: 0 10px; margin-left: 8px; border-radius: 4px; cursor: pointer;">🎮</button>
         <button onclick="envoyerMessage()" style="background: #0984e3; color: white; border: none; padding: 0 15px; margin-left: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">></button>
     </div>
+    <div id="chat-invite-liste" class="user-dropdown" style="display: none; position: static; max-height: 160px; overflow-y: auto; border-top: 1px solid #333; border-radius: 0; box-shadow: none;"></div>
 </div>
 <!-- POP-UP D'ALERTE PERSONNALISÉ MODERNE -->
 
@@ -552,5 +595,6 @@
     <script src="assets/js/notifications.js" data-icones="assets/icons/"></script>
     <script src="assets/js/index.ui.js"></script>
     <script type="module" src="assets/js/index.app.js"></script>
+    <script type="module" src="assets/js/boutique.js"></script>
 </body>
 </html>

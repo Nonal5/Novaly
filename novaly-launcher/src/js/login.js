@@ -22,9 +22,15 @@
         // État de l'A2F pour la session courante : 'aucune' | 'validee' | 'requise'.
         // La session est identifiée par auth_time (date de connexion signée par
         // Firebase) ; Firestore et les Cloud Functions appliquent le même verrou.
+        // Méthodes A2F actives du compte (e-mail, application), lues avec l'état.
+        let methodesA2F = { email: true, app: false };
+        let methode2fa = 'email';
+
         async function etatA2F(user) {
             const actif = await getDoc(doc(db, "a2f_actif", user.uid));
             if (!actif.exists()) return 'aucune';
+            const d = actif.data();
+            methodesA2F = { email: d.email === true || d.methode === 'email', app: d.app === true };
             const { claims } = await user.getIdTokenResult();
             const ok = await getDoc(doc(db, "a2f_sessions", user.uid, "ok", String(claims.auth_time)));
             return ok.exists() ? 'validee' : 'requise';
@@ -42,9 +48,35 @@
         }
 
         // Affiche l'écran du code et envoie un code par e-mail.
+        // Écran du code : l'application est proposée en premier (aucun e-mail envoyé).
         async function demanderCode2FA(user) {
             afficher2faSection();
+            await choisirMethode2faPour(user, methodesA2F.app ? 'app' : 'email');
+        }
+
+        const TEXTES_2FA = {
+            email: ["Un code à 6 chiffres vient d'être envoyé à votre adresse e-mail. Saisissez-le pour continuer.", "Code reçu par e-mail", "000000", 6],
+            app: ["Ouvrez votre application d'authentification (Google Authenticator, Authy…) et saisissez le code Novaly.", "Code de l'application", "000000", 6],
+            secours: ["Saisissez l'un de vos codes de secours. Chaque code ne fonctionne qu'une seule fois.", "Code de secours", "ABCD-EF23", 9]
+        };
+
+        async function choisirMethode2faPour(user, m) {
+            methode2fa = m;
+            const [texte, label, ph, max] = TEXTES_2FA[m];
+            document.getElementById('twofa-texte').innerText = texte;
+            document.getElementById('twofa-label').innerText = label;
+            const champ = document.getElementById('twofa-code');
+            champ.value = ''; champ.placeholder = ph; champ.maxLength = max;
+            champ.inputMode = m === 'secours' ? 'text' : 'numeric';
+            champ.style.letterSpacing = m === 'secours' ? '3px' : '6px';
+            const voir = (id, oui) => { document.getElementById(id).style.display = oui ? 'block' : 'none'; };
+            voir('twofa-renvoyer', m === 'email');
+            voir('twofa-vers-email', m !== 'email' && methodesA2F.email);
+            voir('twofa-vers-app', m !== 'app' && methodesA2F.app);
+            voir('twofa-vers-secours', m !== 'secours' && methodesA2F.app);
             document.getElementById('twofa-error').style.display = "none";
+            champ.focus();
+            if (m !== 'email') return;
             try {
                 const d = await envoyerCode2FA(user);
                 if (d.error) showError('twofa-error', d.error);
@@ -52,6 +84,10 @@
                 showError('twofa-error', "Impossible d'envoyer le code. Réessayez avec « Renvoyer le code ».");
             }
         }
+
+        window.choisirMethode2fa = function(m) {
+            if (auth.currentUser) choisirMethode2faPour(auth.currentUser, m);
+        };
 
         function entrer(user) {
             localStorage.setItem('isLoggedIn', 'true');
@@ -181,10 +217,13 @@
                 const r = await fetch(ENDPOINT_VERIFIER_CODE_2FA, {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
-                    body: JSON.stringify({ code, action: 'login' })
+                    body: JSON.stringify({ code, action: 'login', methode: methode2fa })
                 });
                 const d = await r.json();
                 if (d.success) {
+                    if (typeof d.codesSecoursRestants === 'number' && d.codesSecoursRestants <= 3) {
+                        localStorage.setItem('a2f_alerte', `Il te reste ${d.codesSecoursRestants} code(s) de secours : désactive puis réactive l'application d'authentification pour en obtenir de nouveaux.`);
+                    }
                     entrer(user);
                 } else {
                     showError('twofa-error', d.error || "Code incorrect.");

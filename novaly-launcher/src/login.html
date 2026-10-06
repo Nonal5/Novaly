@@ -97,15 +97,18 @@
         <div id="twofa-section" class="section-fade" style="display: none;">
             <div class="subtitle">Vérification en deux étapes</div>
             <div id="twofa-error" class="error-message"></div>
-            <p style="font-size: 13px; color: #ccc; margin-bottom: 20px;">Un code à 6 chiffres vient d'être envoyé à votre adresse e-mail. Saisissez-le pour continuer.</p>
+            <p id="twofa-texte" style="font-size: 13px; color: #ccc; margin-bottom: 20px;">Un code à 6 chiffres vient d'être envoyé à votre adresse e-mail. Saisissez-le pour continuer.</p>
 
             <div class="form-group">
-                <label>Code de vérification</label>
-                <input type="text" id="twofa-code" inputmode="numeric" maxlength="6" placeholder="000000" style="text-align:center; letter-spacing:6px; font-size:22px;">
+                <label id="twofa-label">Code de vérification</label>
+                <input type="text" id="twofa-code" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="text-align:center; letter-spacing:6px; font-size:22px;" onkeydown="if(event.key==='Enter') verifier2fa()">
             </div>
 
             <button class="btn" onclick="verifier2fa()">Valider</button>
-            <p class="toggle-text">Pas reçu ? <span onclick="renvoyer2fa()">Renvoyer le code</span></p>
+            <p class="toggle-text" id="twofa-renvoyer">Pas reçu ? <span onclick="renvoyer2fa()">Renvoyer le code</span></p>
+            <p class="toggle-text" id="twofa-vers-email" style="display:none;"><span onclick="choisirMethode2fa('email')">Recevoir plutôt un code par e-mail</span></p>
+            <p class="toggle-text" id="twofa-vers-app" style="display:none;"><span onclick="choisirMethode2fa('app')">Utiliser mon application d'authentification</span></p>
+            <p class="toggle-text" id="twofa-vers-secours" style="display:none;"><span onclick="choisirMethode2fa('secours')">Utiliser un code de secours</span></p>
             <p class="toggle-text"><span onclick="annuler2fa()">Annuler et changer de compte</span></p>
         </div>
 

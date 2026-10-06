@@ -74,7 +74,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 tabPublic: "Profil Public", tabSecurity: "Sécurité & Connexion", tabPayment: "Moyens de paiement",
                 profName: "Nom d'utilisateur", profSave: "Enregistrer les modifications", profSaved: "Profil mis à jour !",
                 footerAppsTitle: "Téléchargez Novaly", footerHelpTitle: "Aide", footerNovalyTitle: "Novaly", footerRights: "Tous droits réservés.",
-                title_store: "Magasin", title_online: "Jeux Rapide", title_library: "Bibliothèque", title_community: "Communauté", title_about: "À propos", title_cart: "Mon Panier", title_contact: "Nous Contacter", title_profile: "Paramètres"
+                title_store: "Magasin", title_online: "Jeux Rapide", title_library: "Bibliothèque", title_community: "Communauté", title_about: "À propos", title_cart: "Mon Panier", title_wishlist: "Liste de souhaits", title_contact: "Nous Contacter", title_profile: "Paramètres"
             },
             en: {
                 navStore: "Store", navOnline: "Online Games", navLibrary: "Library", navCommunity: "Community", navAbout: "About", navCart: "Cart", navContact: "Contact Us",
@@ -92,7 +92,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 tabPublic: "Public Profile", tabSecurity: "Security & Login", tabPayment: "Payment Methods",
                 profName: "Username", profSave: "Save Changes", profSaved: "Profile updated!",
                 footerAppsTitle: "Download Novaly", footerHelpTitle: "Help", footerNovalyTitle: "Novaly", footerRights: "All rights reserved.",
-                title_store: "Store", title_online: "Online Games", title_library: "Library", title_community: "Community", title_about: "About", title_cart: "My Cart", title_contact: "Contact Us", title_profile: "Settings"
+                title_store: "Store", title_online: "Online Games", title_library: "Library", title_community: "Community", title_about: "About", title_cart: "My Cart", title_wishlist: "Wishlist", title_contact: "Contact Us", title_profile: "Settings"
             },
             es: {
                 navStore: "Tienda", navOnline: "Juegos Online", navLibrary: "Biblioteca", navCommunity: "Comunidad", navAbout: "Acerca de", navCart: "Carrito", navContact: "Contáctenos",
@@ -235,6 +235,11 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             updatePageTitle();
+
+            // Vues remplies par boutique.js à chaque ouverture
+            if (viewId === 'wishlist' && window.afficherSouhaits) window.afficherSouhaits();
+            if (viewId === 'cart' && window.afficherPanier) window.afficherPanier();
+            if (viewId === 'community' && window.afficherCommunaute) window.afficherCommunaute();
         }
 
         function updatePageTitle() {
@@ -327,7 +332,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // ================= OUVERTURE DIRECTE D'UNE SECTION (liens du plan du site, retour de paiement) =================
 const VUES_PAR_ANCRE = {
     '#magasin': 'store', '#jeuxonline': 'online', '#bibliotheque': 'library', '#communaute': 'community',
-    '#apropos': 'about', '#panier': 'cart', '#contact': 'contact', '#profile': 'profile'
+    '#apropos': 'about', '#panier': 'cart', '#souhaits': 'wishlist', '#contact': 'contact', '#profile': 'profile'
 };
 if (VUES_PAR_ANCRE[window.location.hash]) {
     currentViewId = VUES_PAR_ANCRE[window.location.hash];

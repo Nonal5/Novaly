@@ -1,0 +1,51 @@
+/* ==================================================================
+   BOUTIQUE : promos, panier, liste de souhaits, cadeaux, avis.
+   Fichier IDENTIQUE dans le launcher (src/css) et sur le site (assets/css).
+   ================================================================== */
+
+.promo-badge { display: inline-block; background: #4cd137; color: #000; font-weight: 800; font-size: 11px; padding: 2px 6px; border-radius: 4px; vertical-align: middle; }
+.promo-bandeau { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4cd137; font-weight: 700; margin-bottom: 10px; }
+.carte-prix { font-size: 13px; color: #ddd; margin-top: 4px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.carte-prix s { color: #777; }
+.carte-prix strong { color: #fff; }
+
+.btn-boutique { background: transparent; color: #fff; border: 1px solid #555; font-size: 13px; padding: 8px 12px; }
+.btn-boutique:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+
+.btn-panier { position: relative; margin-right: 10px; cursor: pointer; }
+.compteur-panier { position: absolute; top: -6px; right: -6px; background: #ff4757; color: #fff; font-size: 10px; font-weight: 800; border-radius: 10px; padding: 1px 6px; }
+
+.ligne-boutique { display: flex; align-items: center; gap: 14px; background: #1a1a1a; border: 1px solid #2c2c2c; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+.ligne-cover { width: 120px; height: 68px; border-radius: 6px; background: #222 center/cover; flex: 0 0 auto; cursor: pointer; }
+.ligne-info { flex: 1; min-width: 0; cursor: pointer; }
+.ligne-info strong { display: block; color: #fff; font-size: 15px; }
+
+.panier-total { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #333; margin-top: 14px; padding-top: 14px; font-size: 18px; color: #fff; }
+.panier-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.panier-actions .btn { flex: 1; min-width: 180px; }
+.panier-actions .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.boutique-note { font-size: 12px; color: #888; margin: 8px 0; }
+.boutique-vide { color: #aaa; text-align: center; padding: 40px 10px; }
+.boutique-label { display: block; font-size: 12px; color: #aaa; margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.boutique-champ { width: 100%; box-sizing: border-box; padding: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 6px; outline: none; font-family: inherit; }
+
+/* Avis */
+.avis-moyenne { font-size: 13px; color: #f5b041; font-weight: 600; margin-left: 10px; }
+.avis-form { background: #1a1a1a; border: 1px solid #2c2c2c; border-radius: 10px; padding: 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; }
+.avis-form textarea { width: 100%; box-sizing: border-box; min-height: 70px; padding: 10px; background: #111; border: 1px solid #444; color: #fff; border-radius: 6px; font-family: inherit; resize: vertical; }
+.avis-etoile { font-size: 26px; color: #444; cursor: pointer; transition: color 0.15s; }
+.avis-etoile.on, .avis-etoile:hover { color: #f5b041; }
+.avis-item { border-bottom: 1px solid #262626; padding: 12px 0; color: #ccc; font-size: 14px; }
+.avis-item p { margin: 6px 0 0; color: #bbb; white-space: pre-wrap; }
+.avis-etoiles-lecture { color: #f5b041; margin: 0 6px; letter-spacing: 1px; }
+
+/* Fenêtre (offrir un jeu) */
+.fenetre-fond { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 9998; }
+.fenetre-boite { position: fixed; z-index: 9999; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(440px, calc(100vw - 32px)); background: #161616; border: 1px solid #333; border-radius: 12px; padding: 22px; color: #fff; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+.fenetre-fermer { position: absolute; top: 10px; right: 12px; background: none; border: none; color: #888; font-size: 22px; cursor: pointer; }
+.fenetre-fermer:hover { color: #fff; }
+
+@media (max-width: 600px) {
+    .ligne-cover { width: 80px; height: 46px; }
+}
