@@ -403,3 +403,13 @@ document.getElementById("btn-verifier-maj").addEventListener("click", verifierMi
                 document.getElementById('version-text').innerText = `Version du Launcher : v1.0.1`;
             }
         });
+
+// Liens externes (réseaux sociaux…) : dans le launcher on ouvre le navigateur du système,
+// sur le site on laisse le lien s'ouvrir normalement dans un nouvel onglet.
+window.ouvrirLienExterne = function (url) {
+    if (window.__TAURI__) {
+        window.__TAURI__.core.invoke("plugin:opener|open_url", { url }).catch(() => {});
+        return false;
+    }
+    return true;
+};
