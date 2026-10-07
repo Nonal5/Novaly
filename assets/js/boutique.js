@@ -220,7 +220,7 @@ window.afficherPanier = async function() {
     const ids = lirePanier();
     if (!ids.length) {
         zone.innerHTML = `<div class="generic-view-content"><h2>Votre panier est vide</h2><p>Découvrez nos nouveautés dans le magasin.</p>
-            <button class="btn" style="margin-top: 20px;" onclick="navigateTo('#magasin', 'store')">Aller au magasin</button></div>`;
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="navigateTo('#magasin', 'store')">Aller au magasin</button></div>`;
         return;
     }
     const jeux = (await Promise.all(ids.map(jeu))).filter(Boolean);
@@ -234,11 +234,11 @@ window.afficherPanier = async function() {
             <button class="btn btn-boutique" onclick="retirerDuPanier(${jsArg(g.id)})">Retirer</button></div>`;
     }).join('');
     const assez = solde >= Math.round(total * 100);
-    zone.innerHTML = `<h2 style="margin-top:0;">Mon panier</h2>${lignes}
+    zone.innerHTML = `<h2 class="titre-section">Mon panier</h2>${lignes}
         <div class="panier-total"><span>Total</span><strong>${euros(total)}</strong></div>
         <div class="panier-actions">
-            <button class="btn" style="background:#fff; color:#000;" onclick="payerPanier('carte')">Payer par carte</button>
-            <button class="btn" ${assez && total > 0 ? '' : 'disabled'} style="background:#0984e3; color:#fff;" onclick="payerPanier('solde')">Payer avec mon solde (${euros(solde / 100)})</button>
+            <button class="btn btn-primary" onclick="payerPanier('carte')">Payer par carte</button>
+            <button class="btn btn-accent" ${assez && total > 0 ? '' : 'disabled'} onclick="payerPanier('solde')">Payer avec mon solde (${euros(solde / 100)})</button>
         </div>
         <p class="boutique-note">Le prix final est recalculé au paiement (promotions en cours).</p>`;
 };
@@ -253,13 +253,54 @@ window.payerPanier = async function(moyen) {
     } catch (e) { note(e.message, 'erreur'); }
 };
 
+// ---------- Achat d'un jeu depuis sa page : solde du portefeuille ou carte ----------
+// Appelé par acheterJeu (index.app.js) pour les jeux payants.
+window.choisirPaiement = async function(gameId) {
+    if (!moi) return note("Connecte-toi pour acheter ce jeu.", 'erreur');
+    const g = await jeu(gameId);
+    const p = g && window.prixJeu(g);
+    if (!p) return note("Ce jeu n'est pas en vente.", 'erreur');
+    const manque = Math.round(p.prix * 100) - solde;
+    fenetre(`<h3 class="fenetre-titre">Acheter ${esc(g.titre)}</h3>
+        <div class="paiement-recap">
+            <div class="ligne-cover" style="background-image:url('${esc(g.coverUrl || '')}')"></div>
+            <div class="ligne-info"><strong>${esc(g.titre)}</strong>${window.prixCarte(g)}</div>
+        </div>
+        <div class="paiement-choix">
+            <button class="btn btn-accent" ${manque > 0 ? 'disabled' : ''} onclick="acheterAvec(${jsArg(gameId)}, 'solde')">
+                Payer avec mon solde <span class="btn-detail">${euros(solde / 100)}</span></button>
+            <button class="btn btn-primary" onclick="acheterAvec(${jsArg(gameId)}, 'carte')">Payer par carte</button>
+        </div>
+        ${manque > 0 ? `<p class="boutique-note">Solde insuffisant : il manque ${euros(manque / 100)}.
+            <button class="btn-lien" onclick="allerAuPortefeuille()">Recharger mon solde</button></p>` : ''}
+        <p class="boutique-note">Le prix final est recalculé au paiement (promotions en cours).</p>`);
+};
+
+window.acheterAvec = async function(gameId, moyen) {
+    try {
+        const d = await appeler('creerCommande', { gameIds: [gameId], payerAvec: moyen, retour: DANS_LAUNCHER ? undefined : 'site' });
+        fermerFenetre();
+        if (d.url) { await ouvrirUrl(d.url); note("Termine le paiement dans la page Stripe.", 'succes'); }
+        else {
+            ecrirePanier(lirePanier().filter(id => id !== gameId));
+            note("Achat terminé : le jeu est dans ta bibliothèque.", 'succes');
+        }
+    } catch (e) { note(e.message, 'erreur'); }
+};
+
+window.allerAuPortefeuille = function() {
+    fermerFenetre();
+    if (window.switchProfileTab) window.switchProfileTab('payment', document.getElementById('tab-btn-payment'));
+    if (window.navigateTo) window.navigateTo('#profile', 'profile');
+};
+
 // ---------- Offrir un jeu à un ami ----------
 window.offrirJeu = async function(gameId) {
     if (!moi) return note("Connecte-toi pour offrir un jeu.");
     const amis = (await getDocs(collection(db, "users", moi.uid, "friends"))).docs.map(d => ({ uid: d.id, pseudo: d.data().pseudo || 'Ami' }));
     const g = await jeu(gameId);
     const p = g && window.prixJeu(g);
-    fenetre(`<h3 style="margin-top:0;">🎁 Offrir ${esc(g ? g.titre : 'ce jeu')}</h3>
+    fenetre(`<h3 class="fenetre-titre">🎁 Offrir ${esc(g ? g.titre : 'ce jeu')}</h3>
         ${amis.length ? `
         <label class="boutique-label">À qui ?</label>
         <select id="cadeau-ami" class="boutique-champ">${amis.map(a => `<option value="${esc(a.uid)}">${esc(a.pseudo)}</option>`).join('')}</select>
@@ -267,8 +308,8 @@ window.offrirJeu = async function(gameId) {
         <input id="cadeau-message" class="boutique-champ" maxlength="300" placeholder="Joyeux anniversaire !">
         <p class="boutique-note">${p ? `Prix : ${euros(p.prix)}` : ''} — le jeu arrive directement dans sa bibliothèque.</p>
         <div class="panier-actions">
-            <button class="btn" style="background:#fff; color:#000;" onclick="envoyerCadeau(${jsArg(gameId)}, 'carte')">Payer par carte</button>
-            <button class="btn" ${p && solde >= Math.round(p.prix * 100) ? '' : 'disabled'} style="background:#0984e3; color:#fff;" onclick="envoyerCadeau(${jsArg(gameId)}, 'solde')">Avec mon solde (${euros(solde / 100)})</button>
+            <button class="btn btn-primary" onclick="envoyerCadeau(${jsArg(gameId)}, 'carte')">Payer par carte</button>
+            <button class="btn btn-accent" ${p && solde >= Math.round(p.prix * 100) ? '' : 'disabled'} onclick="envoyerCadeau(${jsArg(gameId)}, 'solde')">Avec mon solde (${euros(solde / 100)})</button>
         </div>` : `<p>Ajoute d'abord des amis pour pouvoir leur offrir des jeux.</p>`}`);
 };
 
@@ -297,7 +338,7 @@ async function chargerAvis(gameId) {
     const peutNoter = moi && possedes.includes(gameId);
 
     zone.innerHTML = `
-        <h2 style="font-size: 18px; margin: 30px 0 10px;">Avis des joueurs
+        <h2 class="avis-titre">Avis des joueurs
             ${avis.length ? `<span class="avis-moyenne">${etoiles(moyenne)} ${moyenne.toFixed(1).replace('.', ',')} / 5 · ${avis.length} avis</span>` : ''}</h2>
         ${peutNoter ? `
         <div class="avis-form">
@@ -306,7 +347,7 @@ async function chargerAvis(gameId) {
             </div>
             <textarea id="avis-texte" maxlength="1000" placeholder="Qu'as-tu pensé du jeu ? (facultatif)">${esc(monAvis ? monAvis.texte : '')}</textarea>
             <div style="display:flex; gap:8px;">
-                <button class="btn" style="background:#fff; color:#000;" onclick="publierAvis(${jsArg(gameId)})">${monAvis ? 'Modifier mon avis' : 'Publier mon avis'}</button>
+                <button class="btn btn-primary" onclick="publierAvis(${jsArg(gameId)})">${monAvis ? 'Modifier mon avis' : 'Publier mon avis'}</button>
                 ${monAvis ? `<button class="btn btn-boutique" onclick="supprimerAvis(${jsArg(gameId)})">Supprimer</button>` : ''}
             </div>
         </div>` : (moi ? `<p class="boutique-note">Possède le jeu pour pouvoir le noter.</p>` : '')}
@@ -351,9 +392,10 @@ function afficherLiens() {
         if (!nom || !btn) continue;
         const c = comptesLies[svc];
         nom.innerText = c ? `Lié : ${c.nom || c.id}` : 'Non lié';
-        nom.style.color = c ? '#4cd137' : '#888';
+        nom.classList.toggle('texte-succes', !!c);
         btn.innerText = c ? 'Délier' : 'Lier';
-        btn.style.background = c ? '#ff6b6b' : '#0984e3';
+        btn.classList.toggle('btn-danger', !!c);
+        btn.classList.toggle('btn-accent', !c);
     }
 }
 
@@ -433,7 +475,7 @@ window.boutiqueSurPageJeu = function(gameId, gameData, possede) {
         if (refus && !possede) {
             // Le serveur refuserait l'achat : on le dit tout de suite.
             const z = document.getElementById('detail-action-zone');
-            if (z) z.innerHTML = `<button class="btn" disabled style="background:#333; color:#aaa; width:100%; padding:15px; cursor:not-allowed;">🔒 ${esc(refus)}</button>`;
+            if (z) z.innerHTML = `<button class="btn btn-secondary btn-lg btn-bloc" disabled>🔒 ${esc(refus)}</button>`;
         }
         zone.innerHTML = `
             ${p && p.promo ? `<div class="promo-bandeau"><span class="promo-badge">-${p.pct}%</span> Promotion ${esc(finPromo(p))}</div>` : ''}

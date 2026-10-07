@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-400 -400 1800 1800" width="1024" height="1024" role="img" aria-labelledby="novaly-n-title">
+  <title id="novaly-n-title">Novaly</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34373F"/>
+      <stop offset="1" stop-color="#050506"/>
+    </linearGradient>
+    <linearGradient id="n" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D5D8DF"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".28"/>
+      <stop offset=".35" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="lift" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="34" stdDeviation="34" flood-color="#000000" flood-opacity=".65"/>
+      <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity=".45"/>
+    </filter>
+  </defs>
+  <rect x="-400" y="-400" width="1800" height="1800" fill="url(#bg)"/>
+  <path filter="url(#lift)" fill="url(#n)" d="M120,0 L404.21,0 A40,40 0 0 1 441.49,25.5 L684.77,650.87 A26,26 0 0 0 735,641.45 L735,40 A40,40 0 0 1 775,0 L880,0 A120,120 0 0 1 1000,120 L1000,880 A120,120 0 0 1 880,1000 L595.79,1000 A40,40 0 0 1 558.51,974.5 L315.23,349.13 A26,26 0 0 0 265,358.55 L265,960 A40,40 0 0 1 225,1000 L120,1000 A120,120 0 0 1 0,880 L0,120 A120,120 0 0 1 120,0 Z"/>
+</svg>

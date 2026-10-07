@@ -902,6 +902,13 @@ window.acheterJeu = async function(gameId) {
         return;
     }
 
+    // Jeu payant : fenêtre de choix « solde du portefeuille » ou « carte » (boutique.js)
+    if (window.choisirPaiement && window.prixJeu) {
+        const snap = await getDoc(doc(db, "games", gameId)).catch(() => null);
+        const tarif = snap && snap.exists() && window.prixJeu(snap.data());
+        if (tarif && tarif.prix > 0) return window.choisirPaiement(gameId);
+    }
+
     // Le bouton passe en mode chargement
     const zoneAction = document.getElementById('detail-action-zone');
     const boutonOriginal = zoneAction.innerHTML;

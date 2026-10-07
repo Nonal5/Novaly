@@ -82,3 +82,71 @@ body {
     .logo { font-size: 26px; }
     .subtitle { font-size: 12px; margin-bottom: 20px; }
 }
+
+/* ================= CONNEXION — thème moderne =================
+   Fond sombre uni (plus de photo), carte nette, champs et boutons
+   alignés sur le thème du launcher. Bloc identique launcher / site. */
+:root {
+    --l-bg: #0b0b0e; --l-carte: #131318; --l-champ: #18181e;
+    --l-bord: rgba(255, 255, 255, 0.08); --l-bord-fort: rgba(255, 255, 255, 0.14);
+    --l-texte: #f4f4f6; --l-texte-2: #a3a3ad; --l-texte-3: #6e6e78;
+    --l-accent: #2f7cf6; --l-courbe: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.login-fond {
+    background:
+        radial-gradient(600px 380px at 82% 8%, rgba(47, 124, 246, 0.16), transparent 70%),
+        radial-gradient(520px 360px at 12% 95%, rgba(140, 90, 255, 0.10), transparent 70%),
+        radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px) 0 0 / 22px 22px,
+        var(--l-bg) !important;
+    color: var(--l-texte);
+    -webkit-font-smoothing: antialiased;
+}
+.login-box {
+    background: var(--l-carte);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border: 1px solid var(--l-bord); border-radius: 20px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 30px 80px rgba(0, 0, 0, 0.55);
+    padding: 34px 32px 28px; width: calc(100% - 32px); max-width: 380px; box-sizing: border-box;
+    text-align: left;
+    animation: loginEntree 0.35s var(--l-courbe) both;
+}
+@keyframes loginEntree { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: none; } }
+img.logo { display: block; height: 20px; width: auto; margin: 0 0 26px; user-select: none; }
+.subtitle { color: var(--l-texte); font-size: 21px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 22px; }
+.login-box p { color: var(--l-texte-2) !important; line-height: 1.5; }
+.form-group { margin-bottom: 16px; }
+.form-group label { text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 600; color: var(--l-texte-2); margin-bottom: 7px; }
+.form-group input {
+    height: 44px; padding: 0 14px; border-radius: 11px; font-size: 14px; box-sizing: border-box;
+    background: var(--l-champ); border: 1px solid var(--l-bord-fort); color: var(--l-texte);
+    transition: border-color 140ms, box-shadow 140ms, background 140ms;
+}
+.form-group input::placeholder { color: var(--l-texte-3); }
+.form-group input:hover { border-color: rgba(255, 255, 255, 0.22); }
+.form-group input:focus { border-color: var(--l-accent); background: #1c1c23; box-shadow: 0 0 0 3px rgba(47, 124, 246, 0.35); }
+.form-group input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px var(--l-champ) inset; -webkit-text-fill-color: var(--l-texte); }
+.btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    height: 46px; min-height: 46px; padding: 0 16px; width: 100%; margin-top: 8px; box-sizing: border-box;
+    background: #f4f4f6; color: #0b0b0e; border: 1px solid transparent; border-radius: 12px;
+    font-family: inherit; font-size: 14px; font-weight: 700; text-transform: none; letter-spacing: 0;
+    cursor: pointer; transition: background 140ms, transform 140ms var(--l-courbe), border-color 140ms;
+}
+.btn:hover { background: #fff; transform: none; }
+.btn:active { transform: scale(0.98); }
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(47, 124, 246, 0.45); }
+.btn-google { background: transparent; color: var(--l-texte); border: 1px solid var(--l-bord-fort); margin-top: 0; }
+.btn-google:hover { background: rgba(255, 255, 255, 0.06); color: #fff; border-color: rgba(255, 255, 255, 0.22); }
+.divider { color: var(--l-texte-3); font-size: 12px; margin: 18px 0; }
+.divider::before, .divider::after { border-bottom-color: var(--l-bord); }
+.toggle-text { text-align: center; color: var(--l-texte-2); margin-top: 20px; }
+.toggle-text span { color: #8fb6fb; text-decoration: none; font-weight: 600; }
+.toggle-text span:hover { color: #fff; text-decoration: none; }
+.error-message { border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.1); color: #ff8a8a; }
+.back-link { display: block; text-align: center; margin-top: 18px; color: var(--l-texte-3); }
+.back-link:hover { color: var(--l-texte); }
+/* État de chargement des boutons (js/chargement.js) */
+.is-loading { position: relative; color: transparent !important; pointer-events: none; }
+.is-loading > * { visibility: hidden; }
+.is-loading::after { content: ""; position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; margin: -8px 0 0 -8px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--couleur-roue, currentColor); border-right-color: transparent; animation: loginRoue 620ms linear infinite; }
+@keyframes loginRoue { to { transform: rotate(360deg); } }

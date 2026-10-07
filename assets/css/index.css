@@ -466,3 +466,13 @@
     /* -50% décale exactement de la moitié de la liste (la partie dupliquée) -10px pour ajuster le gap */
     100% { transform: translateX(calc(-50% - 10px)); } 
 }
+
+/* Logo image (assets/img/logo/novaly-wordmark.png) à la place du texte */
+img.logo-img { height: 19px; width: auto; min-width: 0; background: none; object-fit: contain; user-select: none; }
+
+/* Bouton profil aligné verticalement avec le reste de l'en-tête */
+.user-section { height: 100%; align-items: center; }
+#logged-in-view, #logged-out-view { height: 100%; align-items: center; }
+#logged-out-view[style*="block"] { display: flex !important; }
+.profile-trigger { height: 38px; box-sizing: border-box; align-items: center; }
+.profile-trigger.nav-item { height: 38px; }
