@@ -156,6 +156,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 if(t[key]) el.placeholder = t[key];
             });
 
+            // Tous les autres textes (profil, boutique, fenêtres…) : js/traductions.js
+            if (window.traduirePage) window.traduirePage(langCode);
+
             updatePageTitle();
         }
 
