@@ -205,11 +205,11 @@
                     snapshot.forEach(docRequest => {
                         const req = docRequest.data();
                         html += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 10px; border-radius: 4px; margin-bottom: 5px; border: 1px solid #333;">
+                        <div class="panel-inset" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 5px;">
                             <span style="color: white; font-weight: bold; font-size: 11px;">${esc(req.senderPseudo)}</span>
                             <div style="display: flex; gap: 5px;">
-                                <button onclick="acceptFriend(${jsArg(docRequest.id)}, ${jsArg(req.senderId)})" style="background: #4cd137; color: black; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 800;">OK</button>
-                                <button onclick="declineFriend(${jsArg(docRequest.id)})" style="background: transparent; color: #ff4757; border: 1px solid #ff4757; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 800;">X</button>
+                                <button class="btn btn-success btn-sm" onclick="acceptFriend(${jsArg(docRequest.id)}, ${jsArg(req.senderId)})">OK</button>
+                                <button class="btn btn-ghost btn-ghost-danger btn-sm" onclick="declineFriend(${jsArg(docRequest.id)})">X</button>
                             </div>
                         </div>`;
                     });
@@ -673,7 +673,7 @@ window.chargerMagasin = async function() {
                     <div class="game-tags"><span class="tag tag-action">Disponible</span></div>
                     <div class="game-title">${esc(g.titre)}</div>
                     ${window.prixCarte ? window.prixCarte(g) : ''}
-                    <button class="btn" style="width:100%; margin-top:10px; background: #ffffff; color: #000; font-size: 12px;">Voir la page</button>
+                    <button class="btn btn-primary btn-bloc" style="margin-top: 10px;">Voir la page</button>
                 </div>
             `;
         });
@@ -727,7 +727,7 @@ window.actualiserBibliotheque = async function() {
             if (gameSnap.exists()) {
                 const gameData = gameSnap.data();
                 // Sur le site, les jeux du catalogue se jouent dans le launcher
-                const actionBtn = `<button class="btn" style="width:100%; margin-top:10px; background: #4cd137; color: black;" onclick="event.stopPropagation(); ouvrirNovaly(${jsArg(gameId)})">► Jouer sur Novaly</button>`;
+                const actionBtn = `<button class="btn btn-success btn-bloc" style="margin-top: 10px;" onclick="event.stopPropagation(); ouvrirNovaly(${jsArg(gameId)})">► Jouer sur Novaly</button>`;
 
                 html += `
                 <div class="game-card" onclick="afficherPageJeu(${jsArg(gameId)})">
@@ -912,7 +912,7 @@ window.acheterJeu = async function(gameId) {
     // Le bouton passe en mode chargement
     const zoneAction = document.getElementById('detail-action-zone');
     const boutonOriginal = zoneAction.innerHTML;
-    zoneAction.innerHTML = `<button class="btn" disabled style="background: #333; color: white; width: 100%; padding: 15px;">Redirection sécurisée...</button>`;
+    zoneAction.innerHTML = `<button class="btn btn-secondary btn-bloc btn-lg" disabled>Redirection sécurisée...</button>`;
 
     try {
         // Remplace cette URL par celle de ta future Cloud Function
@@ -974,11 +974,11 @@ window.afficherPageJeu = async function(gameId) {
         const possede = window.mesJeux && window.mesJeux.includes(gameId);
 
         if (!possede) {
-            zoneAction.innerHTML = `<button class="btn" style="background: #ffffff; color: #000; width: 100%; font-size: 16px; padding: 15px;" onclick="acheterJeu(${jsArg(gameId)})">${libelleBoutonAchat(gameData)}</button>`;
+            zoneAction.innerHTML = `<button class="btn btn-primary btn-bloc btn-lg" onclick="acheterJeu(${jsArg(gameId)})">${libelleBoutonAchat(gameData)}</button>`;
         } else {
             // Sur le site, les jeux s'installent et se lancent depuis le launcher Novaly
             zoneAction.innerHTML = `
-                <button class="btn" style="background: #4cd137; color: black; width: 100%; font-size: 16px; padding: 15px;" onclick="ouvrirNovaly(${jsArg(gameId)})">► Jouer sur Novaly</button>
+                <button class="btn btn-success btn-bloc btn-lg" onclick="ouvrirNovaly(${jsArg(gameId)})">► Jouer sur Novaly</button>
                 <p style="color: #aaa; font-size: 12px; margin: 12px 0 0;">Ce jeu se joue avec le launcher Novaly.
                     <a href="telecharger.html" target="_blank" style="color: #fff;">Pas encore installé ? Télécharger Novaly</a></p>`;
         }

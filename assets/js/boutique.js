@@ -485,8 +485,85 @@ window.boutiqueSurPageJeu = function(gameId, gameData, possede) {
                 ${payant ? `<button class="btn btn-boutique" onclick="offrirJeu(${jsArg(gameId)})">🎁 Offrir</button>` : ''}
             </div>`;
     }
+    afficherMedias(gameData);
     chargerAvis(gameId);
 };
+
+// ---------- Médias d'un jeu : vidéo + captures d'écran ----------
+// Champs Firestore du jeu (games/{id}), tous facultatifs :
+//   trailerUrl : lien YouTube (youtube.com/watch?v=…, youtu.be/…) ou fichier vidéo .mp4 / .webm
+//   captures   : liste de liens d'images (https)
+let capturesJeu = [];
+
+function lienSur(url) {
+    try { const u = new URL(String(url)); return u.protocol === 'https:' ? u : null; } catch (e) { return null; }
+}
+
+function idYoutube(u) {
+    const h = u.hostname.replace(/^www\.|^m\./, '');
+    let id = null;
+    if (h === 'youtu.be') id = u.pathname.slice(1);
+    else if (h === 'youtube.com' || h === 'youtube-nocookie.com') {
+        id = u.searchParams.get('v') || (u.pathname.match(/^\/(?:embed|shorts)\/([^/?#]+)/) || [])[1];
+    }
+    return id && /^[\w-]{6,20}$/.test(id) ? id : null;
+}
+
+function blocVideo(url) {
+    const u = lienSur(url);
+    if (!u) return '';
+    const yt = idYoutube(u);
+    if (yt) return `<div class="media-video"><iframe src="https://www.youtube-nocookie.com/embed/${yt}?rel=0" title="Bande-annonce"
+        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`;
+    if (/\.(mp4|webm)$/i.test(u.pathname)) return `<div class="media-video"><video src="${esc(u.href)}" controls preload="metadata" playsinline></video></div>`;
+    return '';
+}
+
+function afficherMedias(g) {
+    const zone = document.getElementById('detail-medias-zone');
+    if (!zone) return;
+    const video = blocVideo(g.trailerUrl);
+    capturesJeu = (Array.isArray(g.captures) ? g.captures : []).map(lienSur).filter(Boolean).map(u => u.href).slice(0, 20);
+    if (!video && !capturesJeu.length) {
+        zone.innerHTML = `<h2 class="detail-section-titre">Médias</h2>
+            <div class="detail-medias"><div class="detail-media"><span>Vidéo et captures d'écran bientôt disponibles</span></div></div>`;
+        return;
+    }
+    zone.innerHTML = `<h2 class="detail-section-titre">Médias</h2>
+        ${video}
+        ${capturesJeu.length ? `<div class="media-captures">${capturesJeu.map((src, i) =>
+            `<button class="media-capture" onclick="ouvrirCapture(${i})" aria-label="Agrandir la capture ${i + 1}"><img src="${esc(src)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}`;
+}
+
+// Visionneuse plein écran (flèches du clavier, Échap pour fermer)
+let captureOuverte = -1;
+window.ouvrirCapture = function(i) {
+    if (!capturesJeu.length) return;
+    captureOuverte = (i + capturesJeu.length) % capturesJeu.length;
+    let v = document.getElementById('visionneuse');
+    if (!v) {
+        v = document.createElement('div');
+        v.id = 'visionneuse';
+        v.innerHTML = `<div class="visionneuse-fond" onclick="fermerCapture()"></div>
+            <img class="visionneuse-image" alt="">
+            <button class="visionneuse-nav visionneuse-prec" onclick="ouvrirCapture(captureOuverteIndex() - 1)" aria-label="Précédente">‹</button>
+            <button class="visionneuse-nav visionneuse-suiv" onclick="ouvrirCapture(captureOuverteIndex() + 1)" aria-label="Suivante">›</button>
+            <button class="visionneuse-fermer" onclick="fermerCapture()" aria-label="Fermer">×</button>
+            <div class="visionneuse-compteur"></div>`;
+        document.body.appendChild(v);
+    }
+    v.querySelector('.visionneuse-image').src = capturesJeu[captureOuverte];
+    v.querySelector('.visionneuse-compteur').innerText = `${captureOuverte + 1} / ${capturesJeu.length}`;
+    v.querySelectorAll('.visionneuse-nav').forEach(b => b.style.display = capturesJeu.length > 1 ? '' : 'none');
+};
+window.captureOuverteIndex = () => captureOuverte;
+window.fermerCapture = function() { document.getElementById('visionneuse')?.remove(); captureOuverte = -1; };
+document.addEventListener('keydown', (e) => {
+    if (captureOuverte < 0) return;
+    if (e.key === 'Escape') window.fermerCapture();
+    else if (e.key === 'ArrowRight') window.ouvrirCapture(captureOuverte + 1);
+    else if (e.key === 'ArrowLeft') window.ouvrirCapture(captureOuverte - 1);
+});
 
 // ---------- Portefeuille ----------
 function afficherSolde() {

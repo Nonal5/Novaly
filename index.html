@@ -25,8 +25,9 @@
     <link rel="stylesheet" href="assets/css/index.css">
     <link rel="stylesheet" href="assets/css/notifications.css">
     <link rel="stylesheet" href="assets/css/boutique.css">
+    <link rel="stylesheet" href="assets/css/ui.css">
 </head>
-<body>
+<body class="site">
 
 <header class="main-header">
         <div class="header-left">
@@ -56,10 +57,10 @@
                     <span id="unread-badge" style="display: none; background: #ff4757; color: white; border-radius: 10px; padding: 2px 6px; font-size: 10px; margin-left: 5px;">0</span>
                 </div>
                 <div id="friends-dropdown" class="user-dropdown" style="width: 280px; right: 0;">
-                    <div style="padding: 15px; border-bottom: 1px solid #333; background: #151515;">
+                    <div class="panel-inset sep-bas" style="padding: 15px;">
                         <div style="display: flex; gap: 8px;">
-                            <input type="text" id="friend-search-input" placeholder="Ajouter un pseudo..." style="flex-grow: 1; padding: 10px; background: #0a0a0a; border: 1px solid #444; color: white; border-radius: 4px; outline: none; font-size: 12px; font-family: 'Inter', sans-serif;">
-                            <button class="btn" onclick="sendFriendRequest()" style="background: #0984e3; color: white; border: none; padding: 0 15px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 13px;">+</button>
+                            <input type="text" id="friend-search-input" placeholder="Ajouter un pseudo..." style="flex-grow: 1; padding: 10px; font-size: 12px;">
+                            <button class="btn btn-accent" onclick="sendFriendRequest()">+</button>
                         </div>
                         <p id="friend-msg" style="font-size: 11px; margin-top: 8px; margin-bottom: 0; display: none;"></p>
                     </div>
@@ -143,31 +144,31 @@
     </header>
 
     <div id="game-lobby-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-        <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 12px; width: 400px; padding: 30px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+        <div class="panel modal-boite" style="width: 400px; padding: 30px; text-align: center; position: relative;">
             <span onclick="closeGameModal()" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#888'">&times;</span>
             
             <h2 id="lobby-game-title" style="margin-top: 0; font-weight: 800; font-size: 24px;">Titre du jeu</h2>
             <p style="color: #aaa; font-size: 13px; margin-bottom: 25px;">Choisissez votre mode de jeu :</p>
             
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <button class="btn" style="background: #0984e3; color: white; padding: 15px; font-size: 14px;" onclick="startPublicMatch()">
+                <button class="btn btn-accent btn-lg" onclick="startPublicMatch()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                     Lancer publiquement
                 </button>
-                <button class="btn" style="background: transparent; color: white; border: 1px solid #555; padding: 15px; font-size: 14px;" onclick="togglePrivateMatchInput()">
+                <button class="btn btn-ghost btn-lg" onclick="togglePrivateMatchInput()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     Partie privée
                 </button>
             </div>
 
-            <div id="private-match-section" style="display: none; margin-top: 20px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="panel-inset" id="private-match-section" style="display: none; margin-top: 20px; padding: 15px; animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
                 <label style="display: block; font-size: 12px; color: #888; margin-bottom: 8px; text-align: left;">Rejoindre avec un code :</label>
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" id="private-room-code" placeholder="EX: 4A8B" maxlength="6" style="flex-grow: 1; padding: 12px; background: #000; border: 1px solid #444; color: white; border-radius: 4px; text-transform: uppercase; text-align: center; font-weight: bold; letter-spacing: 2px; font-size: 16px; outline: none;">
-                    <button class="btn" style="background: #4cd137; color: black; border: none; padding: 0 20px; font-weight: 800;" onclick="joinPrivateMatch()">GO</button>
+                    <input type="text" id="private-room-code" placeholder="EX: 4A8B" maxlength="6" style="flex-grow: 1; padding: 12px; text-transform: uppercase; text-align: center; font-weight: bold; letter-spacing: 2px; font-size: 16px;">
+                    <button class="btn btn-success" onclick="joinPrivateMatch()">GO</button>
                 </div>
                 <div style="margin-top: 15px; border-top: 1px solid #222; padding-top: 15px;">
-                    <button class="btn" style="background: transparent; color: #ccc; border: 1px dashed #555; width: 100%; font-size: 12px;" onclick="createPrivateMatch()">
+                    <button class="btn btn-ghost btn-bloc" onclick="createPrivateMatch()">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         Créer une nouvelle salle privée
                     </button>
@@ -238,25 +239,21 @@
         </div>
 
         <div id="view-game-detail" class="view-section">
-            <button class="btn" style="background: transparent; border: 1px solid #444; color: white; margin-bottom: 20px;" onclick="navigateTo('#magasin', 'store')">← Retour au magasin</button>
-            
-            <div class="hero-banner" id="detail-banner" style="height: 350px; justify-content: flex-end; align-items: flex-start; text-align: left; padding: 40px;">
-                <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); width: 100%; max-width: 500px;">
-                    <h1 id="detail-title" style="margin: 0 0 10px; font-size: 32px;">Titre du jeu</h1>
-                    <p id="detail-desc" style="font-size: 14px; color: #ccc; margin-bottom: 20px;">Description du jeu ici...</p>
-                    <div id="detail-boutique" style="margin-bottom: 12px;"></div>
+            <button class="btn btn-ghost btn-sm detail-retour" onclick="navigateTo('#magasin', 'store')">← Retour au magasin</button>
+
+            <div class="detail-hero" id="detail-banner">
+                <div class="detail-infos">
+                    <h1 id="detail-title">Titre du jeu</h1>
+                    <p id="detail-desc">Description du jeu ici...</p>
+                    <div id="detail-boutique"></div>
                     <div id="detail-action-zone">
-                        <!-- Le bouton (Acheter / Télécharger / Jouer) s'affichera ici -->
+                        <!-- Le bouton (Acheter / Télécharger le launcher) s'affichera ici -->
                     </div>
                 </div>
             </div>
-            
-            <h2 style="font-size: 18px; margin-bottom: 20px;">Médias & Teasers</h2>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div style="height: 200px; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #555;">[ Espace Vidéo Teaser ]</div>
-                <div style="height: 200px; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #555;">[ Espace Capture d'écran ]</div>
-            </div>
-            <div id="detail-avis"></div>
+
+            <div id="detail-medias-zone"></div>
+            <div id="detail-avis" class="detail-avis"></div>
         </div>
 
         <div id="view-community" class="view-section">
@@ -295,7 +292,7 @@
             <div class="generic-view-content" style="max-width: 600px; margin: 0 auto; text-align: left;">
                 <h2 data-i18n="aboutTitle" style="color: white; margin-bottom: 20px;">À propos de Novaly</h2>
                 <p data-i18n="aboutDesc1" style="line-height: 1.6;">Novaly est votre plateforme de jeu de nouvelle génération, conçue pour offrir des performances optimales, une bibliothèque unifiée et une expérience utilisateur fluide sans distraction.</p>
-                <div style="background: #121212; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #333;">
+                <div class="panel-inset" style="padding: 15px; margin: 20px 0;">
                     <p style="margin: 0; font-size: 14px; color: var(--text-main); font-weight: 600;">
                         <span data-i18n="aboutVersion">Version du Launcher :</span>
                         <span class="app-version">…</span>
@@ -354,10 +351,10 @@
                         <h3>Informations de compte</h3>
                         <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Gérez les détails de votre compte et votre apparence publique.</p>
                         
-                        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 25px; background: #222; padding: 20px; border-radius: 8px; border: 1px solid #333;">
+                        <div class="panel" style="display: flex; align-items: center; gap: 20px; margin-bottom: 25px; padding: 20px;">
                             <div id="profile-avatar-preview" style="width: 80px; height: 80px; background-color: #111; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; background-size: cover; background-position: center; background-repeat: no-repeat; border: 2px solid #444; flex-shrink: 0;">?</div>                            
                             <div>
-                                <label for="avatar-upload" class="btn" style="background: #fff; color: #000; padding: 8px 15px; font-size: 13px;">Téléverser une image</label>
+                                <label for="avatar-upload" class="btn btn-primary">Téléverser une image</label>
                                 <input type="file" id="avatar-upload" accept="image/png, image/jpeg" style="display: none;" onchange="previewAvatar(event)">
                                 <p style="font-size: 11px; color: #888; margin-top: 8px; margin-bottom: 0;">Format JPG ou PNG. Max 1 Mo.</p>
                             </div>
@@ -370,15 +367,15 @@
                         <div class="form-group">
                             <label>Titre (Cosmétique)</label>
                             <select id="profile-title">
-                                <option value="NOVICE" style="background: #222; color: white;">NOVICE (Défaut)</option>
-                                <option value="PIONNIER" style="background: #222; color: #f1c40f;">PIONNIER (Fondateur)</option>
-                                <option value="BETA TESTEUR" style="background: #222; color: #3498db;">BÊTA TESTEUR</option>
-                                <option value="VIP" style="background: #222; color: #e74c3c;">VIP</option>
+                                <option value="NOVICE">NOVICE (Défaut)</option>
+                                <option value="PIONNIER">PIONNIER (Fondateur)</option>
+                                <option value="BETA TESTEUR">BÊTA TESTEUR</option>
+                                <option value="VIP">VIP</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Adresse e-mail</label>
-                            <input type="email" id="profile-email" value="" disabled style="background: #111; color: #555;">
+                            <input type="email" id="profile-email" value="" disabled>
                         </div>
 
                         <hr style="border: 0; border-top: 1px solid #333; margin: 30px 0;">
@@ -405,15 +402,15 @@
                         <div style="background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; padding: 25px; border-radius: 8px;">
                             <h3 style="color: #ff4757; margin-top: 0;">Zone de danger</h3>
                             <p style="color: #ccc; font-size: 12px; margin-bottom: 15px;">La suppression de votre compte est définitive.</p>
-                            <button class="btn" style="background: #ff4757; color: white; border: none;" onclick="document.getElementById('delete-confirm-box').style.display='block'">Supprimer mon compte</button>
+                            <button class="btn btn-danger" onclick="document.getElementById('delete-confirm-box').style.display='block'">Supprimer mon compte</button>
                             
-                            <div id="delete-confirm-box" style="display: none; margin-top: 20px; background: #111; padding: 20px; border-radius: 6px; border: 1px solid #ff4757;">
+                            <div class="panel-inset bord-danger" id="delete-confirm-box" style="display: none; margin-top: 20px; padding: 20px;">
                                 <p style="font-size: 13px; color: white; margin-top: 0; margin-bottom: 15px; font-weight: bold;">Confirmez votre identité :</p>
-                                <input type="email" id="delete-email" placeholder="Adresse e-mail" style="width: 100%; margin-bottom: 10px; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
-                                <input type="password" id="delete-password" placeholder="Mot de passe" style="width: 100%; margin-bottom: 15px; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
+                                <input type="email" id="delete-email" placeholder="Adresse e-mail" style="width: 100%; margin-bottom: 10px; padding: 12px;">
+                                <input type="password" id="delete-password" placeholder="Mot de passe" style="width: 100%; margin-bottom: 15px; padding: 12px;">
                                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                    <button class="btn" style="background: transparent; color: white; border: 1px solid #555; flex-grow: 1;" onclick="document.getElementById('delete-confirm-box').style.display='none'">Annuler</button>
-                                    <button class="btn" style="background: #ff4757; color: white; border: none; flex-grow: 2;" onclick="confirmDeleteAccount()">Confirmer la suppression</button>
+                                    <button class="btn btn-ghost" style="flex-grow: 1;" onclick="document.getElementById('delete-confirm-box').style.display='none'">Annuler</button>
+                                    <button class="btn btn-danger" style="flex-grow: 2;" onclick="confirmDeleteAccount()">Confirmer la suppression</button>
                                 </div>
                                 <p id="delete-msg" style="color: #ff4757; font-size: 12px; margin-top: 10px; display: none;"></p>
                             </div>
@@ -424,19 +421,19 @@
                         <h3>Authentification à deux facteurs (A2F)</h3>
                         <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés. Cette fonctionnalité arrive bientôt.</p>
                         
-                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
+                        <div class="panel" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
                             <div>
                                 <strong>Application d'authentification</strong>
                                 <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Utilisez Google Authenticator ou Authy.</p>
                             </div>
-                            <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
+                            <button class="btn btn-secondary" disabled style="width: 100px;">Bientôt</button>
                         </div>
-                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div class="panel" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                             <div>
                                 <strong>Authentification par E-mail</strong>
                                 <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Recevez un code à votre e-mail.</p>
                             </div>
-                            <button class="btn" disabled style="background: #333; color: #888; border: none; width: 100px; cursor: not-allowed;">Bientôt</button>
+                            <button class="btn btn-secondary" disabled style="width: 100px;">Bientôt</button>
                         </div>
                     </div>
 
@@ -447,16 +444,16 @@
                             <h2 style="font-size: 48px; margin: 0; font-weight: 900;" id="wallet-balance">0,00 €</h2>
                             <p style="color: #aaa; margin: 20px 0 10px; font-size: 13px;">Ajouter des fonds</p>
                             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                                <button class="btn" onclick="rechargerPortefeuille(500)" style="background: #fff; color: #000;">+5 €</button>
-                                <button class="btn" onclick="rechargerPortefeuille(1000)" style="background: #fff; color: #000;">+10 €</button>
-                                <button class="btn" onclick="rechargerPortefeuille(2000)" style="background: #fff; color: #000;">+20 €</button>
-                                <button class="btn" onclick="rechargerPortefeuille(5000)" style="background: #fff; color: #000;">+50 €</button>
+                                <button class="btn btn-primary" onclick="rechargerPortefeuille(500)">+5 €</button>
+                                <button class="btn btn-primary" onclick="rechargerPortefeuille(1000)">+10 €</button>
+                                <button class="btn btn-primary" onclick="rechargerPortefeuille(2000)">+20 €</button>
+                                <button class="btn btn-primary" onclick="rechargerPortefeuille(5000)">+50 €</button>
                             </div>
                             <p style="color: #777; margin: 12px 0 0; font-size: 11px;">Crédit utilisable pour acheter des jeux sur Novaly, non remboursable.</p>
                         </div>
 
                         <h3>Moyens de paiement</h3>
-                        <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 20px; color: #aaa; font-size: 13px; line-height: 1.6;">
+                        <div class="panel" style="padding: 20px; font-size: 13px; line-height: 1.6;">
                             Vos achats sont réglés sur la page de paiement sécurisée de <strong style="color: #fff;">Stripe</strong>.
                             Novaly ne voit ni ne conserve jamais votre numéro de carte.
                         </div>
@@ -465,23 +462,23 @@
                     <div id="tab-links" class="profile-tab-content">
                         <h3>Comptes Associés</h3>
                         <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap; gap: 10px;">
+                            <div class="panel" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 15px;">
                                     <div style="width: 30px; height: 30px; background: #5865F2; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
                                         <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/discord.svg" style="width: 18px; filter: invert(1);">
                                     </div>
                                     <div><strong>Discord</strong><div id="lien-discord-nom" style="font-size: 12px; color: #888;">Non lié</div></div>
                                 </div>
-                                <button class="btn" id="lien-discord-btn" onclick="basculerLien('discord')" style="background: #0984e3; color: white; border: none; width: 100px;">Lier</button>
+                                <button class="btn btn-accent" id="lien-discord-btn" onclick="basculerLien('discord')" style="width: 100px;">Lier</button>
                             </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap; gap: 10px;">
+                            <div class="panel" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; flex-wrap: wrap; gap: 10px;">
                                 <div style="display: flex; align-items: center; gap: 15px;">
                                     <div style="width: 30px; height: 30px; background: #171a21; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
                                         <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/steam.svg" style="width: 18px; filter: invert(1);">
                                     </div>
                                     <div><strong>Steam</strong><div id="lien-steam-nom" style="font-size: 12px; color: #888;">Non lié</div></div>
                                 </div>
-                                <button class="btn" id="lien-steam-btn" onclick="basculerLien('steam')" style="background: #0984e3; color: white; border: none; width: 100px;">Lier</button>
+                                <button class="btn btn-accent" id="lien-steam-btn" onclick="basculerLien('steam')" style="width: 100px;">Lier</button>
                             </div>
                         </div>
                     </div>
@@ -492,12 +489,12 @@
                         <div class="form-group">
                             <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
                         </div>
-                        <button class="btn" disabled style="width: 100%; background: #333; color: #888; cursor: not-allowed;">Bientôt disponible</button>
+                        <button class="btn btn-secondary btn-bloc" disabled>Bientôt disponible</button>
                     </div>
 
                     <div id="tab-parental" class="profile-tab-content">
                         <h3>Contrôle Parental</h3>
-                        <div style="background: #222; padding: 30px; border-radius: 8px; border: 1px solid #444;" id="parental-zone">
+                        <div class="panel" style="padding: 30px;" id="parental-zone">
                             <div style="text-align: center;">
                                 <img src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/icons/shield-alert.svg" style="width: 40px; height: 40px; filter: invert(1); opacity: 0.8; margin-bottom: 15px;">
                                 <h4 id="parental-titre">Le Contrôle Parental est désactivé</h4>
@@ -507,15 +504,15 @@
                                 <label style="display: flex; gap: 10px; align-items: center; color: #ddd;"><input type="checkbox" id="parental-achats"> Bloquer tous les achats (et les recharges)</label>
                                 <label style="display: flex; gap: 10px; align-items: center; color: #ddd;"><input type="checkbox" id="parental-chat"> Couper le chat avec les amis</label>
                                 <label style="color: #ddd;">Âge maximum des jeux
-                                    <select id="parental-age" style="margin-left: 8px; padding: 6px; background: #111; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                                    <select id="parental-age" style="margin-left: 8px; padding: 6px;">
                                         <option value="0">Aucune limite</option><option value="3">PEGI 3</option><option value="7">PEGI 7</option>
                                         <option value="12">PEGI 12</option><option value="16">PEGI 16</option><option value="18">PEGI 18</option>
                                     </select>
                                 </label>
-                                <input type="password" id="parental-pin" inputmode="numeric" maxlength="6" placeholder="Code PIN (4 à 6 chiffres)" style="padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
-                                <input type="password" id="parental-nouveau-pin" inputmode="numeric" maxlength="6" placeholder="Nouveau PIN (facultatif)" style="display: none; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 4px; outline: none;">
-                                <button class="btn" id="parental-btn" onclick="enregistrerParental()" style="background: #0984e3; color: white; border: none; width: 100%;">Activer le contrôle parental</button>
-                                <button class="btn" id="parental-off" onclick="desactiverParental()" style="display: none; background: transparent; color: #ff6b6b; border: 1px solid #ff6b6b; width: 100%;">Désactiver (code PIN requis)</button>
+                                <input type="password" id="parental-pin" inputmode="numeric" maxlength="6" placeholder="Code PIN (4 à 6 chiffres)" style="padding: 12px;">
+                                <input type="password" id="parental-nouveau-pin" inputmode="numeric" maxlength="6" placeholder="Nouveau PIN (facultatif)" style="display: none; padding: 12px;">
+                                <button class="btn btn-accent btn-bloc" id="parental-btn" onclick="enregistrerParental()">Activer le contrôle parental</button>
+                                <button class="btn btn-ghost btn-ghost-danger btn-bloc" id="parental-off" onclick="desactiverParental()" style="display: none;">Désactiver (code PIN requis)</button>
                             </div>
                         </div>
                     </div>
@@ -572,18 +569,18 @@
             </div>
             <iframe id="game-frame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
-        <div id="chat-box" style="display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px 8px 0 0; z-index: 1500; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-    <div style="padding: 12px 15px; background: #0a0a0a; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0;">
+        <div class="panel" id="chat-box" style="display: none; position: fixed; bottom: 20px; right: 20px; width: 320px; z-index: 1500; flex-direction: column;">
+    <div class="panel-inset sep-bas" style="padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;">
         <span id="chat-title" style="font-weight: bold; font-size: 13px; color: white;">Chat</span>
         <span style="cursor: pointer; color: #888; font-weight: bold;" onclick="document.getElementById('chat-box').style.display='none'"><span class="ico" style="-webkit-mask-image: url('assets/icons/x.svg'); mask-image: url('assets/icons/x.svg')"></span></span>
     </div>
     <div id="chat-messages" style="height: 250px; overflow-y: auto; padding: 15px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
         <!-- Les messages apparaitront ici -->
     </div>
-    <div style="display: flex; padding: 10px; border-top: 1px solid #333; background: #111;">
-        <input type="text" id="chat-input" placeholder="Écrire un message..." style="flex-grow: 1; background: #000; color: white; border: 1px solid #444; padding: 10px; border-radius: 4px; outline: none; font-family: 'Inter', sans-serif;">
-        <button onclick="inviterAJouer()" title="Inviter à jouer" style="background: #2a2a2a; color: white; border: 1px solid #444; padding: 0 10px; margin-left: 8px; border-radius: 4px; cursor: pointer;">🎮</button>
-        <button onclick="envoyerMessage()" style="background: #0984e3; color: white; border: none; padding: 0 15px; margin-left: 8px; border-radius: 4px; cursor: pointer; font-weight: bold;">></button>
+    <div class="panel-inset sep-haut" style="display: flex; padding: 10px;">
+        <input type="text" id="chat-input" placeholder="Écrire un message..." style="flex-grow: 1; padding: 10px;">
+        <button class="btn btn-secondary" onclick="inviterAJouer()" title="Inviter à jouer" style="margin-left: 8px;">🎮</button>
+        <button class="btn btn-accent" onclick="envoyerMessage()" style="margin-left: 8px;">></button>
     </div>
     <div id="chat-invite-liste" class="user-dropdown" style="display: none; position: static; max-height: 160px; overflow-y: auto; border-top: 1px solid #333; border-radius: 0; box-shadow: none;"></div>
 </div>
@@ -592,7 +589,9 @@
     </main>
 
 
+    <script src="assets/js/chargement.js"></script>
     <script src="assets/js/notifications.js" data-icones="assets/icons/"></script>
+    <script src="assets/js/traductions.js"></script>
     <script src="assets/js/index.ui.js"></script>
     <script type="module" src="assets/js/index.app.js"></script>
     <script type="module" src="assets/js/boutique.js"></script>
