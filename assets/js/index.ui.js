@@ -36,27 +36,6 @@ window.addEventListener('DOMContentLoaded', () => {
     changeLanguage(savedLang, flags[savedLang]);
 });
 
-// 3. ANIMATION MOTION "NOVALY" (SPOTLIGHT) FIXÉ
-        const motionContainer = document.getElementById('motion-container');
-        const motionLogo = document.getElementById('motion-logo');
-        if (motionContainer && motionLogo) {
-            motionContainer.addEventListener('mousemove', (e) => {
-                if (window.innerWidth > 768) { // Appliquer uniquement sur les écrans plus larges que mobile
-                    motionLogo.classList.add('active-light'); // Allume la lumière
-                    const rect = motionLogo.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    motionLogo.style.setProperty('--mouse-x', `${x}px`);
-                    motionLogo.style.setProperty('--mouse-y', `${y}px`);
-                }
-            });
-
-            motionContainer.addEventListener('mouseleave', () => {
-                if (window.innerWidth > 768) { // Appliquer uniquement sur les écrans plus larges que mobile
-                    motionLogo.classList.remove('active-light'); // Éteint la lumière
-                }
-            });
-        }
         const translations = {
             fr: {
                 navStore: "Magasin", navOnline: "Jeux Rapide", navLibrary: "Bibliothèque", navCommunity: "Communauté", navAbout: "À propos", navCart: "Panier", navContact: "Contactez-nous",
@@ -341,3 +320,13 @@ if (VUES_PAR_ANCRE[window.location.hash]) {
     currentViewId = VUES_PAR_ANCRE[window.location.hash];
     renderView(currentViewId);
 }
+
+// Liens externes (réseaux sociaux…) : dans le launcher on ouvre le navigateur du système,
+// sur le site on laisse le lien s'ouvrir normalement dans un nouvel onglet.
+window.ouvrirLienExterne = function (url) {
+    if (window.__TAURI__) {
+        window.__TAURI__.core.invoke("plugin:opener|open_url", { url }).catch(() => {});
+        return false;
+    }
+    return true;
+};

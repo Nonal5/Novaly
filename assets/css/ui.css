@@ -426,6 +426,29 @@ hr { border: 0 !important; border-top: 1px solid var(--bord) !important; }
 .footer-link { transition: color var(--vite); }
 .footer-link:hover { transform: none; }
 
+/* Réseaux sociaux (pied de page) */
+.footer-social {
+    display: flex; align-items: center; gap: 12px; min-width: 190px;
+    padding: 8px 12px 8px 8px; border-radius: var(--rayon); border: 1px solid var(--bord);
+    background: var(--surface-1); color: var(--texte-2); text-decoration: none;
+    transition: background var(--vite), border-color var(--vite), color var(--vite), transform var(--vite) var(--courbe);
+}
+.social-ico {
+    width: 34px; height: 34px; flex: 0 0 auto; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--surface-3); color: var(--texte);
+    transition: background var(--vite), color var(--vite);
+}
+.social-ico svg { width: 17px; height: 17px; fill: currentColor; }
+.footer-social > span:last-child { display: flex; flex-direction: column; gap: 2px; line-height: 1.15; }
+.footer-social strong { color: var(--texte); font-size: 13px; font-weight: 600; }
+.footer-social small { color: var(--texte-3); font-size: 12px; }
+.footer-social:hover { background: var(--surface-2); border-color: var(--bord-fort); transform: translateY(-1px); }
+.footer-social:active { transform: scale(0.98); }
+.social-discord:hover .social-ico { background: #5865f2; color: #fff; }
+.social-tiktok:hover .social-ico { background: #000; color: #fff; box-shadow: -2px -2px 0 -1px #25f4ee inset, 2px 2px 0 -1px #fe2c55 inset; }
+.social-x:hover .social-ico { background: #fff; color: #000; }
+
 /* ---------- Jeu en plein écran ---------- */
 .game-control-btn { border-radius: 999px; background: rgba(10, 10, 14, 0.7); border-color: var(--bord-fort); text-transform: none; letter-spacing: 0; font-size: 12.5px; }
 .game-control-btn:hover { transform: none; background: rgba(10, 10, 14, 0.92); }

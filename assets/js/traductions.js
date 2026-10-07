@@ -201,6 +201,8 @@
         "Téléchargez Novaly": ["Download Novaly", "Descarga Novaly", "Novaly herunterladen", "Scarica Novaly"],
         "Télécharger Novaly": ["Download Novaly", "Descargar Novaly", "Novaly herunterladen", "Scarica Novaly"],
         "Aide": ["Help", "Ayuda", "Hilfe", "Aiuto"],
+        "Suivez-nous": ["Follow us", "Síguenos", "Folge uns", "Seguici"],
+        "Serveur Novaly": ["Novaly server", "Servidor Novaly", "Novaly-Server", "Server Novaly"],
         "Support": ["Support", "Soporte", "Support", "Supporto"],
         "Tous droits réservés.": ["All rights reserved.", "Todos los derechos reservados.", "Alle Rechte vorbehalten.", "Tutti i diritti riservati."],
         "Bientôt disponible": ["Coming soon", "Próximamente", "Demnächst", "Prossimamente"],
