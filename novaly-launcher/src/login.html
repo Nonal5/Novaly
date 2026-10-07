@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - NOVALY</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/ui.css">
     <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
-    <div class="app-wrapper">
+    <div class="app-wrapper login-fond">
 
         <div class="custom-titlebar" data-tauri-drag-region>
             <div class="titlebar-drag-area" data-tauri-drag-region></div>
@@ -19,7 +20,7 @@
             </div>
         </div>
     <div class="login-box">
-        <div class="logo">NOVALY</div>
+        <img class="logo" src="assets/img/logo/novaly-wordmark.png" alt="Novaly" draggable="false">
 
         <div id="login-section" class="section-fade">
             <div class="subtitle">Heureux de vous revoir</div>
@@ -115,6 +116,7 @@
         <a href="index.html" class="back-link">← Retour au magasin</a>
     </div>
 
+    <script src="js/chargement.js"></script>
     <script type="module" src="js/login.js"></script>
 </body>
 </html>

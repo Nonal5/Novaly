@@ -49,3 +49,24 @@
 @media (max-width: 600px) {
     .ligne-cover { width: 80px; height: 46px; }
 }
+
+/* Variantes de boutons (utilisées par boutique.js ; le launcher les affine dans ui.css) */
+.btn.btn-primary   { background: #fff; color: #000; border: 1px solid #fff; }
+.btn.btn-accent    { background: #0984e3; color: #fff; border: 1px solid #0984e3; }
+.btn.btn-secondary { background: #2a2a2e; color: #ddd; border: 1px solid #3a3a40; }
+.btn.btn-danger    { background: #ff4757; color: #fff; border: 1px solid #ff4757; }
+.btn.btn-lg   { padding: 14px 20px; font-size: 15px; }
+.btn.btn-bloc { width: 100%; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-detail { opacity: 0.75; font-weight: 500; }
+.btn-lien { background: none; border: none; padding: 0; color: #fff; font: inherit; text-decoration: underline; cursor: pointer; }
+.texte-succes { color: #4cd137 !important; }
+.titre-section { margin-top: 0; }
+
+/* Fenêtre d'achat (choix solde / carte) */
+.fenetre-titre { margin: 0 0 16px; font-size: 18px; padding-right: 24px; }
+.paiement-recap { display: flex; align-items: center; gap: 14px; background: #1a1a1a; border: 1px solid #2c2c2c; border-radius: 10px; padding: 10px; }
+.paiement-choix { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.paiement-choix .btn { width: 100%; justify-content: center; padding: 13px 16px; }
+
+.avis-titre { font-size: 18px; margin: 30px 0 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }

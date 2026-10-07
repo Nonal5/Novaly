@@ -202,11 +202,11 @@
                     snapshot.forEach(docRequest => {
                         const req = docRequest.data();
                         html += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 8px 10px; border-radius: 4px; margin-bottom: 5px; border: 1px solid #333;">
+                        <div class="panel-inset" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; margin-bottom: 5px;">
                             <span style="color: white; font-weight: bold; font-size: 11px;">${esc(req.senderPseudo)}</span>
                             <div style="display: flex; gap: 5px;">
-                                <button onclick="acceptFriend(${jsArg(docRequest.id)}, ${jsArg(req.senderId)})" style="background: #4cd137; color: black; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 800;">OK</button>
-                                <button onclick="declineFriend(${jsArg(docRequest.id)})" style="background: transparent; color: #ff4757; border: 1px solid #ff4757; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: 800;">X</button>
+                                <button class="btn btn-success btn-sm" onclick="acceptFriend(${jsArg(docRequest.id)}, ${jsArg(req.senderId)})">OK</button>
+                                <button class="btn btn-ghost btn-ghost-danger btn-sm" onclick="declineFriend(${jsArg(docRequest.id)})">X</button>
                             </div>
                         </div>`;
                     });
@@ -722,7 +722,7 @@ window.chargerMagasin = async function() {
                     <div class="game-tags"><span class="tag tag-action">Disponible</span></div>
                     <div class="game-title">${esc(g.titre)}</div>
                     ${window.prixCarte ? window.prixCarte(g) : ''}
-                    <button class="btn" style="width:100%; margin-top:10px; background: #ffffff; color: #000; font-size: 12px;">Voir la page</button>
+                    <button class="btn btn-primary btn-bloc" style="margin-top: 10px;">Voir la page</button>
                 </div>
             `;
         });
@@ -750,7 +750,7 @@ function carteJeuWeb(gameId) {
                 <div class="game-card" onclick="lancerJeu(${jsArg(gameId)})">
                     <div class="game-cover" style="background: ${jeu.cover}; display: flex; align-items: center; justify-content: center;">${icone}</div>
                     <div class="game-title">${esc(jeu.titre)}</div>
-                    <div class="game-price" style="background:#4cd137; color:#000;">Prêt à jouer</div>
+                    <div class="game-price game-price-pret">Prêt à jouer</div>
                 </div>`;
 }
 
@@ -779,8 +779,8 @@ window.actualiserBibliotheque = async function() {
 
                 // Détermine l'action rapide en fonction du stockage local
                 let actionBtn = savedPath 
-                    ? `<button class="btn" style="width:100%; margin-top:10px; background: #4cd137; color: black;" onclick="event.stopPropagation(); window.afficherPageJeu(${jsArg(gameId)})">► Jouer</button>`
-                    : `<button class="btn" style="width:100%; margin-top:10px; background: #0984e3; color: white;" onclick="event.stopPropagation(); telechargerJeu(${jsArg(gameId)})">Télécharger</button>`;
+                    ? `<button class="btn btn-success btn-bloc" style="margin-top: 10px;" onclick="event.stopPropagation(); window.afficherPageJeu(${jsArg(gameId)})">► Jouer</button>`
+                    : `<button class="btn btn-accent btn-bloc" style="margin-top: 10px;" onclick="event.stopPropagation(); telechargerJeu(${jsArg(gameId)})">Télécharger</button>`;
 
                 html += `
                 <div class="game-card" onclick="afficherPageJeu(${jsArg(gameId)})">
@@ -955,10 +955,17 @@ window.acheterJeu = async function(gameId) {
         return;
     }
 
+    // Jeu payant : fenêtre de choix « solde du portefeuille » ou « carte » (boutique.js)
+    if (window.choisirPaiement && window.prixJeu) {
+        const snap = await getDoc(doc(db, "games", gameId)).catch(() => null);
+        const tarif = snap && snap.exists() && window.prixJeu(snap.data());
+        if (tarif && tarif.prix > 0) return window.choisirPaiement(gameId);
+    }
+
     // Le bouton passe en mode chargement
     const zoneAction = document.getElementById('detail-action-zone');
     const boutonOriginal = zoneAction.innerHTML;
-    zoneAction.innerHTML = `<button class="btn" disabled style="background: #333; color: white; width: 100%; padding: 15px;">Redirection sécurisée...</button>`;
+    zoneAction.innerHTML = `<button class="btn btn-secondary btn-bloc btn-lg" disabled>Redirection sécurisée...</button>`;
 
     try {
         // Remplace cette URL par celle de ta future Cloud Function
@@ -1033,13 +1040,13 @@ window.chargerMoyensPaiement = async function() {
         }
 
         container.innerHTML = data.cartes.map(c => `
-            <div style="display:flex;justify-content:space-between;align-items:center;background:#222;border:1px solid #444;border-radius:8px;padding:15px 20px;flex-wrap:wrap;gap:10px;">
+            <div class="panel" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; flex-wrap: wrap; gap: 10px;">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <span style="text-transform:uppercase;font-weight:bold;">${esc(c.marque)}</span>
                     <span style="color:#aaa;">•••• ${esc(c.dernier4)}</span>
                     <span style="color:#888;font-size:12px;">Exp. ${esc(String(c.mois).padStart(2, '0'))}/${esc(c.annee)}</span>
                 </div>
-                <button class="btn" onclick="supprimerCarte('${esc(c.id)}')" style="background:transparent;color:#ff6b6b;border:1px solid #ff6b6b;padding:6px 12px;">Supprimer</button>
+                <button class="btn btn-ghost btn-ghost-danger btn-sm" onclick="supprimerCarte('${esc(c.id)}')">Supprimer</button>
             </div>
         `).join('');
     } catch (e) {
@@ -1413,7 +1420,7 @@ window.afficherPageJeu = async function(gameId) {
         const possede = window.mesJeux && window.mesJeux.includes(gameId);
 
         if (!possede) {
-            zoneAction.innerHTML = `<button class="btn" style="background: #ffffff; color: #000; width: 100%; font-size: 16px; padding: 15px;" onclick="acheterJeu(${jsArg(gameId)})">${libelleBoutonAchat(gameData)}</button>`;
+            zoneAction.innerHTML = `<button class="btn btn-primary btn-bloc btn-lg" onclick="acheterJeu(${jsArg(gameId)})">${libelleBoutonAchat(gameData)}</button>`;
         } else {
             const { exists } = window.__TAURI__.fs;
             const { join } = window.__TAURI__.path;
@@ -1443,24 +1450,24 @@ window.afficherPageJeu = async function(gameId) {
 
             if (!gameData[exeKey]) {
                 // Pas encore de version de ce jeu pour le système du joueur
-                zoneAction.innerHTML = `<button class="btn" disabled style="background: #333; color: #888; width: 100%; font-size: 16px; padding: 15px; cursor: not-allowed;">Pas encore disponible sur ${NOMS_SYSTEMES[systeme]}</button>`;
+                zoneAction.innerHTML = `<button class="btn btn-secondary btn-bloc btn-lg" disabled>Pas encore disponible sur ${NOMS_SYSTEMES[systeme]}</button>`;
             }
             else if (!estInstalle) {
                 // TÉLÉCHARGER
-                zoneAction.innerHTML = `<button class="btn" style="background: #0984e3; color: white; width: 100%; font-size: 16px; padding: 15px;" onclick="telechargerJeu(${jsArg(gameId)})">Télécharger</button>`;
+                zoneAction.innerHTML = `<button class="btn btn-accent btn-bloc btn-lg" onclick="telechargerJeu(${jsArg(gameId)})">Télécharger</button>`;
             }
             else if (gameData.version && savedVersion !== gameData.version) {
                 // METTRE À JOUR (La version Firebase est différente de la version locale)
-                zoneAction.innerHTML = `<button class="btn" style="background: #eccc68; color: black; width: 100%; font-size: 16px; padding: 15px;" onclick="telechargerJeu(${jsArg(gameId)})">Mettre à jour (v${esc(gameData.version)})</button>`;
+                zoneAction.innerHTML = `<button class="btn btn-warning btn-bloc btn-lg" onclick="telechargerJeu(${jsArg(gameId)})">Mettre à jour (v${esc(gameData.version)})</button>`;
             } 
             else {
                 // JOUER
                 zoneAction.innerHTML = `
-                    <div style="position: relative; display: flex; gap: 10px; width: 100%;">
-                        <button class="btn" style="background: #4cd137; color: black; flex-grow: 1; font-size: 16px; padding: 15px;" onclick="lancerJeuInstalle(${jsArg(cheminExecutable)}, ${jsArg(gameId)}, ${jsArg(gameData.titre)})">► Jouer</button>
-                        <button class="btn" style="background: transparent; color: white; border: 1px solid #555; padding: 0 20px; font-size: 18px; font-weight: bold;" onclick="event.stopPropagation(); document.getElementById('game-options-menu').classList.toggle('show')">...</button>
+                    <div class="detail-jouer">
+                        <button class="btn btn-success btn-lg" style="flex-grow: 1;" onclick="lancerJeuInstalle(${jsArg(cheminExecutable)}, ${jsArg(gameId)}, ${jsArg(gameData.titre)})">► Jouer</button>
+                        <button class="btn btn-ghost btn-lg detail-options" title="Plus d'options" onclick="event.stopPropagation(); document.getElementById('game-options-menu').classList.toggle('show')">...</button>
                         <div id="game-options-menu" class="user-dropdown" style="top: 110%; right: 0; width: 200px; z-index: 100;">
-                            <div class="dropdown-item" style="color: #ff4757;" onclick="desinstallerJeu(${jsArg(gameId)})">Désinstaller</div>
+                            <div class="dropdown-item logout" onclick="desinstallerJeu(${jsArg(gameId)})">Désinstaller</div>
                         </div>
                     </div>`;
             }
@@ -1497,7 +1504,7 @@ window.telechargerJeu = async function(gameId) {
 
         const zoneAction = document.getElementById('detail-action-zone');
         if (zoneAction) {
-            zoneAction.innerHTML = `<button class="btn" disabled style="background: #333; color: white; width: 100%; font-size: 16px; padding: 15px;">Téléchargement en arrière-plan...</button>`;
+            zoneAction.innerHTML = `<button class="btn btn-secondary btn-bloc btn-lg" disabled>Téléchargement en arrière-plan...</button>`;
         }
 
         const globalList = document.getElementById('global-dl-list');
@@ -1509,14 +1516,14 @@ window.telechargerJeu = async function(gameId) {
 
         const dlItemId = 'dl-item-' + gameId;
         globalList.innerHTML += `
-            <div id="${dlItemId}" style="background: #222; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #444;">
+            <div class="panel" id="${dlItemId}" style="padding: 10px; margin-bottom: 10px;">
                 <div style="font-size: 11px; color: white; font-weight: bold; margin-bottom: 5px;">${esc(gameData.titre)}</div>
                 <div style="display: flex; justify-content: space-between; font-size: 10px; color: #aaa; margin-bottom: 5px;">
                     <span id="status-${gameId}">Téléchargement...</span>
                     <span id="percent-${gameId}">0%</span>
                 </div>
-                <div style="width: 100%; background: #111; height: 6px; border-radius: 3px; overflow: hidden;">
-                    <div id="bar-${gameId}" style="width: 0%; height: 100%; background: #0984e3; transition: width 0.2s;"></div>
+                <div class="barre-dl">
+                    <div id="bar-${gameId}" class="barre-dl-remplissage" style="width: 0%;"></div>
                 </div>
             </div>
         `;
@@ -1634,7 +1641,7 @@ window.lancerJeuInstalle = async function(cheminExec, gameId, gameTitle) {
     const actionZone = document.getElementById('detail-action-zone');
     if (actionZone) {
         actionZone.innerHTML = `
-            <button class="btn" style="background: #ff4757; color: white; border: none; padding: 12px 25px; font-weight: bold; border-radius: 6px;" onclick="signalerFinDeJeu(${jsArg(gameId)})">
+            <button class="btn btn-danger" onclick="signalerFinDeJeu(${jsArg(gameId)})">
                 ${icone('square')} Terminer la session
             </button>
             <p style="color: #aaa; font-size: 11px; margin-top: 10px;">Le jeu tourne en arrière-plan. Cliquez ici quand vous avez fini pour sauvegarder votre temps.</p>
@@ -1676,7 +1683,7 @@ window.desinstallerJeu = async function(gameId) {
     if (!(await confirmer("Désinstaller ce jeu et supprimer tous ses fichiers ?", { confirmer: "Désinstaller", danger: true }))) return;
 
     const zoneAction = document.getElementById('detail-action-zone');
-    zoneAction.innerHTML = `<button class="btn" disabled style="background: #333; color: #aaa; width: 100%; padding: 15px; font-size: 16px;">Désinstallation en cours...</button>`;
+    zoneAction.innerHTML = `<button class="btn btn-secondary btn-bloc btn-lg" disabled>Désinstallation en cours...</button>`;
 
     try {
         const { remove } = window.__TAURI__.fs;
@@ -1700,15 +1707,15 @@ window.ouvrirParametres = async function() {
     if (!modal) {
         document.body.insertAdjacentHTML('beforeend', `
             <div id="settings-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
-                <div style="background:#1a1a1a; padding:30px; border-radius:12px; width:450px; border:1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div class="panel modal-boite" style="padding: 30px; width: 450px;">
                     <h2 style="margin-top:0; font-size:20px; border-bottom:1px solid #333; padding-bottom:15px;">Paramètres du Launcher</h2>
 
                     <p style="color:#aaa; font-size:12px; font-weight:bold; text-transform:uppercase; margin-top:20px;">Dossier d'installation par défaut :</p>
                     <div style="background:#000; padding:12px; font-size:12px; margin-bottom:15px; border-radius:6px; word-break:break-all; color:#4cd137;" id="settings-install-path">${esc(currentPath)}</div>
 
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
-                        <button class="btn" style="background:#0984e3; color:white; flex:1;" onclick="choisirDossierDefaut()">Modifier le dossier</button>
-                        <button class="btn" style="background:#333; color:white; flex:1;" onclick="document.getElementById('settings-modal').style.display='none'">Fermer</button>
+                        <button class="btn btn-accent" style="flex: 1;" onclick="choisirDossierDefaut()">Modifier le dossier</button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('settings-modal').style.display='none'">Fermer</button>
                     </div>
                 </div>
             </div>
