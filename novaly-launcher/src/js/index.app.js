@@ -1633,15 +1633,18 @@ window.telechargerJeu = async function(gameId) {
 };
 
 // ================= SAUVEGARDES CLOUD =================
-// Un jeu les active avec le champ Firestore sauvegarde_{mac,win,linux} : le dossier où il écrit
-// ses sauvegardes, qui commence par {jeu} (dossier d'installation), {home}, {donnees}
-// (AppData\Roaming, Application Support, ~/.local/share) ou {documents}.
-// Ex. : "{donnees}/MonStudio/MonJeu/Saves".  Le transfert est fait en Rust (src-tauri/src/sauvegardes.rs).
+// Une seule sauvegarde en ligne par joueur et par jeu, partagée entre Mac, Windows et Linux :
+// seul l'emplacement du dossier sur le disque change selon le système.
+// Champ Firestore du jeu : "sauvegarde" (commun aux 3 systèmes) et/ou sauvegarde_{mac,win,linux}
+// (prioritaire, si le jeu range ses fichiers différemment selon le système). Le chemin commence par
+// {jeu} (dossier d'installation), {home}, {donnees} (AppData\Roaming, Application Support,
+// ~/.local/share) ou {documents}. Ex. : "{donnees}/MonStudio/MonJeu/Saves".
+// Le transfert est fait en Rust (src-tauri/src/sauvegardes.rs).
 const cloudActif = () => { try { return localStorage.getItem('novaly_sauvegardes_cloud') !== 'off'; } catch (e) { return true; } };
 const cleSync = (gameId) => `sauvegarde_sync_${auth.currentUser.uid}_${gameId}`;
 
 async function dossierSauvegarde(gameId, gameData) {
-    const modele = gameData && gameData['sauvegarde_' + await systemeJoueur()];
+    const modele = gameData && (gameData['sauvegarde_' + await systemeJoueur()] || gameData.sauvegarde);
     if (!modele || typeof modele !== 'string') return null;
     const p = window.__TAURI__.path;
     const racines = {

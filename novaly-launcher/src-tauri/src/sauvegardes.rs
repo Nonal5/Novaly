@@ -231,6 +231,12 @@ mod tests {
         std::fs::write(src.join("sous/dossier/b.sav"), vec![7u8; 10_000]).unwrap();
         let octets = zipper(&src).unwrap();
 
+        // Archive portable Mac / Windows / Linux : séparateurs "/" uniquement
+        let archive = zip::ZipArchive::new(Cursor::new(octets.clone())).unwrap();
+        let noms: Vec<&str> = archive.file_names().collect();
+        assert!(noms.contains(&"sous/dossier/b.sav"));
+        assert!(noms.iter().all(|n| !n.contains('\\')));
+
         let dst = base.join("dst");
         std::fs::create_dir_all(&dst).unwrap();
         std::fs::write(dst.join("local.sav"), b"ancien").unwrap();
