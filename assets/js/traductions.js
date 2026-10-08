@@ -206,7 +206,12 @@
         "Support": ["Support", "Soporte", "Support", "Supporto"],
         "Tous droits réservés.": ["All rights reserved.", "Todos los derechos reservados.", "Alle Rechte vorbehalten.", "Tutti i diritti riservati."],
         "Bientôt disponible": ["Coming soon", "Próximamente", "Demnächst", "Prossimamente"],
-        "Bientôt": ["Soon", "Pronto", "Bald", "Presto"]
+        "Bientôt": ["Soon", "Pronto", "Bald", "Presto"],
+        "Sauvegardes cloud (jeux compatibles)": ["Cloud saves (supported games)", "Guardado en la nube (juegos compatibles)", "Cloud-Speicherstände (unterstützte Spiele)", "Salvataggi cloud (giochi compatibili)"],
+        "Récupération de votre sauvegarde cloud…": ["Downloading your cloud save…", "Descargando tu partida en la nube…", "Cloud-Speicherstand wird geladen…", "Recupero del salvataggio cloud…"],
+        "Sauvegarde cloud récupérée.": ["Cloud save restored.", "Partida en la nube recuperada.", "Cloud-Speicherstand wiederhergestellt.", "Salvataggio cloud recuperato."],
+        "Sauvegarde envoyée dans le cloud.": ["Save uploaded to the cloud.", "Partida guardada en la nube.", "Speicherstand in die Cloud hochgeladen.", "Salvataggio caricato nel cloud."],
+        "Sauvegarde cloud indisponible : la partie démarre avec la sauvegarde locale.": ["Cloud save unavailable: the game starts with the local save.", "Guardado en la nube no disponible: el juego empieza con la partida local.", "Cloud-Speicherstand nicht verfügbar: Das Spiel startet mit dem lokalen Speicherstand.", "Salvataggio cloud non disponibile: il gioco parte con il salvataggio locale."]
     };
 
     // Textes avec une partie variable (prix, version…) : [motif, [en, es, de, it]] ; $1 = partie variable

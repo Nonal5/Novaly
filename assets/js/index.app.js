@@ -2,7 +2,7 @@
 // Différences : pas d'installation/lancement de jeux ni de mise à jour (réservés au launcher) ;
 // les jeux possédés s'ouvrent dans le launcher via le lien novaly://.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getAuth, updateProfile, onAuthStateChanged, signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc, onSnapshot, orderBy, arrayUnion, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
@@ -1154,5 +1154,376 @@ window.envoyerContact = async function() {
     } finally {
         btn.disabled = false;
         btn.innerText = texteBtn;
+    }
+};
+
+// ================= MOYENS DE PAIEMENT (cartes enregistrées) =================
+const ENDPOINT_MOYENS_PAIEMENT = "https://us-central1-novaly-a80f7.cloudfunctions.net/moyensPaiement";
+
+window.chargerMoyensPaiement = async function() {
+    const container = document.getElementById('payment-methods-list');
+    if (!container) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+        container.innerHTML = '<p style="color:#888;font-size:13px;">Connectez-vous pour voir vos cartes.</p>';
+        return;
+    }
+    container.innerHTML = '<p style="color:#888;font-size:13px;">Chargement…</p>';
+
+    try {
+        const idToken = await user.getIdToken();
+        const reponse = await fetch(`${ENDPOINT_MOYENS_PAIEMENT}?action=list`, {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${idToken}` }
+        });
+        const data = await reponse.json();
+
+        if (!data.success) {
+            container.innerHTML = `<p style="color:#ff6b6b;font-size:13px;">${esc(data.error || 'Erreur')}</p>`;
+            return;
+        }
+        if (!data.cartes || data.cartes.length === 0) {
+            container.innerHTML = '<p style="color:#888;font-size:13px;">Aucune carte enregistrée.</p>';
+            return;
+        }
+
+        container.innerHTML = data.cartes.map(c => `
+            <div class="panel" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; flex-wrap: wrap; gap: 10px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="text-transform:uppercase;font-weight:bold;">${esc(c.marque)}</span>
+                    <span style="color:#aaa;">•••• ${esc(c.dernier4)}</span>
+                    <span style="color:#888;font-size:12px;">Exp. ${esc(String(c.mois).padStart(2, '0'))}/${esc(c.annee)}</span>
+                </div>
+                <button class="btn btn-ghost btn-ghost-danger btn-sm" onclick="supprimerCarte('${esc(c.id)}')">Supprimer</button>
+            </div>
+        `).join('');
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = '<p style="color:#ff6b6b;font-size:13px;">Erreur réseau.</p>';
+    }
+};
+
+window.ajouterCarte = async function() {
+    const user = auth.currentUser;
+    if (!user) {
+        notifier("Veuillez vous connecter.", { type: 'erreur' });
+        return;
+    }
+    try {
+        const idToken = await user.getIdToken();
+        const reponse = await fetch(ENDPOINT_MOYENS_PAIEMENT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
+            body: JSON.stringify({ action: "add", retour: "site" })
+        });
+        const data = await reponse.json();
+
+        if (data.url) {
+            // Stripe renvoie ensuite vers novaly-store.fr/#profile
+            window.location.href = data.url;
+        } else {
+            notifier(data.error || "Impossible d'ouvrir la page d'ajout de carte.", { type: 'erreur' });
+        }
+    } catch (e) {
+        console.error(e);
+        notifier("Erreur réseau.", { type: 'erreur' });
+    }
+};
+
+window.supprimerCarte = async function(paymentMethodId) {
+    const user = auth.currentUser;
+    if (!user) return;
+    if (!confirm("Supprimer cette carte ?")) return;
+
+    try {
+        const idToken = await user.getIdToken();
+        const reponse = await fetch(ENDPOINT_MOYENS_PAIEMENT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
+            body: JSON.stringify({ action: "delete", paymentMethodId })
+        });
+        const data = await reponse.json();
+
+        if (data.success) {
+            notifier("Carte supprimée.", { type: 'succes' });
+            chargerMoyensPaiement();
+        } else {
+            notifier(data.error || "Suppression impossible.", { type: 'erreur' });
+        }
+    } catch (e) {
+        console.error(e);
+        notifier("Erreur réseau.", { type: 'erreur' });
+    }
+};
+
+// ================= CODE D'ACTIVATION =================
+const ENDPOINT_UTILISER_CODE = "https://us-central1-novaly-a80f7.cloudfunctions.net/utiliserCode";
+
+window.utiliserCode = async function() {
+    const user = auth.currentUser;
+    if (!user) {
+        notifier("Veuillez vous connecter.", { type: 'erreur' });
+        return;
+    }
+    const input = document.getElementById('code-input');
+    const code = input ? input.value.trim() : '';
+    if (!code) {
+        notifier("Saisissez un code.", { type: 'erreur' });
+        return;
+    }
+
+    try {
+        const idToken = await user.getIdToken();
+        const reponse = await fetch(ENDPOINT_UTILISER_CODE, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
+            body: JSON.stringify({ code })
+        });
+        const data = await reponse.json();
+
+        if (data.success) {
+            notifier(`Code validé : « ${data.titre} » ajouté à votre bibliothèque !`, { type: 'succes' });
+            if (input) input.value = '';
+            // Met à jour la bibliothèque en mémoire + rafraîchit l'affichage
+            window.mesJeux = window.mesJeux || [];
+            if (!window.mesJeux.includes(data.gameId)) window.mesJeux.push(data.gameId);
+            if (typeof actualiserBibliotheque === 'function') actualiserBibliotheque();
+        } else {
+            notifier(data.error || "Code invalide.", { type: 'erreur' });
+        }
+    } catch (e) {
+        console.error(e);
+        notifier("Erreur réseau.", { type: 'erreur' });
+    }
+};
+
+// ================= CHANGEMENT DE MOT DE PASSE =================
+window.changerMotDePasse = async function() {
+    const user = auth.currentUser;
+    const msg = document.getElementById('pwd-msg');
+    const show = (texte, ok) => {
+        if (!msg) return;
+        msg.style.display = 'block';
+        msg.style.color = ok ? '#2ecc71' : '#ff6b6b';
+        msg.innerText = texte;
+    };
+
+    if (!user || !user.email) { show("Vous devez être connecté.", false); return; }
+
+    const actuel = document.getElementById('pwd-current').value;
+    const nouveau = document.getElementById('pwd-new').value;
+    const confirme = document.getElementById('pwd-confirm').value;
+
+    if (!actuel || !nouveau || !confirme) { show("Remplissez tous les champs.", false); return; }
+    if (nouveau.length < 6) { show("Le nouveau mot de passe doit faire au moins 6 caractères.", false); return; }
+    if (nouveau !== confirme) { show("Les deux nouveaux mots de passe ne correspondent pas.", false); return; }
+
+    try {
+        // Ré-authentification obligatoire avant un changement sensible
+        const credential = EmailAuthProvider.credential(user.email, actuel);
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, nouveau);
+
+        // La ré-authentification ouvre une nouvelle session : avec l'A2F, il faut
+        // la valider par un code (la page de connexion s'en charge).
+        if ((await getDoc(doc(db, "a2f_actif", user.uid))).exists()) {
+            notifier("Mot de passe mis à jour. Confirmez avec le code reçu par e-mail.", { type: 'succes' });
+            setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+            return;
+        }
+
+        show("Mot de passe mis à jour.", true);
+        document.getElementById('pwd-current').value = '';
+        document.getElementById('pwd-new').value = '';
+        document.getElementById('pwd-confirm').value = '';
+    } catch (e) {
+        console.error(e);
+        if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+            show("Mot de passe actuel incorrect.", false);
+        } else if (e.code === 'auth/weak-password') {
+            show("Nouveau mot de passe trop faible.", false);
+        } else if (e.code === 'auth/requires-recent-login') {
+            show("Reconnectez-vous puis réessayez.", false);
+        } else {
+            show("Erreur : " + (e.message || e.code), false);
+        }
+    }
+};
+
+// ================= 2FA E-MAIL (onglet Sécurité) =================
+const ENDPOINT_ENVOYER_CODE_2FA = "https://us-central1-novaly-a80f7.cloudfunctions.net/envoyerCode2FA";
+const ENDPOINT_VERIFIER_CODE_2FA = "https://us-central1-novaly-a80f7.cloudfunctions.net/verifierCode2FA";
+
+// L'état de référence est a2f_actif/{uid} = {email, app} (écrit seulement par le serveur).
+window.charger2faEmailState = async function() {
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        const snap = await getDoc(doc(db, "a2f_actif", user.uid));
+        const d = snap.exists() ? snap.data() : {};
+        const etat = { 'btn-2fa-email': d.email === true || d.methode === 'email', 'btn-2fa-app': d.app === true };
+        for (const [id, on] of Object.entries(etat)) {
+            const btn = document.getElementById(id);
+            if (!btn) continue;
+            btn.dataset.state = on ? 'on' : 'off';
+            btn.innerText = on ? 'Désactiver' : 'Activer';
+            btn.style.background = on ? '#ff6b6b' : '#0984e3';
+        }
+    } catch (e) { /* lecture best-effort */ }
+};
+
+// ================= A2F PAR APPLICATION (TOTP) =================
+const ENDPOINT_A2F_APP = "https://us-central1-novaly-a80f7.cloudfunctions.net/a2fApp";
+
+async function appelA2fApp(corps) {
+    const r = await fetch(ENDPOINT_A2F_APP, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${await auth.currentUser.getIdToken()}` },
+        body: JSON.stringify(corps)
+    });
+    return r.json().catch(() => ({ error: "Réponse invalide du serveur." }));
+}
+
+window.fermer2faAppBox = function() {
+    document.getElementById('twofa-app-box').style.display = 'none';
+    document.getElementById('twofa-app-code').value = '';
+};
+
+// Activer : QR code à scanner. Désactiver : demande un code (application ou secours).
+window.toggle2faApp = async function() {
+    const btn = document.getElementById('btn-2fa-app');
+    const box = document.getElementById('twofa-app-box');
+    if (!auth.currentUser || !btn) return;
+    const enabling = btn.dataset.state !== 'on';
+    box.dataset.action = enabling ? 'enable' : 'disable';
+    document.getElementById('twofa-app-qr-zone').style.display = enabling ? 'block' : 'none';
+    document.getElementById('twofa-app-consigne').innerText = enabling
+        ? "Scannez le QR code avec votre application, puis saisissez le code à 6 chiffres affiché."
+        : "Pour désactiver, saisissez un code de votre application (ou un code de secours).";
+    if (enabling) {
+        btn.disabled = true;
+        try {
+            const d = await appelA2fApp({ action: 'setup' });
+            if (!d.success) { notifier(d.error || "Configuration impossible.", { type: 'erreur' }); return; }
+            document.getElementById('twofa-app-qr').src = d.qr;
+            document.getElementById('twofa-app-secret').innerText = d.secret.replace(/(.{4})/g, '$1 ').trim();
+        } catch (e) {
+            notifier("Erreur réseau.", { type: 'erreur' }); return;
+        } finally { btn.disabled = false; }
+    }
+    box.style.display = 'flex';
+    document.getElementById('twofa-app-code').focus();
+};
+
+window.valider2faApp = async function() {
+    const box = document.getElementById('twofa-app-box');
+    const code = document.getElementById('twofa-app-code').value.trim();
+    const enabling = box.dataset.action === 'enable';
+    if (enabling ? !/^\d{6}$/.test(code) : !/^(\d{6}|[A-Za-z0-9]{4}-?[A-Za-z0-9]{4})$/.test(code)) {
+        notifier(enabling ? "Le code contient 6 chiffres." : "Code de l'application (6 chiffres) ou code de secours attendu.", { type: 'erreur' });
+        return;
+    }
+    try {
+        const d = await appelA2fApp({ action: enabling ? 'enable' : 'disable', code });
+        if (!d.success) { notifier(d.error || "Code incorrect.", { type: 'erreur' }); return; }
+        fermer2faAppBox();
+        if (enabling) {
+            document.getElementById('twofa-app-secours-liste').innerText = d.codesSecours.join('\n');
+            document.getElementById('twofa-app-secours').style.display = 'block';
+            notifier("Application d'authentification activée.", { type: 'succes' });
+        } else {
+            notifier("Application d'authentification désactivée.", { type: 'succes' });
+        }
+    } catch (e) {
+        notifier("Erreur réseau.", { type: 'erreur' });
+    } finally {
+        charger2faEmailState();
+    }
+};
+
+window.copierCodesSecours = async function() {
+    try {
+        await navigator.clipboard.writeText(document.getElementById('twofa-app-secours-liste').innerText);
+        notifier("Codes copiés.", { type: 'succes' });
+    } catch (e) { notifier("Copie impossible : sélectionnez-les à la main.", { type: 'erreur' }); }
+};
+
+// Alerte laissée par la page de connexion (ex. peu de codes de secours restants).
+try {
+    const alerte = localStorage.getItem('a2f_alerte');
+    if (alerte) { localStorage.removeItem('a2f_alerte'); setTimeout(() => notifier(alerte, { duree: 0 }), 1500); }
+} catch (e) { /* stockage indisponible */ }
+
+window.fermer2faEmailBox = function() {
+    const box = document.getElementById('twofa-email-box');
+    if (box) box.style.display = 'none';
+    document.getElementById('twofa-email-code').value = '';
+};
+
+// Étape 1 : envoi du code par e-mail, puis affichage du champ de saisie.
+window.toggle2faEmail = async function() {
+    const btn = document.getElementById('btn-2fa-email');
+    const user = auth.currentUser;
+    if (!btn || !user) return;
+    const enabling = btn.dataset.state !== 'on';
+
+    if (!enabling && !(await confirmer("Désactiver la vérification par e-mail ?", { confirmer: "Désactiver", danger: true }))) return;
+
+    btn.disabled = true;
+    try {
+        const idToken = await user.getIdToken();
+        const envoi = await fetch(ENDPOINT_ENVOYER_CODE_2FA, {
+            method: "POST", headers: { "Authorization": `Bearer ${idToken}` }
+        });
+        const envoiData = await envoi.json();
+        // 429 = un code envoyé il y a moins d'une minute est toujours valable
+        if (!envoiData.success && envoi.status !== 429) {
+            notifier(envoiData.error || "Envoi du code impossible.", { type: 'erreur' });
+            return;
+        }
+        if (envoiData.error) notifier(envoiData.error);
+        const box = document.getElementById('twofa-email-box');
+        box.dataset.action = enabling ? 'enable' : 'disable';
+        box.style.display = 'flex';
+        document.getElementById('twofa-email-code').focus();
+    } catch (e) {
+        console.error(e);
+        notifier("Erreur réseau.", { type: 'erreur' });
+    } finally {
+        btn.disabled = false;
+    }
+};
+
+// Étape 2 : vérification du code + activation/désactivation côté serveur.
+window.valider2faEmail = async function() {
+    const user = auth.currentUser;
+    const box = document.getElementById('twofa-email-box');
+    const code = document.getElementById('twofa-email-code').value.trim();
+    if (!user || !box) return;
+    if (!/^\d{6}$/.test(code)) {
+        notifier("Le code contient 6 chiffres.", { type: 'erreur' });
+        return;
+    }
+    const enabling = box.dataset.action === 'enable';
+    try {
+        const idToken = await user.getIdToken();
+        const verif = await fetch(ENDPOINT_VERIFIER_CODE_2FA, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
+            body: JSON.stringify({ code, action: enabling ? 'enable' : 'disable' })
+        });
+        const verifData = await verif.json();
+        if (verifData.success) {
+            fermer2faEmailBox();
+            notifier(enabling ? "Vérification par e-mail activée." : "Vérification par e-mail désactivée.", { type: 'succes' });
+        } else {
+            notifier(verifData.error || "Code incorrect.", { type: 'erreur' });
+        }
+    } catch (e) {
+        console.error(e);
+        notifier("Erreur réseau.", { type: 'erreur' });
+    } finally {
+        charger2faEmailState();
     }
 };

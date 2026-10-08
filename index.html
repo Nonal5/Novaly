@@ -413,22 +413,62 @@
                     </div>
 
                     <div id="tab-security" class="profile-tab-content">
+                        <h3>Changer le mot de passe</h3>
+                        <div class="panel" style="padding: 20px; margin-bottom: 30px; display: flex; flex-direction: column; gap: 12px; max-width: 420px;">
+                            <input type="password" id="pwd-current" placeholder="Mot de passe actuel" style="padding: 12px;">
+                            <input type="password" id="pwd-new" placeholder="Nouveau mot de passe (6 caractères min.)" style="padding: 12px;">
+                            <input type="password" id="pwd-confirm" placeholder="Confirmer le nouveau mot de passe" style="padding: 12px;">
+                            <button class="btn btn-accent" onclick="changerMotDePasse()">Mettre à jour le mot de passe</button>
+                            <p id="pwd-msg" style="font-size: 12px; margin: 0; display: none;"></p>
+                        </div>
+
                         <h3>Authentification à deux facteurs (A2F)</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés. Cette fonctionnalité arrive bientôt.</p>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Protégez votre compte des accès non autorisés : à chaque nouvelle connexion, un code vous sera demandé.</p>
                         
                         <div class="panel" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
                             <div>
                                 <strong>Application d'authentification</strong>
-                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Utilisez Google Authenticator ou Authy.</p>
+                                <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Utilisez Google Authenticator, Authy ou 1Password.</p>
                             </div>
-                            <button class="btn btn-secondary" disabled style="width: 100px;">Bientôt</button>
+                            <button class="btn btn-accent" id="btn-2fa-app" onclick="toggle2faApp()" style="width: 120px;">Activer</button>
+                            <!-- Configuration : QR code à scanner puis code de confirmation -->
+                            <div id="twofa-app-box" style="display: none; width: 100%; gap: 16px; align-items: flex-start; flex-wrap: wrap;">
+                                <div id="twofa-app-qr-zone" style="text-align: center;">
+                                    <img id="twofa-app-qr" alt="QR code à scanner" style="width: 180px; height: 180px; background: #fff; border-radius: 8px; padding: 6px;">
+                                    <p style="font-size: 11px; color: #888; margin: 6px 0 0;">Clé manuelle :</p>
+                                    <code id="twofa-app-secret" style="font-size: 11px; color: #ccc; word-break: break-all; display: block; max-width: 190px; user-select: all;"></code>
+                                </div>
+                                <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 10px;">
+                                    <p id="twofa-app-consigne" style="margin: 0; font-size: 12px; color: #aaa;">Scannez le QR code avec votre application, puis saisissez le code à 6 chiffres affiché.</p>
+                                    <input type="text" id="twofa-app-code" inputmode="numeric" maxlength="9" placeholder="000000" autocomplete="one-time-code" style="padding: 10px; width: 150px; text-align: center; letter-spacing: 4px;" onkeydown="if(event.key==='Enter') valider2faApp()">
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-accent" onclick="valider2faApp()">Valider</button>
+                                        <button class="btn btn-secondary" onclick="fermer2faAppBox()">Annuler</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Codes de secours : affichés UNE seule fois après l'activation -->
+                            <div id="twofa-app-secours" style="display: none; width: 100%;">
+                                <p style="margin: 0 0 8px; font-size: 13px; color: #f5b041;"><strong>Notez ces codes de secours maintenant.</strong> Ils permettent de vous connecter si vous perdez votre téléphone. Chacun ne sert qu'une fois et ils ne seront plus affichés.</p>
+                                <pre class="panel-inset" id="twofa-app-secours-liste" style="padding: 12px; font-size: 14px; letter-spacing: 1px; column-count: 2; margin: 0 0 10px; user-select: all;"></pre>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary" onclick="copierCodesSecours()">Copier les codes</button>
+                                    <button class="btn btn-accent" onclick="document.getElementById('twofa-app-secours').style.display='none'">C'est noté</button>
+                                </div>
+                            </div>
                         </div>
                         <div class="panel" style="padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                             <div>
                                 <strong>Authentification par E-mail</strong>
                                 <p style="margin: 5px 0 0; font-size: 12px; color: #aaa;">Recevez un code à votre e-mail.</p>
                             </div>
-                            <button class="btn btn-secondary" disabled style="width: 100px;">Bientôt</button>
+                            <button class="btn btn-accent" id="btn-2fa-email" onclick="toggle2faEmail()" style="width: 120px;">Activer</button>
+                            <div id="twofa-email-box" style="display: none; width: 100%; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <p style="margin: 0; width: 100%; font-size: 12px; color: #aaa;">Saisissez le code à 6 chiffres envoyé à votre adresse e-mail.</p>
+                                <input type="text" id="twofa-email-code" inputmode="numeric" maxlength="6" placeholder="000000" style="padding: 10px; width: 120px; text-align: center; letter-spacing: 4px;">
+                                <button class="btn btn-accent" onclick="valider2faEmail()">Valider</button>
+                                <button class="btn btn-secondary" onclick="fermer2faEmailBox()">Annuler</button>
+                            </div>
                         </div>
                     </div>
 
@@ -448,8 +488,12 @@
                         </div>
 
                         <h3>Moyens de paiement</h3>
-                        <div class="panel" style="padding: 20px; font-size: 13px; line-height: 1.6;">
-                            Vos achats sont réglés sur la page de paiement sécurisée de <strong style="color: #fff;">Stripe</strong>.
+                        <div id="payment-methods-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                            <p style="color: #888; font-size: 13px;">Chargement…</p>
+                        </div>
+                        <button class="btn btn-accent" onclick="ajouterCarte()">+ Ajouter une carte</button>
+                        <div class="panel" style="padding: 20px; font-size: 13px; line-height: 1.6; margin-top: 20px;">
+                            Vos cartes sont enregistrées en toute sécurité par <strong style="color: #fff;">Stripe</strong>.
                             Novaly ne voit ni ne conserve jamais votre numéro de carte.
                         </div>
                     </div>
@@ -480,11 +524,11 @@
 
                     <div id="tab-code" class="profile-tab-content">
                         <h3>Utiliser un code</h3>
-                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Saisissez un code pour débloquer des cosmétiques ou des crédits Novaly.</p>
+                        <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Saisissez un code pour débloquer un jeu dans votre bibliothèque.</p>
                         <div class="form-group">
-                            <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
+                            <input type="text" id="code-input" maxlength="25" placeholder="XXXX-XXXX-XXXX-XXXX" style="font-size: 20px; text-transform: uppercase; text-align: center; letter-spacing: 3px; padding: 20px;">
                         </div>
-                        <button class="btn btn-secondary btn-bloc" disabled>Bientôt disponible</button>
+                        <button class="btn btn-accent btn-bloc" onclick="utiliserCode()">Valider le code</button>
                     </div>
 
                     <div id="tab-parental" class="profile-tab-content">

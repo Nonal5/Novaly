@@ -240,6 +240,15 @@ window.addEventListener('DOMContentLoaded', () => {
             element.classList.add('active');
             document.getElementById('tab-' + tabId).classList.add('active');
 
+            // Charge les cartes enregistrées à l'ouverture de l'onglet paiement.
+            if (tabId === 'payment' && typeof chargerMoyensPaiement === 'function') {
+                chargerMoyensPaiement();
+            }
+            // Reflète l'état de l'A2F à l'ouverture de l'onglet sécurité.
+            if (tabId === 'security' && typeof charger2faEmailState === 'function') {
+                charger2faEmailState();
+            }
+
             // Auto-scroll pour rendre l'onglet visible sur mobile
             const sidebar = document.getElementById('profileSidebar');
             if (sidebar && window.innerWidth <= 1024) {
