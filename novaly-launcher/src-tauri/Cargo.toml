@@ -28,6 +28,10 @@ tauri-plugin-shell = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-os = "2"
 tauri-plugin-deep-link = "2.0.0"
+# Sauvegardes cloud (src/sauvegardes.rs) : mêmes versions que celles déjà utilisées par le plugin updater
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-no-provider"] }
+rustls = { version = "0.23", default-features = false, features = ["ring"] }
+zip = { version = "4", default-features = false, features = ["deflate"] }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"

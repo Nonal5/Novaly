@@ -1632,6 +1632,75 @@ window.telechargerJeu = async function(gameId) {
     }
 };
 
+// ================= SAUVEGARDES CLOUD =================
+// Un jeu les active avec le champ Firestore sauvegarde_{mac,win,linux} : le dossier où il écrit
+// ses sauvegardes, qui commence par {jeu} (dossier d'installation), {home}, {donnees}
+// (AppData\Roaming, Application Support, ~/.local/share) ou {documents}.
+// Ex. : "{donnees}/MonStudio/MonJeu/Saves".  Le transfert est fait en Rust (src-tauri/src/sauvegardes.rs).
+const cloudActif = () => { try { return localStorage.getItem('novaly_sauvegardes_cloud') !== 'off'; } catch (e) { return true; } };
+const cleSync = (gameId) => `sauvegarde_sync_${auth.currentUser.uid}_${gameId}`;
+
+async function dossierSauvegarde(gameId, gameData) {
+    const modele = gameData && gameData['sauvegarde_' + await systemeJoueur()];
+    if (!modele || typeof modele !== 'string') return null;
+    const p = window.__TAURI__.path;
+    const racines = {
+        '{jeu}': () => localStorage.getItem('install_path_' + gameId),
+        '{home}': () => p.homeDir(),
+        '{donnees}': () => p.dataDir(),
+        '{documents}': () => p.documentDir(),
+    };
+    const jeton = Object.keys(racines).find(j => modele.startsWith(j));
+    const reste = jeton && modele.slice(jeton.length).split(/[\\/]+/).filter(Boolean);
+    if (!jeton || reste.some(m => m === '..')) { console.warn("Dossier de sauvegarde invalide :", modele); return null; }
+    const racine = await racines[jeton]();
+    return racine ? p.join(racine, ...reste) : null;
+}
+
+// Avant de jouer : si la sauvegarde en ligne a changé depuis la dernière synchro
+// (partie jouée sur un autre ordinateur), on la récupère. Les fichiers locaux sont
+// gardés dans <dossier>.avant-cloud.zip.
+async function recupererSauvegarde(gameId, gameData) {
+    if (!cloudActif() || !auth.currentUser) return null;
+    const dossier = await dossierSauvegarde(gameId, gameData);
+    if (!dossier) return null;
+    const objet = `saves/${auth.currentUser.uid}/${gameId}.zip`;
+    try {
+        const jeton = await auth.currentUser.getIdToken();
+        const enLigne = await window.__TAURI__.core.invoke('sauvegarde_infos', { objet, jeton });
+        if (enLigne && enLigne !== localStorage.getItem(cleSync(gameId))) {
+            notifier("Récupération de votre sauvegarde cloud…", { icone: 'cloud' });
+            await window.__TAURI__.core.invoke('sauvegarde_recuperer', { dossier, objet, jeton });
+            localStorage.setItem(cleSync(gameId), enLigne);
+            notifier("Sauvegarde cloud récupérée.", { type: 'succes', icone: 'cloud' });
+        }
+    } catch (e) {
+        console.error("Sauvegarde cloud :", e);
+        notifier("Sauvegarde cloud indisponible : la partie démarre avec la sauvegarde locale.", { type: 'erreur' });
+    }
+    return dossier;
+}
+
+// Après la session : envoi du dossier de sauvegarde.
+async function envoyerSauvegarde(gameId, dossier) {
+    if (!dossier || !cloudActif() || !auth.currentUser) return;
+    try {
+        const jeton = await auth.currentUser.getIdToken();
+        const date = await window.__TAURI__.core.invoke('sauvegarde_envoyer', {
+            dossier, objet: `saves/${auth.currentUser.uid}/${gameId}.zip`, jeton
+        });
+        if (date) {
+            localStorage.setItem(cleSync(gameId), date);
+            notifier("Sauvegarde envoyée dans le cloud.", { type: 'succes', icone: 'cloud' });
+        }
+    } catch (e) {
+        console.error("Sauvegarde cloud :", e);
+        notifier("Envoi de la sauvegarde cloud impossible : " + e, { type: 'erreur' });
+    }
+}
+
+window.sauvegardesEnCours = {};
+
 // On ajoute gameId et gameTitle dans les paramètres pour que le compteur sache quoi traquer !
 window.lancerJeuInstalle = async function(cheminExec, gameId, gameTitle) {
     // 1. On lance le chrono et on met à jour le statut Firebase
@@ -1648,7 +1717,13 @@ window.lancerJeuInstalle = async function(cheminExec, gameId, gameTitle) {
         `;
     }
 
-    // 3. Lancement physique du jeu sur l'OS
+    // 3. Sauvegarde cloud plus récente ? On la récupère avant que le jeu ne démarre.
+    try {
+        const gameData = (await getDoc(doc(db, "games", gameId))).data();
+        window.sauvegardesEnCours[gameId] = await recupererSauvegarde(gameId, gameData);
+    } catch (e) { console.error(e); }
+
+    // 4. Lancement physique du jeu sur l'OS
     try {
         const { type } = window.__TAURI__.os;
         const systeme = await systemeJoueur();
@@ -1672,6 +1747,10 @@ window.lancerJeuInstalle = async function(cheminExec, gameId, gameTitle) {
 window.signalerFinDeJeu = async function(gameId) {
     // On arrête le chrono, on calcule les minutes et on repasse le profil "En ligne"
     await window.terminerSessionJeu();
+
+    const dossier = window.sauvegardesEnCours[gameId];
+    delete window.sauvegardesEnCours[gameId];
+    envoyerSauvegarde(gameId, dossier);
 
     // On recharge l'interface de la page pour remettre le bouton "► Jouer"
     if (window.afficherPageJeu) {
@@ -1713,6 +1792,11 @@ window.ouvrirParametres = async function() {
                     <p style="color:#aaa; font-size:12px; font-weight:bold; text-transform:uppercase; margin-top:20px;">Dossier d'installation par défaut :</p>
                     <div style="background:#000; padding:12px; font-size:12px; margin-bottom:15px; border-radius:6px; word-break:break-all; color:#4cd137;" id="settings-install-path">${esc(currentPath)}</div>
 
+                    <label style="display:flex; gap:10px; align-items:center; color:#ddd; font-size:13px; margin-top:20px;">
+                        <input type="checkbox" id="settings-cloud" ${cloudActif() ? 'checked' : ''} onchange="try { localStorage.setItem('novaly_sauvegardes_cloud', this.checked ? 'on' : 'off'); } catch (e) {}">
+                        Sauvegardes cloud (jeux compatibles)
+                    </label>
+
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button class="btn btn-accent" style="flex: 1;" onclick="choisirDossierDefaut()">Modifier le dossier</button>
                         <button class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('settings-modal').style.display='none'">Fermer</button>
@@ -1722,6 +1806,7 @@ window.ouvrirParametres = async function() {
         `);
     } else {
         document.getElementById('settings-install-path').innerText = currentPath;
+        document.getElementById('settings-cloud').checked = cloudActif();
         modal.style.display = 'flex';
     }
 };

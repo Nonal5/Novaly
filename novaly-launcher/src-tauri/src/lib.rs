@@ -1,4 +1,6 @@
 use tauri::Manager;
+
+mod sauvegardes;
 #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
 use tauri_plugin_deep_link::DeepLinkExt;
 
@@ -47,7 +49,12 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![lancer_jeu])
+        .invoke_handler(tauri::generate_handler![
+            lancer_jeu,
+            sauvegardes::sauvegarde_infos,
+            sauvegardes::sauvegarde_envoyer,
+            sauvegardes::sauvegarde_recuperer
+        ])
         .setup(|app| {
             // Linux (AppImage) et Windows en développement : le schéma novaly:// doit être
             // enregistré au lancement (les installeurs Mac / Windows le font eux-mêmes)
