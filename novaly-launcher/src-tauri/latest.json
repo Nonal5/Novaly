@@ -1,51 +1,51 @@
 {
-  "version": "1.0.97",
-  "notes": "ADD: Social on web",
-  "pub_date": "2026-10-07T13:21:02.900Z",
+  "version": "1.0.99",
+  "notes": "maj",
+  "pub_date": "2026-10-09T12:30:23.134Z",
   "platforms": {
     "darwin-aarch64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQU43ZkJicXZnMzJRc3BGSXR3dmZTNmVZL2NCNVh5V1lDNWhVaUlrSW5SM2VoLzFMMlZDVnVVbXBUYXpKQnl6WGRla0F0M08vOWhOSDNHSExqVHluWkFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc3OTgwCWZpbGU6Tm92YWx5LmFwcC50YXIuZ3oKYXdQV1VIR2w3SUlnQjYzWDA0Q1RVeUNEYXFZRERpVHRMamFPRTlqNDVNQjVkcFc1bExVbTJISjNwbitNMDZRVlBBOUFWeHF0aHk5VlhqYWxjUHdLQlE9PQo=",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_aarch64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQU83Wk5oNUVkNlM0SFc1aXhUVVZtWHM0OFJaQkdTNVQ4V3hoTHhrVnpDR29qYXE4UXZzUnlzdVhPNmRrcE9VUllwSnNkWGkzNG9Ic09CemRHZ1dNc0FzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ3ODE4CWZpbGU6Tm92YWx5LmFwcC50YXIuZ3oKVjVZUDRVOE1hUnAyRG9UcC9Ma2hCWUcyb3FHVGg4TFFoeXVqYWkzbHhXSmhRWVp2UHlXYkFzY3BpanJLMVdnNUFEcHpCNWdnTU9QOEVZMllBcktYQnc9PQo=",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_aarch64.app.tar.gz"
     },
     "darwin-aarch64-app": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQU43ZkJicXZnMzJRc3BGSXR3dmZTNmVZL2NCNVh5V1lDNWhVaUlrSW5SM2VoLzFMMlZDVnVVbXBUYXpKQnl6WGRla0F0M08vOWhOSDNHSExqVHluWkFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc3OTgwCWZpbGU6Tm92YWx5LmFwcC50YXIuZ3oKYXdQV1VIR2w3SUlnQjYzWDA0Q1RVeUNEYXFZRERpVHRMamFPRTlqNDVNQjVkcFc1bExVbTJISjNwbitNMDZRVlBBOUFWeHF0aHk5VlhqYWxjUHdLQlE9PQo=",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_aarch64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQU83Wk5oNUVkNlM0SFc1aXhUVVZtWHM0OFJaQkdTNVQ4V3hoTHhrVnpDR29qYXE4UXZzUnlzdVhPNmRrcE9VUllwSnNkWGkzNG9Ic09CemRHZ1dNc0FzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ3ODE4CWZpbGU6Tm92YWx5LmFwcC50YXIuZ3oKVjVZUDRVOE1hUnAyRG9UcC9Ma2hCWUcyb3FHVGg4TFFoeXVqYWkzbHhXSmhRWVp2UHlXYkFzY3BpanJLMVdnNUFEcHpCNWdnTU9QOEVZMllBcktYQnc9PQo=",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_aarch64.app.tar.gz"
     },
     "darwin-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQU1LaHFuVzM4Z0Z2UGt0RGxwcDdCMzJSRkRlTHVJTEJ3a1pwWDFBQVNpTDZXODZMTWpzaDhlSmtQaEtqWm5NU1hvMSthb1RVdGRSU0RINjl3c3lvN3dRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc4MzM5CWZpbGU6Tm92YWx5LmFwcC50YXIuZ3oKckN4elRXYnpOak5FTnA5Zy9PbytTNEt2cEZDeVJGcjF3bVhRbzAwK3doK1dvWEV1WGZKSmhnMlE2bGJkSDFqd2kzWnNBVDhSMXFTbExLeEIwOVk0RHc9PQo=",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_x64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUtkT1R4NDUwQ1ZKOWM3Z0J4WUVJQmE4RlpLMzU1TGRKK2lwUVlxeXJIQjc1OUtneVVBZFE5TWkxTERjc3cyWjNQUFUvTlBNS1VJMnJyczhidzNLRXdzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ4MTY1CWZpbGU6Tm92YWx5LmFwcC50YXIuZ3oKYXc0SkRzZEk0UjM2Z3dJWm1OK0NLdTF6MXd1SHYrODk4a2FMSWxkVmQ1RTB3QmZ6RzZCYjc1ZDNnaXlOaXpCcWJSOFYxdGo2bUoxYnpYRmgxK1ViQnc9PQo=",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_x64.app.tar.gz"
     },
     "darwin-x86_64-app": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQU1LaHFuVzM4Z0Z2UGt0RGxwcDdCMzJSRkRlTHVJTEJ3a1pwWDFBQVNpTDZXODZMTWpzaDhlSmtQaEtqWm5NU1hvMSthb1RVdGRSU0RINjl3c3lvN3dRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc4MzM5CWZpbGU6Tm92YWx5LmFwcC50YXIuZ3oKckN4elRXYnpOak5FTnA5Zy9PbytTNEt2cEZDeVJGcjF3bVhRbzAwK3doK1dvWEV1WGZKSmhnMlE2bGJkSDFqd2kzWnNBVDhSMXFTbExLeEIwOVk0RHc9PQo=",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_x64.app.tar.gz"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUtkT1R4NDUwQ1ZKOWM3Z0J4WUVJQmE4RlpLMzU1TGRKK2lwUVlxeXJIQjc1OUtneVVBZFE5TWkxTERjc3cyWjNQUFUvTlBNS1VJMnJyczhidzNLRXdzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ4MTY1CWZpbGU6Tm92YWx5LmFwcC50YXIuZ3oKYXc0SkRzZEk0UjM2Z3dJWm1OK0NLdTF6MXd1SHYrODk4a2FMSWxkVmQ1RTB3QmZ6RzZCYjc1ZDNnaXlOaXpCcWJSOFYxdGo2bUoxYnpYRmgxK1ViQnc9PQo=",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_x64.app.tar.gz"
     },
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUpGM3IyNy85UDRSSWVYWGVJQzUxbUF0bXBHUWhVVWRPdVAyd3d2eFd2aFBnTFkwV3Ivd0UxckozL1MvWVFhcFd5TjdlWlZLaHA2M0RsK0o5bGZXbFFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc4Nzg1CWZpbGU6Tm92YWx5XzEuMC45N194NjQtc2V0dXAuZXhlCldPRXN4M2lILyt3SEdpanhKZjV2Y2thMGM2L1NGSDA5MW5TMnZLRER5Z1dRTkRzODlYanllcFMzamZiUTJ3VWFDR3JOZzBLWFhSR3A0dkpPNDZleENnPT0K",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_1.0.97_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUt2WCsycDFOaUxUYTdtN3hGODc5czZVRXBRclg0TmdOR1NIS29zeHpYaklRMXVRalVUVG11VGVVVUhwZWpoOE93R1hLZW1zWGJBYzdzaUlLSmFQSWdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ4NjMxCWZpbGU6Tm92YWx5XzEuMC45OV94NjQtc2V0dXAuZXhlClYyODlSYy9CdU1mZTRuRWpYVTZJWllpL2RGM3NLQlFVZy9KTFJHbk9UekplaGpqVUJVcy96S0VrczBzYS9VZUVBM2JvanJMV0dNNVFnMitteUNIaERBPT0K",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_1.0.99_x64-setup.exe"
     },
     "windows-x86_64-nsis": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUpGM3IyNy85UDRSSWVYWGVJQzUxbUF0bXBHUWhVVWRPdVAyd3d2eFd2aFBnTFkwV3Ivd0UxckozL1MvWVFhcFd5TjdlWlZLaHA2M0RsK0o5bGZXbFFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc4Nzg1CWZpbGU6Tm92YWx5XzEuMC45N194NjQtc2V0dXAuZXhlCldPRXN4M2lILyt3SEdpanhKZjV2Y2thMGM2L1NGSDA5MW5TMnZLRER5Z1dRTkRzODlYanllcFMzamZiUTJ3VWFDR3JOZzBLWFhSR3A0dkpPNDZleENnPT0K",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_1.0.97_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUt2WCsycDFOaUxUYTdtN3hGODc5czZVRXBRclg0TmdOR1NIS29zeHpYaklRMXVRalVUVG11VGVVVUhwZWpoOE93R1hLZW1zWGJBYzdzaUlLSmFQSWdrPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ4NjMxCWZpbGU6Tm92YWx5XzEuMC45OV94NjQtc2V0dXAuZXhlClYyODlSYy9CdU1mZTRuRWpYVTZJWllpL2RGM3NLQlFVZy9KTFJHbk9UekplaGpqVUJVcy96S0VrczBzYS9VZUVBM2JvanJMV0dNNVFnMitteUNIaERBPT0K",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_1.0.99_x64-setup.exe"
     },
     "windows-x86_64-msi": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUVjLzN4RkhJUHM5R1B1bnlreHhNRm50dXZXWTZ0dm95SnVBVmRrcWd6VWlDcVBmMDVvWUFXNU54cm8yd2NmWlFrVFd1QlAzdHBvU1lVUitURnpVbFFjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc4Nzg1CWZpbGU6Tm92YWx5XzEuMC45N194NjRfZW4tVVMubXNpCmFZQ2ZwSXNJc0VVRW5WbGlvTzNhbS9WbVpFMWRFY0EzcGVxRS9uYVJoUm96T3BmaWwzT3BlUGhydnR5V0pXVGV3WXMwODN6ejFaMUUwcFF1cnRhQkFnPT0K",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_1.0.97_x64_en-US.msi"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUI3SlRiUGc4YUM0ZVYzeGs5Q3RDdCtxQlIra1RwVnNHaDNJbzlyOGQ4TzhLenVTcEtiR3dRYmtURHlhbVExZ1o5alNXTXU5MzlPelBMVGRQQkR5R3djPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ4NjMxCWZpbGU6Tm92YWx5XzEuMC45OV94NjRfZW4tVVMubXNpCnBGRjFqSktJUTAvV2lvOW43bFJLbDhuUDR3VGhjMGFtUWwrYXRKZW5LU01qaXU1T3BMdW45NmNmTkZMK1JEOWlrZGNiK09TTlNOOXlDNUNaWG10TkFBPT0K",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_1.0.99_x64_en-US.msi"
     },
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUpscjArMnJ2U3ZGS2VScUpQUHVDbDVGOFJYNWlISEI0d29iUGpUSDNSRHRJMUxBTnBpeXp4TWgvTG9yZWxXV3NVYncxMkpzc1VCaTltK3lPOEJ1QWdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc5MjU0CWZpbGU6Tm92YWx5XzEuMC45N19hbWQ2NC5BcHBJbWFnZQpVbGlORXpyYmhkWnY1WmZlWEpoZVpjdjVodHFPQ0FqWEVXTGNkbVZBbWExWG5TQ2xTU1paSGVoR3oxOUhWVFBYVnVpSDNtWm9vZjF2NzJLMjB3UzhBdz09Cg==",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_1.0.97_amd64.AppImage"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUJMTmVwZFAybWxTSW9LdHlNU2VQZXNqdktsV3h0ZC9xZjE0REx3SFBhdHNXdzNjb1FqTFdhaXk3eDM5SitRSi96eUkvaGNMSDk1ZmNvTXdoNnlnTWdJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ5MDE1CWZpbGU6Tm92YWx5XzEuMC45OV9hbWQ2NC5BcHBJbWFnZQpXYkZ2YzZpL21kalNwWng2UUVjYWgzS1lsbXBMckw5TTZHalIxSTUxZmhiU3VVUnE5MGRoN0pYUVEzSlVXRGRPL0NDRERXRXNnbVdpQUJVcitkelFBdz09Cg==",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_1.0.99_amd64.AppImage"
     },
     "linux-x86_64-appimage": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUpscjArMnJ2U3ZGS2VScUpQUHVDbDVGOFJYNWlISEI0d29iUGpUSDNSRHRJMUxBTnBpeXp4TWgvTG9yZWxXV3NVYncxMkpzc1VCaTltK3lPOEJ1QWdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc5MjU0CWZpbGU6Tm92YWx5XzEuMC45N19hbWQ2NC5BcHBJbWFnZQpVbGlORXpyYmhkWnY1WmZlWEpoZVpjdjVodHFPQ0FqWEVXTGNkbVZBbWExWG5TQ2xTU1paSGVoR3oxOUhWVFBYVnVpSDNtWm9vZjF2NzJLMjB3UzhBdz09Cg==",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_1.0.97_amd64.AppImage"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUJMTmVwZFAybWxTSW9LdHlNU2VQZXNqdktsV3h0ZC9xZjE0REx3SFBhdHNXdzNjb1FqTFdhaXk3eDM5SitRSi96eUkvaGNMSDk1ZmNvTXdoNnlnTWdJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ5MDE1CWZpbGU6Tm92YWx5XzEuMC45OV9hbWQ2NC5BcHBJbWFnZQpXYkZ2YzZpL21kalNwWng2UUVjYWgzS1lsbXBMckw5TTZHalIxSTUxZmhiU3VVUnE5MGRoN0pYUVEzSlVXRGRPL0NDRERXRXNnbVdpQUJVcitkelFBdz09Cg==",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_1.0.99_amd64.AppImage"
     },
     "linux-x86_64-deb": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUF1d2tzZktKR3BJMWRieEh2RXIyRUwxdVhnbG5IL3Bvb1R4aVF3em9hYmIvVlBHd0ZsMk83c2V2Ny9UZ0E1U2ZScFVabmllZ01oVTlLc2lkOEg0UFFJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc5MjU0CWZpbGU6Tm92YWx5XzEuMC45N19hbWQ2NC5kZWIKWG1GaDJkQUxsdUszem9HdUFZT2IzbnpHN1NGTG8wVTdpeDA1a1ZGMzJXUndIemRDV2ZqS1pmc25RakkrRUIzZGxIVkROWWk5UjN2UFp3R1RVT0FwQ3c9PQo=",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly_1.0.97_amd64.deb"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQVBvWkRlcUJYTUpCclNmTFYzc0hjVTR2SUVjWEt2eDFYRnBSQ2F2VEdzUUpQK2RQSFlMVEt2T1JLQVkrVUQvQzZBbnJxK0x1a3o0OUZpeWEza0V1ekFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ5MDE1CWZpbGU6Tm92YWx5XzEuMC45OV9hbWQ2NC5kZWIKUVRtM1ZKb3dYQ2dMM1M1M0tMbW9WaWVmejlPWmhydFdDNW9YUzlsbjdQNkNQZlh5N1lqdHF6T3dNclZjb2ZXRlVjRXBuSXVGRnZYcXphTGhDa0FzQlE9PQo=",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly_1.0.99_amd64.deb"
     },
     "linux-x86_64-rpm": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUk2Wkl2V01HM0dZZkdNWnRhL0hITVpzZmN1Mml6eHc0WmtOY3Z2NGk3UWF5TDdYT2RNU0VSL2FhS29qOUxqZk1vNlR3b1pUUUp1VGZaaFVsY01UakFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxMzc5MjU0CWZpbGU6Tm92YWx5LTEuMC45Ny0xLng4Nl82NC5ycG0Kcy9jbi84aVI0ZW11MGRBbEg5enJES1hpY1MwRTQ0NWJaUnBRTnZFbkQwZkVFZkZDZmh4K2huNWUxVmNXUGRnZDlLNHFXaGxkWWd3Zm1NQmVtdXhyRHc9PQo=",
-      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.97/Novaly-1.0.97-1.x86_64.rpm"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUY2FzblpDdDRlQUdGMVpKV3laSEZLU0E4L2hFSG4rdWhHMzdBd0pQc0dHY1Y3RVc4Nm5tVE4ycDEyOHpCTUZtMnJXR1VuaFA5dU9BamkyemliNXBzd1FqamtXa1loZVFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkxNTQ5MDE1CWZpbGU6Tm92YWx5LTEuMC45OS0xLng4Nl82NC5ycG0KR05WWlNFbmFmV3ZuVkU0VjlFazZRWVBKc0FvMXNiQXAvdnRXMmM5bmNkT09ER2pNV2VvbmJHbk54WDl2WDViSy93SW81RGNNQmNRREd0ZHU5RGJXQ1E9PQo=",
+      "url": "https://github.com/Nonal5/Novaly/releases/download/v1.0.99/Novaly-1.0.99-1.x86_64.rpm"
     }
   }
 }
